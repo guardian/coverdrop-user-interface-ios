@@ -192,14 +192,18 @@ struct InboxView_Previews: PreviewProvider {
     static var previews: some View {
         let privateSendingQueueRepo = initSendingQueue()
         let secretDataRepository = SecretDataRepository.shared
-        secretDataRepository.secretData = try! MessageHelper.loadMessagesFromDeadDrop()
+        if let messages = try? MessageHelper.loadMessagesFromDeadDrop() {
+            secretDataRepository.secretData = messages
+        }
         let viewModel = InboxViewModel(secretDataRepository: secretDataRepository)
         return PreviewWrapper(InboxView(viewModel: viewModel, conversationViewModel: ConversationViewModel()))
     }
 
     static func initSendingQueue() {
         Task {
-            try await PrivateSendingQueueRepository.shared.start()
+            if let coverMesage = try? CoverMessage.getCoverMessage() {
+                try await PrivateSendingQueueRepository.shared.start(coverMessage: coverMesage)
+            }
         }
     }
 }
