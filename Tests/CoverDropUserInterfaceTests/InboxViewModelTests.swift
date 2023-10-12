@@ -8,11 +8,12 @@ import XCTest
 final class InboxViewModelTests: XCTestCase {
     // the hour is the number of hours to add / subtract from noon
     private func testDate(hourFromNoon hour: Int = 0) -> Date {
-        return try! XCTUnwrap(DateComponents(calendar: .current,
-                                             year: 2023,
-                                             month: 05,
-                                             day: 01,
-                                             hour: 12 + hour).date) // `hour`on May 1st
+        if let date = try? XCTUnwrap(DateComponents(calendar: .current,
+                                                    year: 2023,
+                                                    month: 05,
+                                                    day: 01,
+                                                    hour: 12 + hour).date) // `hour`on May 1st
+        { return date } else { return Date() }
     }
 
     private static let recipients = try! MessageRecipients(verifiedPublicKeys: PublicKeysHelper.shared.testKeys, excludingDefaultRecipient: false)
@@ -37,9 +38,9 @@ final class InboxViewModelTests: XCTestCase {
 
         let privateSendingQueueSecret = try PrivateSendingQueueSecret.fromSecureRandom()
         // GIVEN a mailbox with no messages
-        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(recipient: firstTestJournalist,
-                                                                                         messageText: messageText,
-                                                                                         dateSent: testDate(), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
+        let recentOutboundMessage = try Message.outboundMessage(message: OutboundMessageData(recipient: firstTestJournalist,
+                                                                                             messageText: messageText,
+                                                                                             dateSent: testDate(), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
         // WHEN when finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: [recentOutboundMessage])
 

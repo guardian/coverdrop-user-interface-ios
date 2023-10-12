@@ -178,7 +178,8 @@ class InboxViewModel: ObservableObject {
 
         let inactiveMailbox = mailboxRemovingOutbound?.filter {
             if case let .incomingMessage(message: message) = $0,
-               message.sender == activeMessage.sender {
+               message.sender == activeMessage.sender
+            {
                 return false
             }
             return true
@@ -219,11 +220,15 @@ class InboxViewModel: ObservableObject {
     ///     to change their mind after sending a message.
     ///
     public func deleteAllMessagesAndCurrentSession() async throws {
+        let publicDataRepository = PublicDataRepository.shared
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
             unlockedSecretData.messageMailbox = []
             try await secretDataRepository.lock(data: unlockedSecretData, withSecureEnclave: SecureEnclave.isAvailable)
             try await EncryptedStorage.createInitialStorageWithRandomPassphrase(withSecureEnclave: SecureEnclave.isAvailable)
-            try await PrivateSendingQueueRepository.shared.wipeQueue()
+
+            if let coverMesage = try? CoverMessage.getCoverMessage() {
+                try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessage: coverMesage)
+            }
         }
     }
 }
