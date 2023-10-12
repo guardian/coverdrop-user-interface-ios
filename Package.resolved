@@ -3,10 +3,10 @@
     {
       "identity" : "coverdrop-core-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/guardian/coverdrop-core-ios/",
+      "location" : "https://github.com/guardian/coverdrop-core-ios",
       "state" : {
         "branch" : "main",
-        "revision" : "1601945542a8f98deae2cca4a36f2184dc6c2e33"
+        "revision" : "95512a9960cfa4760b53b756eea703e2f989311b"
       }
     },
     {

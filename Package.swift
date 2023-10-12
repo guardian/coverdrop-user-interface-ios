@@ -23,14 +23,14 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "CoverDropUserInterface",
-            dependencies: ["CoverDropCore", "SVGView", .product(name: "CoverDropCore", package: "coverdrop-core-ios")],
+            dependencies: [.product(name: "CoverDropCore", package: "coverdrop-core-ios"), "SVGView"],
             resources: [
                 .process("Resources/Icons")
             ]
         ),
         .testTarget(
             name: "CoverDropUserInterfaceTests",
-            dependencies: ["CoverDropUserInterface", "SVGView", "CoverDropCore", .product(name: "CoverDropCore", package: "coverdrop-core-ios")]
+            dependencies: ["CoverDropUserInterface", "SVGView", .product(name: "CoverDropCore", package: "coverdrop-core-ios")]
         )
     ]
 )
