@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "fonts",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/guardian/fonts.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "b728562a7e53dadd399d3334fc4923a1cecc2b66"
-      }
-    },
-    {
       "identity" : "gzipswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/1024jp/GzipSwift",
