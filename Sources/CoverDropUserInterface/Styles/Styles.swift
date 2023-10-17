@@ -1,4 +1,5 @@
 import Foundation
+import GuardianFonts
 import SwiftUI
 
 struct Padding {
@@ -430,7 +431,7 @@ private struct RecipientListItemStyle: ViewModifier {
 enum SegmentedControlAppearance {
     static func setup() {
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.SegmentedControlAppearance.selectedSegmentTintColor)
-        guard let font = UIFont(name: CoverDropFonts.GuardianFontStyle.textSansBold.fontName,
+        guard let font = UIFont(name: GuardianFontStyle.textSansBold.fontName,
                                 size: FontSize.segmentedControlText) else { return }
         let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor(Color.SegmentedControlAppearance.textForegroundColor),
                               NSAttributedString.Key.font: font]
