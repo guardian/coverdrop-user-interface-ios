@@ -1,6 +1,5 @@
 import CoverDropCore
 import CryptoKit
-import GuardianFonts
 import SwiftUI
 
 struct InboxView: View {

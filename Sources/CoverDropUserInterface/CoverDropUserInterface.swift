@@ -1,14 +1,9 @@
 import Foundation
-import GuardianFonts
 import SwiftUI
 
 public enum CoverDropUserInterface {
     public static func application(_: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier) -> Bool {
         return extensionPointIdentifier != .keyboard
-    }
-
-    public static func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) {
-        GuardianFonts.registerFonts()
     }
 
     public static func applicationDidEnterBackground(_ window: UIWindow?, coverProvider: AppSwitchingCoverProvider) {
