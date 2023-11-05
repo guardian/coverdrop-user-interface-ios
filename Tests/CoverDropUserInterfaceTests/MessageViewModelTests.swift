@@ -44,7 +44,7 @@ final class MessageViewModelTests: XCTestCase {
         let shortTopic = "This will be an incredibly long topic."
         sut.topic = shortTopic
 
-        for _ in 1 ... 2000 {
+        for _ in 1 ... 6000 {
             sut.topic.append(contentsOf: shortTopic)
         }
 
@@ -64,7 +64,7 @@ final class MessageViewModelTests: XCTestCase {
         let shortMessage = "This will be an incredibly long message."
         sut.message = shortMessage
 
-        for _ in 1 ... 2000 {
+        for _ in 1 ... 6000 {
             sut.message.append(contentsOf: shortMessage)
         }
 

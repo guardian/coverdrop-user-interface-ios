@@ -54,7 +54,11 @@ struct MessageData {
             return data.messageMailbox.filter { message in
                 switch message {
                 case let .incomingMessage(message: messageData):
-                    return messageData.sender == messageRecipient
+                    if case let .textMessage(message: incomingMessage) = messageData {
+                        return incomingMessage.sender == messageRecipient
+                    } else {
+                        return false
+                    }
                 case let .outboundMessage(message: messageData):
                     return messageData.recipient == messageRecipient
                 }

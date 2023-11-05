@@ -12,10 +12,16 @@ public struct ActiveConversation: Equatable {
         return messages.contains(where: { message in
             switch message {
             case let .incomingMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case .expiring:
-                    return true
-                case .pendingOrSent:
+                switch messageData {
+                case let .textMessage(message: incomingMessageData):
+                    switch incomingMessageData.expiredStatus {
+                    case .expiring:
+                        return true
+                    case .pendingOrSent:
+                        return false
+                    }
+
+                case let .handoverMessage(message: handover):
                     return false
                 }
             case let .outboundMessage(message: messageData):
@@ -33,10 +39,15 @@ public struct ActiveConversation: Equatable {
         if let lastMessage = messages.sorted(by: >).last {
             switch lastMessage {
             case let .incomingMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case let .expiring(time: expiringTime):
-                    return expiringTime
-                case .pendingOrSent:
+                switch messageData {
+                case let .textMessage(message: incomingMessageData):
+                    switch incomingMessageData.expiredStatus {
+                    case let .expiring(time: expiringTime):
+                        return expiringTime
+                    case .pendingOrSent:
+                        return nil
+                    }
+                case .handoverMessage(message: _):
                     return nil
                 }
             case let .outboundMessage(message: messageData):
@@ -64,10 +75,16 @@ public struct InactiveConversation: Equatable {
         return messages.contains(where: { message in
             switch message {
             case let .incomingMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case .expiring:
-                    return true
-                case .pendingOrSent:
+                switch messageData {
+                case let .textMessage(message: incomingMessageData):
+                    switch incomingMessageData.expiredStatus {
+                    case .expiring:
+                        return true
+                    case .pendingOrSent:
+                        return false
+                    }
+
+                case let .handoverMessage(message: handover):
                     return false
                 }
             case let .outboundMessage(message: messageData):
@@ -85,10 +102,15 @@ public struct InactiveConversation: Equatable {
         if let lastMessage = messages.sorted(by: >).last {
             switch lastMessage {
             case let .incomingMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case let .expiring(time: expiringTime):
-                    return expiringTime
-                case .pendingOrSent:
+                switch messageData {
+                case let .textMessage(message: incomingMessageData):
+                    switch incomingMessageData.expiredStatus {
+                    case let .expiring(time: expiringTime):
+                        return expiringTime
+                    case .pendingOrSent:
+                        return nil
+                    }
+                case .handoverMessage(message: _):
                     return nil
                 }
             case let .outboundMessage(message: messageData):
@@ -157,10 +179,14 @@ class InboxViewModel: ObservableObject {
         // 2. Find most recent message from remaining message (this will identify the active conversation)
         guard let mostRecentMessage = mailboxRemovingOutbound?.sorted(by: >).first else { return nil }
 
-        if case let .incomingMessage(message: message) = mostRecentMessage {
-            let allMessagesInConversation = messagesForRecipient(recipient: message.sender, mailbox: mailbox)
-            return ActiveConversation(recipient: message.sender,
-                                      lastMessageUpdated: message.dateReceived, messages: allMessagesInConversation)
+        if case let .incomingMessage(message: incomingMessageType) = mostRecentMessage {
+            if case let .textMessage(message: incomingMessage) = incomingMessageType {
+                let allMessagesInConversation = messagesForRecipient(recipient: incomingMessage.sender, mailbox: mailbox)
+                return ActiveConversation(recipient: incomingMessage.sender,
+                                          lastMessageUpdated: incomingMessage.dateReceived, messages: allMessagesInConversation)
+            } else {
+                return nil
+            }
         }
         return nil
     }
@@ -174,10 +200,14 @@ class InboxViewModel: ObservableObject {
         }
 
         // 2. Remove messages from the active message recipient
-        guard case let .incomingMessage(activeMessage) = mailboxRemovingOutbound?.sorted(by: >).first else { return nil }
+        guard case let .incomingMessage(incomingMessage) = mailboxRemovingOutbound?.sorted(by: >).first else { return nil }
+        guard case let .textMessage(activeMessage) = incomingMessage else {
+            return nil
+        }
 
         let inactiveMailbox = mailboxRemovingOutbound?.filter {
-            if case let .incomingMessage(message: message) = $0,
+            if case let .incomingMessage(message: incomingMessageType) = $0,
+               case let .textMessage(message) = incomingMessageType,
                message.sender == activeMessage.sender
             {
                 return false
@@ -188,8 +218,11 @@ class InboxViewModel: ObservableObject {
 
         // 3. Find the remaining recipients
         let recipients: [JournalistKeyData] = inactiveMailbox.compactMap {
-            guard case let .incomingMessage(message: message) = $0 else { return nil }
-            return message.sender
+            guard case let .incomingMessage(message: incomingMessageType) = $0 else { return nil }
+            guard case let .textMessage(activeMessage) = incomingMessageType else {
+                return nil
+            }
+            return activeMessage.sender
         }
 
         // 4. Return an array of inactive threads, in no particular order
@@ -206,7 +239,11 @@ class InboxViewModel: ObservableObject {
                 return outbound.recipient == recipient
 
             case let .incomingMessage(message: incoming):
-                return incoming.sender == recipient
+                if case let .textMessage(message: incomingMessageData) = incoming {
+                    return incomingMessageData.sender == recipient
+                } else {
+                    return false
+                }
             }
         } ?? []
     }

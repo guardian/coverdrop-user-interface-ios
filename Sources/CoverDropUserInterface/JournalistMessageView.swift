@@ -85,10 +85,14 @@ struct JournalistMessageView: View {
                                 // We have a seperate view for incoming and outbound messages
                                 // because outbound messages have message statuses which cannot be observed
                                 // when inside an enum
-                                case let .outboundMessage(message: message):
-                                    OutboundMessageView(outboundMessage: message, id: index)
-                                case let .incomingMessage(message: message):
-                                    IncomingMessageView(message: message, id: index)
+                                case let .incomingMessage(message: incomingMessage):
+                                    if case let .textMessage(message: incomingTextMessage) = incomingMessage {
+                                        IncomingMessageView(message: incomingTextMessage, id: index)
+                                    } else {
+                                        EmptyView()
+                                    }
+                                case let .outboundMessage(message: outboundMessage):
+                                    OutboundMessageView(outboundMessage: outboundMessage, id: index)
                                 }
                             }.onChange(of: data.messageMailbox.count) { _ in
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
