@@ -1,9 +1,11 @@
+import CoverDropCore
 import Foundation
 import SVGView
 import SwiftUI
 
 struct StartCoverDropSessionView: View {
     @ObservedObject var navigation = Navigation.shared
+    @ObservedObject var coverDropService: CoverDropServices = .shared
 
     /// Controls whether the alert is shown before starting a new conversation
     @State private var showingNewMessageAlert = false
@@ -17,47 +19,58 @@ struct StartCoverDropSessionView: View {
     var body: some View {
         NavigationView {
             HeaderView(type: .home) {
-                VStack(alignment: .leading) {
-                    titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
+                if coverDropService.isReady {
+                    VStack(alignment: .leading) {
+                        titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
 
-                    Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras condimentum, massa id interdum luctus, lacus velit pulvinar enim, eu malesuada metus turpis eu quam. Nunc augue magna, sodales a scelerisque eget, interdum vitae leo. Aliquam nec elementum lacus, a accumsan purus.").textStyle(BodyStyle())
+                        Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras condimentum, massa id interdum luctus, lacus velit pulvinar enim, eu malesuada metus turpis eu quam. Nunc augue magna, sodales a scelerisque eget, interdum vitae leo. Aliquam nec elementum lacus, a accumsan purus.").textStyle(BodyStyle())
 
-                    Spacer()
+                        Spacer()
 
-                    Button("Start a new conversation") {
-                        showingNewMessageAlert = true
-                    }
-                    .disabled(!viewModel.keysAvailable)
-                    .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.keysAvailable))
-                    .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
-                        Button("Yes, start conversation") {
-                            navigation.destination = .onboarding
-                            viewModel.viewHidden()
+                        Button("Start a new conversation") {
+                            showingNewMessageAlert = true
                         }
-                        Button("Cancel", role: .cancel) {}
-                    }, message: {
-                        Text("This will remove any existing messages from your secure inbox. Do you want to continue?")
-                    })
+                        .disabled(!viewModel.keysAvailable)
+                        .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.keysAvailable))
+                        .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
+                            Button("Yes, start conversation") {
+                                navigation.destination = .onboarding
+                                viewModel.viewHidden()
+                            }
+                            Button("Cancel", role: .cancel) {}
+                        }, message: {
+                            Text("This will remove any existing messages from your secure inbox. Do you want to continue?")
+                        })
 
-                    Button("Check your inbox") {
-                        navigation.destination = .login
-                        viewModel.viewHidden()
-                    }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
+                        Button("Check your inbox") {
+                            navigation.destination = .login
+                            viewModel.viewHidden()
+                        }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
 
-                }.padding(Padding.large)
-                    .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+                    }.padding(Padding.large)
+                        .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
 
-                customDivider()
+                    customDivider()
 
-                HStack {
-                    Button("About CoverDrop") {
-                        navigation.destination = .about
-                        viewModel.viewHidden()
-                    }.buttonStyle(FooterButtonStyle())
-                    Button("Privacy policy") {
-                        navigation.destination = .privacy
-                        viewModel.viewHidden()
-                    }.buttonStyle(FooterButtonStyle())
+                    HStack {
+                        Button("About CoverDrop") {
+                            navigation.destination = .about
+                            viewModel.viewHidden()
+                        }.buttonStyle(FooterButtonStyle())
+                        Button("Privacy policy") {
+                            navigation.destination = .privacy
+                            viewModel.viewHidden()
+                        }.buttonStyle(FooterButtonStyle())
+                    }
+                } else {
+                    VStack {
+                        Spacer()
+                        Text("Loading...").textStyle(TitleStyle()).font(Font.headline.leading(.loose))
+                        ProgressView().progressViewStyle(.circular).foregroundColor(.white)
+                        Spacer()
+
+                    }.padding(10)
+                        .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
                 }
             }
         }

@@ -258,12 +258,14 @@ class InboxViewModel: ObservableObject {
     ///
     public func deleteAllMessagesAndCurrentSession() async throws {
         let publicDataRepository = PublicDataRepository.shared
-        if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
+        if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData,
+           let verifiedPublicKeys = publicDataRepository.verifiedPublicKeysData
+        {
             unlockedSecretData.messageMailbox = []
             try await secretDataRepository.lock(data: unlockedSecretData, withSecureEnclave: SecureEnclave.isAvailable)
             try await EncryptedStorage.createInitialStorageWithRandomPassphrase(withSecureEnclave: SecureEnclave.isAvailable)
 
-            if let coverMesage = try? CoverMessage.getCoverMessage() {
+            if let coverMesage = try? CoverMessage.getCoverMessage(verifiedPublicKeys: verifiedPublicKeys) {
                 try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessage: coverMesage)
             }
         }

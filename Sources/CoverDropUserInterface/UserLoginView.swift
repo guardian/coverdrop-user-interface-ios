@@ -99,7 +99,7 @@ struct UserLoginView_Previews: PreviewProvider {
 extension UserLoginView {
     class UserLoginViewModel: ObservableObject {
         enum State {
-            case inital, errorIncorrectWords, errorUnableToUnlock
+            case inital, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
         }
 
         public static let passphraseLength = SecureEnclave.isAvailable ? ApplicationConfig.config.passphraseLowWordCount : ApplicationConfig.config.passphraseHighWordCount
@@ -120,7 +120,12 @@ extension UserLoginView {
                     return
                 }
 
-                let unlocked = try await secretDataRepository.unlock(passphrase: validPassphrase)
+                guard let key = try? await SecureEnclavePrivateKey.loadKey(name: EncryptedStorage.fileName) else {
+                    state = .errorSecureStorageNotInitialised
+                    return
+                }
+
+                let unlocked = try await secretDataRepository.unlock(passphrase: validPassphrase, key: key)
 
                 if unlocked {
                     passphrase = UserLoginView.passphraseArray()

@@ -86,7 +86,8 @@ struct OutboundMessageView_Previews: PreviewProvider {
 
     static func initSendingQueue() {
         Task {
-            if let coverMesage = try? CoverMessage.getCoverMessage() {
+            let verifiedPublicKeys = PublicKeysHelper.shared.testKeys
+            if let coverMesage = try? CoverMessage.getCoverMessage(verifiedPublicKeys: verifiedPublicKeys) {
                 try await PrivateSendingQueueRepository.shared.start(coverMessage: coverMesage)
             }
         }
