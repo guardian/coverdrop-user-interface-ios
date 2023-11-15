@@ -10,13 +10,15 @@ struct JournalistMessageView: View {
     @ObservedObject var inboxViewModel = InboxViewModel()
     @ObservedObject var navigation = Navigation.shared
     @StateObject var messageViewModel: ConversationViewModel
+    var config: ConfigType?
 
     // by default we want to make the user have to choose to send another message
     @State var alreadySentMessage: Bool = false
 
     var journalist: JournalistKeyData
 
-    init(journalist: JournalistKeyData, viewModel: ConversationViewModel) {
+    init(journalist: JournalistKeyData, viewModel: ConversationViewModel, config: ConfigType? = PublicDataRepository.appConfig) {
+        self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
         UIScrollView.appearance().backgroundColor = UIColor(Color.JournalistNewMessageView.scrollviewBackgroundColor)
@@ -49,10 +51,12 @@ struct JournalistMessageView: View {
                     } else {
                         if let messageRecipient = self.messageViewModel.messageRecipient,
                            let key = messageRecipient.getMessageKey(),
-                           let config = PublicDataRepository.appConfig
+                           let config = config
                         {
-                            if key.isExpired(now: config.currentTime()) {
+                            if key.isExpired(now: config.currentKeysPublishedTime()) {
                                 expiredKeysMessage(recipent: messageRecipient)
+                            } else if alreadySentMessage {
+                                messageSendView()
                             } else {
                                 chooseToSentAnotherMessage()
                             }
@@ -60,7 +64,7 @@ struct JournalistMessageView: View {
                             messageSendView()
                         }
                     }
-                }.padding(Padding.medium)
+                }
             }
             .navigationBarTitle("Secure chat with \(journalist.displayName)", displayMode: .inline)
             .navigationBarHidden(true)
@@ -108,7 +112,7 @@ struct JournalistMessageView: View {
                 }
             }.padding(Padding.medium)
                 .background(Color.JournalistNewMessageView.messageListBackgroundColor)
-                .foregroundColor(Color.JournalistNewMessageView.messageListForegroudnColor)
+                .foregroundColor(Color.JournalistNewMessageView.messageListForegroundColor)
             // This spacer keeps the middle pane in full height
             Spacer()
         }
@@ -122,21 +126,27 @@ struct JournalistMessageView: View {
             }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
                 .accessibilityLabel("Send a new message")
         }.foregroundColor(Color.ComposeMessageTextStyle.foregroundColor)
+            .padding(Padding.medium)
     }
 
     func viewingInactiveConversation() -> some View {
-        return InformationView(viewType: .info, title: "This conversation has been closed", message: "Go to your active conversation to send a message.")
+        return InformationView(viewType: .info, title: "This conversation has been closed", message: "Go to your active conversation to send a message.").padding(Padding.medium)
     }
 
     func expiredKeysMessage(recipent: JournalistKeyData) -> some View {
         return InformationView(viewType: .info, title: "\(recipent.displayName) is currently unavailable.", message: "Check your internet connection or try again later.")
+            .padding(Padding.medium)
     }
 
     func messageSendView() -> some View {
         return VStack {
+            messageLengthView()
             TextEditor(text: $messageViewModel.message)
                 .style(ComposeMessageTextStyle())
-                .frame(minHeight: 60, maxHeight: 60)
+                .frame(minHeight: 60, maxHeight: 80)
+                .padding(Padding.medium)
+                .accessibilityLabel("Compose your message")
+
             Button("Send") {
                 Task {
                     try? await messageViewModel.sendMessage()
@@ -144,7 +154,30 @@ struct JournalistMessageView: View {
                 }
             }.disabled(messageViewModel.sendButtonDisabled)
                 .buttonStyle(PrimaryButtonStyle(isDisabled: messageViewModel.sendButtonDisabled))
+                .padding([.horizontal], Padding.medium)
         }
+    }
+
+    func messageLengthView() -> some View {
+        return VStack {
+            switch messageViewModel.messageLengthProgressPercentage {
+            case let .success(percentage):
+                ProgressView(value: percentage, total: 100)
+                    .progressViewStyle(LinearProgressViewStyle(tint: Color.ProgressBarStyle.fillingColor))
+            case let .failure(errorType):
+                switch errorType {
+                case .invalidCharacter:
+                    Text("You've entered an invalid character")
+                case .textTooLong:
+                    Text("Message limit reached")
+                    Text("Please shorten your message")
+                    ProgressView(value: 100, total: 100)
+                        .progressViewStyle(LinearProgressViewStyle(tint: Color.ProgressBarStyle.fullColor))
+                case .compressionFailed, .unknownError:
+                    Text("Message error, please try again later")
+                }
+            }
+        }.foregroundColor(Color.JournalistNewMessageView.messageListForegroundColor)
     }
 
     private func scrollToLastMessage(scrollViewProxy: ScrollViewProxy) {
@@ -162,12 +195,13 @@ struct JournalistMessageView: View {
 
 struct JournalistMessageView_Previews: PreviewProvider {
     @MainActor struct Container: View {
+        let previewConfig = ConfigType.devConfig
         @State var viewModel = getViewModel(recipient: PublicKeysHelper.shared.testDefaultJournalist!)
         @State var anotherViewModel = getViewModel(recipient: PublicKeysHelper.shared.getTestDesk!)
         let privateSendingQueueRepo = initSendingQueue()
 
         @MainActor var body: some View {
-            JournalistMessageView(journalist: PublicKeysHelper.shared.testDefaultJournalist!, viewModel: viewModel)
+            JournalistMessageView(journalist: PublicKeysHelper.shared.testDefaultJournalist!, viewModel: viewModel, config: previewConfig)
             JournalistMessageView(journalist: PublicKeysHelper.shared.getTestDesk!, viewModel: anotherViewModel)
         }
     }

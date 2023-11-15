@@ -457,7 +457,6 @@ struct ComposeMessageTextStyle: ViewModifier {
                 .scrollContentBackground(Visibility.hidden)
                 .background(Color.ComposeMessageTextStyle.backgroundColor)
                 .font(.textSansRegular, size: FontSize.textField)
-                .padding(.top, Padding.small)
                 .background(
                     RoundedRectangle(cornerRadius: CornerRadius.small)
                         .stroke(Color.ComposeMessageTextStyle.strokeColor, lineWidth: 1)

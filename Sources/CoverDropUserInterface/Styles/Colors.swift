@@ -100,6 +100,11 @@ extension Color {
         static let foregroundColor = GuardianColor.neutral100
     }
 
+    enum ProgressBarStyle {
+        static let fillingColor = GuardianColor.brandAlt400
+        static let fullColor = GuardianColor.error500
+    }
+
     enum ComposeMessageTextStyle {
         static let backgroundColor = GuardianColor.specialReport200
         static let strokeColor = GuardianColor.specialReport400
@@ -156,7 +161,7 @@ extension Color {
         static let textEditorBackgroundColor = GuardianColor.specialReport200
         static let textEditorStrokeColor = GuardianColor.neutral100
         static let messageListBackgroundColor = GuardianColor.investigationsBase
-        static let messageListForegroudnColor = GuardianColor.neutral100
+        static let messageListForegroundColor = GuardianColor.neutral100
         static let messageViewCurrentUserColor = GuardianColor.specialReport200
         static let messageViewUnselectedUserColor = GuardianColor.specialReport200
         static let tickIconColor = GuardianColor.green500

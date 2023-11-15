@@ -1,5 +1,10 @@
 import CoverDropCore
+import Gzip
 import SwiftUI
+
+enum MessageComposeError: Error {
+    case textTooLong, invalidCharacter, compressionFailed, unknownError
+}
 
 struct MessageData {
     var isCurrentUser: Bool
@@ -121,13 +126,13 @@ struct MessageData {
         }
     }
 
-    // We want to disable the send button when the message box is empty or we are in the sending state
+    // We want to disable the send button when the message box is empty, too long or we are in the sending state
     var sendButtonDisabled: Bool {
         switch state {
         case .sending:
             return false
         case _:
-            return message.isEmpty
+            return message.isEmpty || messageIsTooLong
         }
     }
 
@@ -139,6 +144,31 @@ struct MessageData {
             return true
         } catch {
             return false
+        }
+    }
+
+    /// Get the compressed size of the current message, if its greater than zero
+    /// return this as a percentage of the total padded message length
+    /// otherwise return 0
+    var messageLengthProgressPercentage: Result<Double, MessageComposeError> {
+        let padToSize = Constants.messagePaddingLen
+        do {
+            let (_, compressedSize) = try PaddedCompressedString.compressCheckingLength(from: message)
+            // Check the size is greater than 0 to avoid returning `Infinity`
+            if compressedSize > 0 {
+                let percentage = Double(compressedSize) / Double(padToSize) * 100
+                return .success(percentage)
+            } else {
+                return .success(0)
+            }
+        } catch PaddedCompressedStringError.compressedStringTooLong {
+            return .failure(MessageComposeError.textTooLong)
+        } catch PaddedCompressedStringError.invaidUTF8StringConversion {
+            return .failure(MessageComposeError.invalidCharacter)
+        } catch is GzipError {
+            return .failure(MessageComposeError.compressionFailed)
+        } catch {
+            return .failure(MessageComposeError.unknownError)
         }
     }
 
