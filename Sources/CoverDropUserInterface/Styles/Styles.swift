@@ -194,6 +194,14 @@ struct PassphraseTextStyle: ViewModifier {
     }
 }
 
+struct MonoSpacedStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        return content
+            .font(.system(.body, design: .monospaced))
+            .padding(Padding.large)
+    }
+}
+
 struct SelectRecipientTextStyle: ViewModifier {
     func body(content: Content) -> some View {
         return content

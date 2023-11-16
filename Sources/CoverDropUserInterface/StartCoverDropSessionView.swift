@@ -6,11 +6,11 @@ import SwiftUI
 struct StartCoverDropSessionView: View {
     @ObservedObject var navigation = Navigation.shared
     @ObservedObject var coverDropService: CoverDropServices = .shared
+    @ObservedObject private var viewModel = StartCoverDropSessionViewModel()
+    @ObservedObject private var publicDataRepository = PublicDataRepository.shared
 
     /// Controls whether the alert is shown before starting a new conversation
     @State private var showingNewMessageAlert = false
-
-    @ObservedObject private var viewModel = StartCoverDropSessionViewModel()
 
     init() {
         UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).adjustsFontSizeToFitWidth = true
@@ -27,40 +27,52 @@ struct StartCoverDropSessionView: View {
 
                         Spacer()
 
-                        Button("Start a new conversation") {
-                            showingNewMessageAlert = true
-                        }
-                        .disabled(!viewModel.keysAvailable)
-                        .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.keysAvailable))
-                        .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
-                            Button("Yes, start conversation") {
-                                navigation.destination = .onboarding
-                                viewModel.viewHidden()
+                        if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
+                           coverDropServiceStatus.isAvailable == false
+                        {
+                            VStack {
+                                Text("The SecureMessaging feature is currently not available. Please try again later. Below we show technical information that might be helpful.")
+                                Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
                             }
-                            Button("Cancel", role: .cancel) {}
-                        }, message: {
-                            Text("This will remove any existing messages from your secure inbox. Do you want to continue?")
-                        })
 
-                        Button("Check your inbox") {
-                            navigation.destination = .login
-                            viewModel.viewHidden()
-                        }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
+                        } else {
+                            Button("Start a new conversation") {
+                                showingNewMessageAlert = true
+                            }
+                            .disabled(!viewModel.keysAvailable)
+                            .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.keysAvailable))
+                            .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
+                                Button("Yes, start conversation") {
+                                    navigation.destination = .onboarding
+                                    viewModel.viewHidden()
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            }, message: {
+                                Text("This will remove any existing messages from your secure inbox. Do you want to continue?")
+                            })
+
+                            Button("Check your inbox") {
+                                navigation.destination = .login
+                                viewModel.viewHidden()
+                            }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
+                        }
 
                     }.padding(Padding.large)
                         .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
 
-                    customDivider()
-
-                    HStack {
-                        Button("About CoverDrop") {
-                            navigation.destination = .about
-                            viewModel.viewHidden()
-                        }.buttonStyle(FooterButtonStyle())
-                        Button("Privacy policy") {
-                            navigation.destination = .privacy
-                            viewModel.viewHidden()
-                        }.buttonStyle(FooterButtonStyle())
+                    if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
+                       coverDropServiceStatus.isAvailable
+                    { customDivider()
+                        HStack {
+                            Button("About CoverDrop") {
+                                navigation.destination = .about
+                                viewModel.viewHidden()
+                            }.buttonStyle(FooterButtonStyle())
+                            Button("Privacy policy") {
+                                navigation.destination = .privacy
+                                viewModel.viewHidden()
+                            }.buttonStyle(FooterButtonStyle())
+                        }
                     }
                 } else {
                     VStack {
@@ -84,7 +96,33 @@ struct StartCoverDropSessionView: View {
 }
 
 struct StartCoverDropSessionView_Previews: PreviewProvider {
+    @MainActor struct Container: View {
+        let setup = setupView()
+
+        @MainActor var body: some View {
+            let available = setAvailabe()
+            PreviewWrapper(StartCoverDropSessionView())
+            let unavailable = setUnavailabe()
+            PreviewWrapper(StartCoverDropSessionView())
+        }
+    }
+
+    public static func setAvailabe() {
+        PublicDataRepository.shared.coverDropServiceStatus = StatusData(status: .available, description: "Service is available", timestamp: RFC3339DateTimeString(date: Date()), isAvailable: true)
+    }
+
+    public static func setUnavailabe() {
+        PublicDataRepository.shared.coverDropServiceStatus = StatusData(status: .noInformation, description: "Service is unavailable", timestamp: RFC3339DateTimeString(date: Date()), isAvailable: false)
+    }
+
+    public static func setupView() {
+        PublicDataRepository.setup(ConfigType.devConfig)
+        PublicDataRepository.shared.areKeysAvailable = true
+        CoverDropServices.shared.isReady = true
+        PublicDataRepository.shared.coverDropServiceStatus = StatusData(status: .available, description: "", timestamp: RFC3339DateTimeString(date: Date()), isAvailable: true)
+    }
+
     static var previews: some View {
-        return PreviewWrapper(StartCoverDropSessionView())
+        Container()
     }
 }
