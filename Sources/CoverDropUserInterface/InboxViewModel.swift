@@ -265,8 +265,8 @@ class InboxViewModel: ObservableObject {
             try await secretDataRepository.lock(data: unlockedSecretData, withSecureEnclave: SecureEnclave.isAvailable)
             try await EncryptedStorage.createInitialStorageWithRandomPassphrase(withSecureEnclave: SecureEnclave.isAvailable)
 
-            if let coverMesage = try? CoverMessage.getCoverMessage(verifiedPublicKeys: verifiedPublicKeys) {
-                try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessage: coverMesage)
+            if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
+                try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory: coverMessageFactory)
             }
         }
     }
