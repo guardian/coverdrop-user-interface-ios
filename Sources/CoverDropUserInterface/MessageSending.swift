@@ -21,8 +21,7 @@ extension MessageSending {
     func sendMessage(_ message: String,
                      to recipient: JournalistKeyData,
                      verifiedPublicKeys: VerifiedPublicKeys,
-                     secretDataRepository: SecretDataRepository, dateSent: Date) async throws
-    {
+                     secretDataRepository: SecretDataRepository, dateSent: Date) async throws {
         // add the current message to the private sending queue and
         // secret Data Repository
         switch await secretDataRepository.secretData {

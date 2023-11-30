@@ -8,32 +8,32 @@ struct NewMessageView: View {
     @State var isSelectRecipientViewOpen = false
     @State private var showingDismissalAlert = false
     var isInboxEmpty: Bool
-    
+
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping will allow us to fail fast in the case of developer error.
     @StateObject var viewModel: ConversationViewModel
-    
+
     init(viewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
         UITextView.appearance().backgroundColor = .clear
         self.isInboxEmpty = inboxIsEmpty
-        
+
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
         switch viewModel.state {
-            case .initial, .loading, .sending:
-                ProgressView()
-            case .ready:
-                newMessage()
-            case let .error(error):
-                Text("Error: \(error)")
+        case .initial, .loading, .sending:
+            ProgressView()
+        case .ready:
+            newMessage()
+        case let .error(error):
+            Text("Error: \(error)")
         }
     }
-    
+
     private func newMessage() -> some View {
         HeaderView(type: .home,
                    dismissAction: {
-                       showingDismissalAlert = true
+                    showingDismissalAlert = true
                    }) {
             ScrollView {
                 VStack(alignment: .leading) {
@@ -48,7 +48,7 @@ struct NewMessageView: View {
                         Text("Change the recipient if you know which desk or journalist you’d like to contact.")
                             .textStyle(BodyStyle())
                     }
-                    
+
                     ZStack(alignment: .trailing) {
                         if let messageRecipient = viewModel.messageRecipient {
                             Text("\(messageRecipient.displayName)")
@@ -95,22 +95,22 @@ struct NewMessageView: View {
                 .alert("Leaving your inbox",
                        isPresented: $showingDismissalAlert,
                        actions: {
-                           Button("Yes, I want to leave") {
-                               Task {
-                                   if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                                       navigation.destination = .inbox
-                                       try await SecretDataRepository.shared.lock(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
-                                   }
-                               }
-                           }
-                           Button("Cancel", role: .cancel) {}
+                        Button("Yes, I want to leave") {
+                            Task {
+                                if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                                    navigation.destination = .inbox
+                                    try await SecretDataRepository.shared.lock(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
+                                }
+                            }
+                        }
+                        Button("Cancel", role: .cancel) {}
                        }, message: {
-                           Text("You will be leaving your secure inbox and your message will not be sent.\n Do you want to continue?")
+                        Text("You will be leaving your secure inbox and your message will not be sent.\n Do you want to continue?")
                        })
             }
         }
     }
-    
+
     @ViewBuilder
     func messageSend() -> some View {
         Spacer()
@@ -149,7 +149,7 @@ struct NewMessageView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     func messageCompose() -> some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -173,7 +173,7 @@ struct NewMessageView: View {
             .style(ComposeMessageTextStyle())
             .accessibilityIdentifier("Compose your message")
             .frame(height: 140)
-        
+
         Spacer()
     }
 }
@@ -182,20 +182,20 @@ struct NewMessageView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewWrapper(NewMessageView(viewModel: viewModel()))
     }
-    
+
     private static func viewModel() -> ConversationViewModel {
         return ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
     }
-    
+
     private static func viewModelWithALongMessage() -> ConversationViewModel {
         let viewModel = viewModel()
         let shortMessage = "This will be an incredibly long message."
         viewModel.message = shortMessage
-        
+
         for _ in 1 ... 2000 {
             viewModel.message.append(contentsOf: shortMessage)
         }
-        
+
         return viewModel
     }
 }

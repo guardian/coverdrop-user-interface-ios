@@ -13,8 +13,7 @@ struct HeaderView<Content: View>: View {
 
     init(type: Destination,
          dismissAction: (() -> Void)? = nil,
-         @ViewBuilder _ content: () -> Content)
-    {
+         @ViewBuilder _ content: () -> Content) {
         self.content = content()
         self.type = type
         self.dismissAction = dismissAction

@@ -1,4 +1,4 @@
-// 
+//
 // This file will eventually be removed once the iOS team starts using the external iOS fonts library.
 //
 
@@ -121,64 +121,64 @@ public class CoverDropFonts {
         /// Mapping from GuardianFontStyle to the font name
         fileprivate static func fontName(for style: GuardianFontStyle) -> String {
             switch style {
-                case .headlineBold:
-                    return "GHGuardianHeadline-Bold"
-                case .headlineRegularItalic:
-                    return "GHGuardianHeadline-RegularItalic"
-                case .headlineLight:
-                    return "GHGuardianHeadline-Light"
-                case .headlineMedium:
-                    return "GHGuardianHeadline-Medium"
-                case .headlineRegular:
-                    return "GHGuardianHeadline-Regular"
-                case .headlineSemibold:
-                    return "GHGuardianHeadline-Semibold"
-                case .headlineLightItalic:
-                    return "GHGuardianHeadline-LightItalic"
-                case .headlineMediumItalic:
-                    return "GHGuardianHeadline-MediumItalic"
-                case .headlineSemiboldItalic:
-                    return "GHGuardianHeadline-SemiboldItalic"
-                case .headlineBoldItalic:
-                    return "GHGuardianHeadline-BoldItalic"
-                case .headlineBlack:
-                    return "GHGuardianHeadline-Black"
-                case .headlineBlackItalic:
-                    return "GHGuardianHeadline-BlackItalic"
-                case .textSansBold:
-                    return "GuardianTextSans-Bold"
-                case .textSansBoldItalic:
-                    return "GuardianTextSans-BoldIt"
-                case .textSansRegular:
-                    return "GuardianTextSans-Regular"
-                case .textSansRegularItalic:
-                    return "GuardianTextSans-RegularIt"
-                case .textSansMedium:
-                    return "GuardianTextSans-Medium"
-                case .textSansMediumItalic:
-                    return "GuardianTextSans-MediumIt"
-                case .textSansBlack:
-                    return "GuardianTextSans-Black"
-                case .textSansBlackItalic:
-                    return "GuardianTextSans-BlackIt"
-                case .textEgyptianRegular:
-                    return "GuardianTextEgyptian-Reg"
-                case .textEgyptianRegularItalic:
-                    return "GuardianTextEgyptian-RegIt"
-                case .textEgyptianMedium:
-                    return "GuardianTextEgyptian-Med"
-                case .textEgyptianMediumItalic:
-                    return "GuardianTextEgyptian-MedIt"
-                case .textEgyptianBold:
-                    return "GuardianTextEgyptian-Bold"
-                case .textEgyptianBoldItalic:
-                    return "GuardianTextEgyptian-BoldIt"
-                case .textEgyptianBlack:
-                    return "GuardianTextEgyptian-Black"
-                case .textEgyptianBlackItalic:
-                    return "GuardianTextEgyptian-BlackIt"
-                case .titlepieceBold:
-                    return "GTGuardianTitlepiece-Bold"
+            case .headlineBold:
+                return "GHGuardianHeadline-Bold"
+            case .headlineRegularItalic:
+                return "GHGuardianHeadline-RegularItalic"
+            case .headlineLight:
+                return "GHGuardianHeadline-Light"
+            case .headlineMedium:
+                return "GHGuardianHeadline-Medium"
+            case .headlineRegular:
+                return "GHGuardianHeadline-Regular"
+            case .headlineSemibold:
+                return "GHGuardianHeadline-Semibold"
+            case .headlineLightItalic:
+                return "GHGuardianHeadline-LightItalic"
+            case .headlineMediumItalic:
+                return "GHGuardianHeadline-MediumItalic"
+            case .headlineSemiboldItalic:
+                return "GHGuardianHeadline-SemiboldItalic"
+            case .headlineBoldItalic:
+                return "GHGuardianHeadline-BoldItalic"
+            case .headlineBlack:
+                return "GHGuardianHeadline-Black"
+            case .headlineBlackItalic:
+                return "GHGuardianHeadline-BlackItalic"
+            case .textSansBold:
+                return "GuardianTextSans-Bold"
+            case .textSansBoldItalic:
+                return "GuardianTextSans-BoldIt"
+            case .textSansRegular:
+                return "GuardianTextSans-Regular"
+            case .textSansRegularItalic:
+                return "GuardianTextSans-RegularIt"
+            case .textSansMedium:
+                return "GuardianTextSans-Medium"
+            case .textSansMediumItalic:
+                return "GuardianTextSans-MediumIt"
+            case .textSansBlack:
+                return "GuardianTextSans-Black"
+            case .textSansBlackItalic:
+                return "GuardianTextSans-BlackIt"
+            case .textEgyptianRegular:
+                return "GuardianTextEgyptian-Reg"
+            case .textEgyptianRegularItalic:
+                return "GuardianTextEgyptian-RegIt"
+            case .textEgyptianMedium:
+                return "GuardianTextEgyptian-Med"
+            case .textEgyptianMediumItalic:
+                return "GuardianTextEgyptian-MedIt"
+            case .textEgyptianBold:
+                return "GuardianTextEgyptian-Bold"
+            case .textEgyptianBoldItalic:
+                return "GuardianTextEgyptian-BoldIt"
+            case .textEgyptianBlack:
+                return "GuardianTextEgyptian-Black"
+            case .textEgyptianBlackItalic:
+                return "GuardianTextEgyptian-BlackIt"
+            case .titlepieceBold:
+                return "GTGuardianTitlepiece-Bold"
             }
         }
     }
@@ -206,14 +206,14 @@ public extension View {
 public extension CoverDropFonts.GuardianFontStyle {
     var relativeStyle: Font.TextStyle {
         switch self {
-            case .headlineLight, .headlineRegular, .headlineMedium, .headlineBold, .headlineSemibold, .headlineRegularItalic, .headlineLightItalic, .headlineMediumItalic, .headlineSemiboldItalic, .headlineBoldItalic, .headlineBlack, .headlineBlackItalic:
-                return .headline
-            case .textSansBold, .textSansBoldItalic, .textSansRegular, .textSansRegularItalic, .textSansMedium, .textSansMediumItalic, .textSansBlack, .textSansBlackItalic:
-                return .body
-            case .textEgyptianRegular, .textEgyptianRegularItalic, .textEgyptianMedium, .textEgyptianMediumItalic, .textEgyptianBold, .textEgyptianBoldItalic, .textEgyptianBlack, .textEgyptianBlackItalic:
-                return .body
-            case .titlepieceBold:
-                return .title
+        case .headlineLight, .headlineRegular, .headlineMedium, .headlineBold, .headlineSemibold, .headlineRegularItalic, .headlineLightItalic, .headlineMediumItalic, .headlineSemiboldItalic, .headlineBoldItalic, .headlineBlack, .headlineBlackItalic:
+            return .headline
+        case .textSansBold, .textSansBoldItalic, .textSansRegular, .textSansRegularItalic, .textSansMedium, .textSansMediumItalic, .textSansBlack, .textSansBlackItalic:
+            return .body
+        case .textEgyptianRegular, .textEgyptianRegularItalic, .textEgyptianMedium, .textEgyptianMediumItalic, .textEgyptianBold, .textEgyptianBoldItalic, .textEgyptianBlack, .textEgyptianBlackItalic:
+            return .body
+        case .titlepieceBold:
+            return .title
         }
     }
 }

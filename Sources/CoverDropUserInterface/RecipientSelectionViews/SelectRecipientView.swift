@@ -9,8 +9,7 @@ struct SelectRecipientView: View {
 
     public init(isSelectRecipientViewOpen: Binding<Bool>,
                 selectedRecipient: Binding<JournalistKeyData?>,
-                recipients: MessageRecipients)
-    {
+                recipients: MessageRecipients) {
         SegmentedControlAppearance.setup()
 
         _isSelectRecipientViewOpen = isSelectRecipientViewOpen
@@ -52,18 +51,17 @@ struct SelectRecipientView: View {
         } else {
             List(recipients, id: \.self) { recipient in
                 switch recipientType {
-                    case .desks:
-                        DeskRecipientItem(recipient: recipient,
-                                          selectedRecipient: $selectedRecipient,
-                                          isSelectRecipientViewOpen: $isSelectRecipientViewOpen)
+                case .desks:
+                    DeskRecipientItem(recipient: recipient,
+                                      selectedRecipient: $selectedRecipient,
+                                      isSelectRecipientViewOpen: $isSelectRecipientViewOpen)
 
-                    case .journalists:
-                        JournalistRecipientItem(name: recipient.displayName,
-                                                description: recipient.recipientDescription)
-                        {
-                            selectedRecipient = recipient
-                            $isSelectRecipientViewOpen.wrappedValue.toggle()
-                        }
+                case .journalists:
+                    JournalistRecipientItem(name: recipient.displayName,
+                                            description: recipient.recipientDescription) {
+                        selectedRecipient = recipient
+                        $isSelectRecipientViewOpen.wrappedValue.toggle()
+                    }
                 }
             }
             .listStyle(.plain)

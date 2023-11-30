@@ -45,14 +45,12 @@ struct JournalistMessageView: View {
                     if !self.messageViewModel.isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation) {
                         viewingInactiveConversation()
                     } else if self.messageViewModel.isMostRecentMessageFromUser()
-                        && alreadySentMessage
-                    {
+                                && alreadySentMessage {
                         messageSendView()
                     } else {
                         if let messageRecipient = self.messageViewModel.messageRecipient,
                            let key = messageRecipient.getMessageKey(),
-                           let config = config
-                        {
+                           let config = config {
                             if key.isExpired(now: config.currentKeysPublishedTime()) {
                                 expiredKeysMessage(recipent: messageRecipient)
                             } else if alreadySentMessage {
@@ -111,8 +109,8 @@ struct JournalistMessageView: View {
                     }
                 }
             }.padding(Padding.medium)
-                .background(Color.JournalistNewMessageView.messageListBackgroundColor)
-                .foregroundColor(Color.JournalistNewMessageView.messageListForegroundColor)
+            .background(Color.JournalistNewMessageView.messageListBackgroundColor)
+            .foregroundColor(Color.JournalistNewMessageView.messageListForegroundColor)
             // This spacer keeps the middle pane in full height
             Spacer()
         }
@@ -124,9 +122,9 @@ struct JournalistMessageView: View {
             Button("Send a new message") {
                 self.alreadySentMessage = true
             }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
-                .accessibilityLabel("Send a new message")
+            .accessibilityLabel("Send a new message")
         }.foregroundColor(Color.ComposeMessageTextStyle.foregroundColor)
-            .padding(Padding.medium)
+        .padding(Padding.medium)
     }
 
     func viewingInactiveConversation() -> some View {
@@ -153,8 +151,8 @@ struct JournalistMessageView: View {
                     messageViewModel.clearMessage()
                 }
             }.disabled(messageViewModel.sendButtonDisabled)
-                .buttonStyle(PrimaryButtonStyle(isDisabled: messageViewModel.sendButtonDisabled))
-                .padding([.horizontal], Padding.medium)
+            .buttonStyle(PrimaryButtonStyle(isDisabled: messageViewModel.sendButtonDisabled))
+            .padding([.horizontal], Padding.medium)
         }
     }
 

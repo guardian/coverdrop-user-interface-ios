@@ -22,8 +22,7 @@ struct InboxView: View {
                         .padding(Padding.large)
                 }
                 if let inactiveConversations = viewModel.inactiveConversations,
-                   inactiveConversations.count > 0
-                {
+                   inactiveConversations.count > 0 {
                     inactiveConversationsView(for: inactiveConversations)
                 }
                 Spacer()
@@ -72,8 +71,7 @@ struct InboxView: View {
             .padding([.leading, .trailing], Padding.large)
             .padding([.top, .bottom], Padding.medium)
             if let isExpired = viewModel.activeConversation?.containsExpiringMessages,
-               let expiredDate = viewModel.activeConversation?.messageExpiringDate
-            {
+               let expiredDate = viewModel.activeConversation?.messageExpiringDate {
                 customDivider()
                 expiredInformationText(expiredDate: expiredDate)
                     .padding([.leading], Padding.medium)
@@ -113,8 +111,7 @@ struct InboxView: View {
                     navigation.destination = .viewConversation
                 }
             if inactiveConversation.containsExpiringMessages != nil,
-               let expiredDate = inactiveConversation.messageExpiringDate
-            {
+               let expiredDate = inactiveConversation.messageExpiringDate {
                 expiredInformationText(expiredDate: expiredDate)
             }
         }
@@ -139,18 +136,18 @@ struct InboxView: View {
             .alert("Delete all conversations",
                    isPresented: $showingDeleteAlert,
                    actions: {
-                       Button("Yes, delete conversations", role: .destructive) {
-                           Task {
-                               navigation.destination = .home
-                               try await viewModel.deleteAllMessagesAndCurrentSession()
-                               if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                                   try await SecretDataRepository.shared.lock(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
-                               }
-                           }
-                       }
-                       Button("Cancel", role: .cancel) {}
+                    Button("Yes, delete conversations", role: .destructive) {
+                        Task {
+                            navigation.destination = .home
+                            try await viewModel.deleteAllMessagesAndCurrentSession()
+                            if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                                try await SecretDataRepository.shared.lock(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
+                            }
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
                    }, message: {
-                       Text("Deleting all conversations will remove all messages from your device, including pending message to be sent. These cannot be retrieved again. You will also not receive any replies to existing conversations. Would you like to proceed?")
+                    Text("Deleting all conversations will remove all messages from your device, including pending message to be sent. These cannot be retrieved again. You will also not receive any replies to existing conversations. Would you like to proceed?")
                    })
             Spacer()
         }

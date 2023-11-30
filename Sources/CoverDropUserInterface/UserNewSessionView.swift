@@ -55,20 +55,20 @@ struct UserNewSessionView: View {
                 }
 
             }.padding(Padding.large)
-                .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-                .onAppear {
-                    self.viewModel.currentState = .hidden
-                    do {
-                        try viewModel.newPassphrase()
-                    } catch {
-                        self.viewModel.currentState = .error(NewSessionError.failedToGeneratePassphrase)
-                    }
-
-                    tertiaryButton(action: {
-                                       navigation.destination = .login
-                                   },
-                                   text: "I already have a passphrase")
+            .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+            .onAppear {
+                self.viewModel.currentState = .hidden
+                do {
+                    try viewModel.newPassphrase()
+                } catch {
+                    self.viewModel.currentState = .error(NewSessionError.failedToGeneratePassphrase)
                 }
+
+                tertiaryButton(action: {
+                    navigation.destination = .login
+                },
+                text: "I already have a passphrase")
+            }
         }
     }
 

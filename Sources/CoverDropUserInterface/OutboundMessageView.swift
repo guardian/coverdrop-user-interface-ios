@@ -43,8 +43,8 @@ struct OutboundMessageView: View {
                     }
 
                 }.background(messageData.isCurrentUser ? Color.JournalistNewMessageView.messageViewCurrentUserColor : Color.JournalistNewMessageView.messageViewUnselectedUserColor)
-                    .cornerRadius(10)
-                    .padding([.bottom], Padding.medium)
+                .cornerRadius(10)
+                .padding([.bottom], Padding.medium)
             }
             .id(id)
             // And if we are not the current user put a spacer at the end!

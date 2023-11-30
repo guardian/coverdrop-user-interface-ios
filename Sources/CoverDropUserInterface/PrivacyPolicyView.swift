@@ -18,6 +18,6 @@ struct PrivacyPolicyView: View {
                 Spacer()
             }
         }.foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-            .navigationBarHidden(true)
+        .navigationBarHidden(true)
     }
 }

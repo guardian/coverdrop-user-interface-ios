@@ -40,7 +40,7 @@ struct UserLoginView: View {
                 .keyboardShortcut(.defaultAction)
                 .buttonStyle(PrimaryButtonStyle(isDisabled: false))
             }.padding(Padding.medium)
-                .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+            .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
         }
     }
 
@@ -66,7 +66,7 @@ struct UserLoginView: View {
                         }, label: {
                             Image(systemName: "eye.fill")
                         }).accessibilityIdentifier("show \(id + 1)")
-                            .padding([.trailing], Padding.medium)
+                        .padding([.trailing], Padding.medium)
                     }
                 } else {
                     ZStack(alignment: .trailing) {
@@ -80,7 +80,7 @@ struct UserLoginView: View {
                         }, label: {
                             Image(systemName: "eye.slash.fill")
                         }).accessibilityIdentifier("hide \(id + 1)")
-                            .padding([.trailing], Padding.medium)
+                        .padding([.trailing], Padding.medium)
                     }
                 }
             }
