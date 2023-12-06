@@ -24,7 +24,7 @@ final class InboxViewModelTests: XCTestCase {
 
     func testActiveConversatoinWithNoMessages() {
         // GIVEN a mailbox with no messages
-        let mailbox: [Message] = []
+        let mailbox: Set<Message> = []
 
         // WHEN when finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: mailbox)
@@ -156,7 +156,7 @@ final class InboxViewModelTests: XCTestCase {
 
     func testInactiveConversationsWithNoMessages() {
         // GIVEN a mailbox with no messages
-        let mailbox = [Message]()
+        let mailbox = Set<Message>()
 
         // WHEN when finding the inactive conversation
         let inactiveMessages = InboxViewModel.findInactiveMessages(in: mailbox)

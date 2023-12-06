@@ -56,7 +56,7 @@ struct MessageData {
     var currentConversation: [Message] {
         switch secretDataRepository.secretData {
         case let .unlockedSecretData(unlockedData: data):
-            return data.messageMailbox.filter { message in
+            let filteredMailbox: [Message] = data.messageMailbox.filter { message in
                 switch message {
                 case let .incomingMessage(message: messageData):
                     if case let .textMessage(message: incomingMessage) = messageData {
@@ -68,6 +68,9 @@ struct MessageData {
                     return messageData.recipient == messageRecipient
                 }
             }
+            return filteredMailbox.sorted(by: { message1, message2 -> Bool in
+                message1.getDate() < message2.getDate()
+            })
         case _:
             return []
         }
@@ -106,6 +109,8 @@ struct MessageData {
             state = .error(message: "Cannot get config")
             return
         }
+
+        Debug.println("messageRecipient is \(String(describing: messageRecipient.getMessageKey()?.key.toBytes().hexStr))")
 
         do {
             try await sendMessage(completeMessage(),

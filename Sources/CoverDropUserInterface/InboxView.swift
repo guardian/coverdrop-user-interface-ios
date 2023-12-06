@@ -136,18 +136,18 @@ struct InboxView: View {
             .alert("Delete all conversations",
                    isPresented: $showingDeleteAlert,
                    actions: {
-                    Button("Yes, delete conversations", role: .destructive) {
-                        Task {
-                            navigation.destination = .home
-                            try await viewModel.deleteAllMessagesAndCurrentSession()
-                            if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                                try await SecretDataRepository.shared.lock(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
-                            }
-                        }
-                    }
-                    Button("Cancel", role: .cancel) {}
+                       Button("Yes, delete conversations", role: .destructive) {
+                           Task {
+                               navigation.destination = .home
+                               try await viewModel.deleteAllMessagesAndCurrentSession()
+                               if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                                   try await SecretDataRepository.shared.lock(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
+                               }
+                           }
+                       }
+                       Button("Cancel", role: .cancel) {}
                    }, message: {
-                    Text("Deleting all conversations will remove all messages from your device, including pending message to be sent. These cannot be retrieved again. You will also not receive any replies to existing conversations. Would you like to proceed?")
+                       Text("Deleting all conversations will remove all messages from your device, including pending message to be sent. These cannot be retrieved again. You will also not receive any replies to existing conversations. Would you like to proceed?")
                    })
             Spacer()
         }
@@ -183,24 +183,48 @@ struct InboxView: View {
     }
 }
 
-// swiftlint:disable force_try
-struct InboxView_Previews: PreviewProvider {
-    static var previews: some View {
-        let privateSendingQueueRepo = initSendingQueue()
-        let secretDataRepository = SecretDataRepository.shared
-        if let messages = try? MessageHelper.loadMessagesFromDeadDrop() {
-            secretDataRepository.secretData = messages
-        }
-        let viewModel = InboxViewModel(secretDataRepository: secretDataRepository)
-        return PreviewWrapper(InboxView(viewModel: viewModel, conversationViewModel: ConversationViewModel()))
+struct PreviewView: View {
+    enum LoadingState: Equatable {
+        case loading, ready
     }
 
-    static func initSendingQueue() {
-        Task {
-            let verifiedPublicKeys = PublicKeysHelper.shared.testKeys
-            if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
-                try await PrivateSendingQueueRepository.shared.start(coverMessageFactory: coverMessageFactory)
+    @State var state = LoadingState.loading
+
+    var body: some View {
+        switch state {
+            case .loading:
+                ProgressView().onAppear {
+                    Task {
+                        let privateSendingQueueRepo = try? await PreviewView.initSendingQueue()
+
+                        let secretDataRepository = SecretDataRepository.shared
+                        let initMessages = await PreviewView.initMessages(secretDataRepository: secretDataRepository)
+                        state = .ready
+                    }
+                }
+            case .ready:
+                InboxView(viewModel: InboxViewModel(secretDataRepository: SecretDataRepository.shared), conversationViewModel: ConversationViewModel())
+        }
+    }
+
+    static func initMessages(secretDataRepository: SecretDataRepository) async {
+        if let messages = try? await MessageHelper.loadMessagesFromDeadDrop() {
+            await MainActor.run {
+                secretDataRepository.secretData = messages
             }
         }
+    }
+
+    static func initSendingQueue() async throws {
+        let verifiedPublicKeys = PublicKeysHelper.shared.testKeys
+        if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
+            try await PrivateSendingQueueRepository.shared.start(coverMessageFactory: coverMessageFactory)
+        }
+    }
+}
+
+struct InboxView_Previews: PreviewProvider {
+    static var previews: some View {
+        PreviewView()
     }
 }

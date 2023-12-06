@@ -6,7 +6,7 @@ public struct ActiveConversation: Equatable {
     let recipient: JournalistKeyData
     let lastMessageUpdated: Date
 
-    var messages: [Message] = []
+    var messages: Set<Message> = []
 
     var containsExpiringMessages: Bool {
         return messages.contains(where: { message in
@@ -69,7 +69,7 @@ public struct ActiveConversation: Equatable {
 
 public struct InactiveConversation: Equatable {
     let recipient: JournalistKeyData
-    var messages: [Message] = []
+    var messages: Set<Message> = []
 
     var containsExpiringMessages: Bool {
         return messages.contains(where: { message in
@@ -128,7 +128,7 @@ public struct InactiveConversation: Equatable {
 
 @MainActor
 class InboxViewModel: ObservableObject {
-    private var mailbox: [Message]? {
+    private var mailbox: Set<Message>? {
         guard case let .unlockedSecretData(unlockedData: data) = secretDataRepository.secretData else { return nil }
         return data.messageMailbox
     }
@@ -150,7 +150,7 @@ class InboxViewModel: ObservableObject {
     }
 
     /// Finds the most recent conversation in a mailbox, and returns an Active Conversation. If there are no messages in the mailbox, this returns nil.
-    static func findActiveConversation(in mailbox: [Message]?) -> ActiveConversation? {
+    static func findActiveConversation(in mailbox: Set<Message>?) -> ActiveConversation? {
         guard let existingMailbox = mailbox else {
             return nil
         }
@@ -165,7 +165,7 @@ class InboxViewModel: ObservableObject {
             let messages = existingMailbox.sorted(by: >)
             if let message = messages.first {
                 if case let .outboundMessage(data) = message {
-                    return ActiveConversation(recipient: data.recipient, lastMessageUpdated: data.dateQueued, messages: messages)
+                    return ActiveConversation(recipient: data.recipient, lastMessageUpdated: data.dateQueued, messages: Set(messages))
                 }
             }
         }
@@ -192,7 +192,7 @@ class InboxViewModel: ObservableObject {
     }
 
     /// Finds the inactive conversations in the inbox. If there are no messages in the mailbox, this returns nil. If there is 1 message in the mailbox, this returns nil - since 1 message would be considered the active conversation.
-    static func findInactiveMessages(in mailbox: [Message]?) -> [InactiveConversation]? {
+    static func findInactiveMessages(in mailbox: Set<Message>?) -> [InactiveConversation]? {
         // 1. Remove all outbound messages
         let mailboxRemovingOutbound = mailbox?.filter {
             guard case .incomingMessage = $0 else { return false }
@@ -231,7 +231,7 @@ class InboxViewModel: ObservableObject {
         }
     }
 
-    static func messagesForRecipient(recipient: JournalistKeyData, mailbox: [Message]?) -> [Message] {
+    static func messagesForRecipient(recipient: JournalistKeyData, mailbox: Set<Message>?) -> Set<Message> {
         return mailbox?.filter {
             switch $0 {
             case let .outboundMessage(message: outbound):
@@ -244,7 +244,7 @@ class InboxViewModel: ObservableObject {
                     return false
                 }
             }
-        } ?? []
+        } ?? Set()
     }
 
     ///
