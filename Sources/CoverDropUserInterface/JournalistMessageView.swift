@@ -1,5 +1,4 @@
 import CoverDropCore
-import CryptoKit
 import SwiftUI
 
 enum MessageError: Error {
@@ -33,7 +32,7 @@ struct JournalistMessageView: View {
         HeaderView(type: .viewConversation, dismissAction: {
             Task {
                 if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                    try await SecretDataRepository.shared.saveMessages(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
+                    try await SecretDataRepository.shared.storeData(unlockedData: unlockedData)
                     navigation.destination = .inbox
                     messageViewModel.messageRecipient = nil
                 }

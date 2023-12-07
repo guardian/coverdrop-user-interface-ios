@@ -1,5 +1,4 @@
 import CoverDropCore
-import CryptoKit
 import SwiftUI
 
 public struct ActiveConversation: Equatable {
@@ -260,8 +259,8 @@ class InboxViewModel: ObservableObject {
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData,
            let verifiedPublicKeys = publicDataRepository.verifiedPublicKeysData {
             unlockedSecretData.messageMailbox = []
-            try await secretDataRepository.lock(data: unlockedSecretData, withSecureEnclave: SecureEnclave.isAvailable)
-            try await EncryptedStorage.createInitialStorageWithRandomPassphrase(withSecureEnclave: SecureEnclave.isAvailable)
+            try await secretDataRepository.lock(unlockedData: unlockedSecretData)
+            try await EncryptedStorage.createOrResetStorageWithRandomPassphrase()
 
             if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
                 try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory: coverMessageFactory)

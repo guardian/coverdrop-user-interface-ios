@@ -102,7 +102,7 @@ extension UserLoginView {
             case inital, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
         }
 
-        public static let passphraseLength = SecureEnclave.isAvailable ? ApplicationConfig.config.passphraseLowWordCount : ApplicationConfig.config.passphraseHighWordCount
+        public static let passphraseLength = ApplicationConfig.config.passphraseWordCount
 
         @Published var passphrase: [String] = passphraseArray()
         @Published var passphraseFieldsMasked: [Bool] = passphraseVisibilityArray()
@@ -120,14 +120,9 @@ extension UserLoginView {
                     return
                 }
 
-                guard let key = try? await SecureEnclavePrivateKey.loadKey(name: EncryptedStorage.fileName) else {
-                    state = .errorSecureStorageNotInitialised
-                    return
-                }
+                let session = try? await secretDataRepository.unlock(passphrase: validPassphrase)
 
-                let unlocked = try await secretDataRepository.unlock(passphrase: validPassphrase, key: key)
-
-                if unlocked {
+                if session != nil {
                     passphrase = UserLoginView.passphraseArray()
                     // try and decrypt the stored dead drops
                     if let date = PublicDataRepository.appConfig?.currentTime() {

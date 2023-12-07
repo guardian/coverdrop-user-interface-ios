@@ -1,5 +1,4 @@
 import CoverDropCore
-import CryptoKit
 import SVGView
 import SwiftUI
 
@@ -12,7 +11,7 @@ struct MessageSentView: View {
                 Task {
                     navigation.destination = .home
                     if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                        try await SecretDataRepository.shared.lock(data: unlockedData, withSecureEnclave: SecureEnclave.isAvailable)
+                        try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
                     }
                 }
             }) {

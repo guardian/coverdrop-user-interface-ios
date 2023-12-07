@@ -120,9 +120,8 @@ extension UserNewSessionView {
 
         func createNewStorage() async {
             do {
-                let keyPair: EncryptionKeypair<User> = try EncryptionKeypair<User>.generateEncryptionKeypair()
                 if let validPassphrase = passphrase {
-                    _ = try await EncryptedStorage.createNewStorageWithPassphrase(passphrase: validPassphrase, withSecureEnclave: SecureEnclave.isAvailable, userKeyPair: keyPair)
+                    _ = try await EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: validPassphrase)
                 } else {
                     currentState = .error("Missing Passphrase")
                 }
