@@ -3,12 +3,12 @@ import SwiftUI
 
 struct SelectRecipientView: View {
     @StateObject private var viewModel = SelectRecipientViewModel()
-    @Binding var selectedRecipient: JournalistKeyData?
+    @Binding var selectedRecipient: JournalistData?
     let recipients: MessageRecipients
     @Binding var isSelectRecipientViewOpen: Bool
 
     public init(isSelectRecipientViewOpen: Binding<Bool>,
-                selectedRecipient: Binding<JournalistKeyData?>,
+                selectedRecipient: Binding<JournalistData?>,
                 recipients: MessageRecipients) {
         SegmentedControlAppearance.setup()
 

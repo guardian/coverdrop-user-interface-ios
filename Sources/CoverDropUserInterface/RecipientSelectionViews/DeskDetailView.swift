@@ -3,7 +3,7 @@ import SwiftUI
 
 struct DeskDetailView: View {
     @Environment(\.dismiss) private var dismiss
-    @Binding var selectedRecipient: JournalistKeyData?
+    @Binding var selectedRecipient: JournalistData?
     @Binding var isSelectRecipientViewOpen: Bool
 
     let viewModel: DeskDetailViewModel
@@ -34,7 +34,7 @@ struct DeskDetailView: View {
 }
 
 struct DeskDetailViewModel {
-    let recipient: JournalistKeyData
+    let recipient: JournalistData
 }
 
 struct DeskDetailView_Previews: PreviewProvider {

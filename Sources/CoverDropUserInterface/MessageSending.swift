@@ -11,7 +11,7 @@ protocol MessageSending {
     ///   - secretDataRepository: A required instance of the SecretDataRepository
     /// - Returns: An optional error message used for the purposes of debugging
     func sendMessage(_ message: String,
-                     to recipient: JournalistKeyData,
+                     to recipient: JournalistData,
                      verifiedPublicKeys: VerifiedPublicKeys,
                      secretDataRepository: SecretDataRepository, dateSent: Date) async throws
 }
@@ -19,15 +19,15 @@ protocol MessageSending {
 extension MessageSending {
     @MainActor
     func sendMessage(_ message: String,
-                     to recipient: JournalistKeyData,
+                     to recipient: JournalistData,
                      verifiedPublicKeys: VerifiedPublicKeys,
                      secretDataRepository: SecretDataRepository, dateSent: Date) async throws {
         // add the current message to the private sending queue and
-        // secret Data Repository
-        switch await secretDataRepository.secretData {
+        // secret Data  Repository
+        switch secretDataRepository.secretData {
         case let .unlockedSecretData(unlockedData: unlockedSecretData):
             do {
-                let outboundMessage = await OutboundMessageData(recipient: recipient,
+                let outboundMessage = OutboundMessageData(recipient: recipient,
                                                                 messageText: message,
                                                                 dateSent: dateSent)
                 let userKey = unlockedSecretData.userKey.publicKey
@@ -42,6 +42,7 @@ extension MessageSending {
                 let newMessage: Message = .outboundMessage(message: outboundMessage)
 
                 unlockedSecretData.addMessage(message: newMessage)
+
             } catch {
                 throw "Failed to enqueue message"
             }

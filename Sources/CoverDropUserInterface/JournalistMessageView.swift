@@ -14,9 +14,9 @@ struct JournalistMessageView: View {
     // by default we want to make the user have to choose to send another message
     @State var alreadySentMessage: Bool = false
 
-    var journalist: JournalistKeyData
+    var journalist: JournalistData
 
-    init(journalist: JournalistKeyData, viewModel: ConversationViewModel, config: ConfigType? = PublicDataRepository.appConfig) {
+    init(journalist: JournalistData, viewModel: ConversationViewModel, config: ConfigType? = PublicDataRepository.appConfig) {
         self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
@@ -48,9 +48,9 @@ struct JournalistMessageView: View {
                         messageSendView()
                     } else {
                         if let messageRecipient = self.messageViewModel.messageRecipient,
-                           let key = messageRecipient.getMessageKey(),
+                           let currentKey = messageRecipient.getMessageKey(),
                            let config = config {
-                            if key.isExpired(now: config.currentKeysPublishedTime()) {
+                            if currentKey.isExpired(now: config.currentKeysPublishedTime()) {
                                 expiredKeysMessage(recipent: messageRecipient)
                             } else if alreadySentMessage {
                                 messageSendView()
@@ -130,7 +130,7 @@ struct JournalistMessageView: View {
         return InformationView(viewType: .info, title: "This conversation has been closed", message: "Go to your active conversation to send a message.").padding(Padding.medium)
     }
 
-    func expiredKeysMessage(recipent: JournalistKeyData) -> some View {
+    func expiredKeysMessage(recipent: JournalistData) -> some View {
         return InformationView(viewType: .info, title: "\(recipent.displayName) is currently unavailable.", message: "Check your internet connection or try again later.")
             .padding(Padding.medium)
     }
@@ -203,7 +203,7 @@ struct JournalistMessageView_Previews: PreviewProvider {
         }
     }
 
-    static func getViewModel(recipient: JournalistKeyData) -> ConversationViewModel {
+    static func getViewModel(recipient: JournalistData) -> ConversationViewModel {
         do {
             let model = ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys, recipient: recipient)
 

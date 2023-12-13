@@ -18,7 +18,7 @@ struct InboxStateView: View {
 struct UnlockedSecretDataStateSwitcher: View {
     @ObservedObject var navigation = Navigation.shared
     @ObservedObject var unlockedSecretData: UnlockedSecretData
-    @ObservedObject var conversationViewModel = ConversationViewModel()
+    @ObservedObject var conversationViewModel = ConversationViewModel(verifiedPublicKeys: PublicDataRepository.shared.verifiedPublicKeysData)
 
     var body: some View {
         if unlockedSecretData.messageMailbox.isEmpty {

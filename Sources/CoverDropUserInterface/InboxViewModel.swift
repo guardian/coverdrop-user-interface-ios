@@ -2,7 +2,7 @@ import CoverDropCore
 import SwiftUI
 
 public struct ActiveConversation: Equatable {
-    let recipient: JournalistKeyData
+    let recipient: JournalistData
     let lastMessageUpdated: Date
 
     var messages: Set<Message> = []
@@ -67,7 +67,7 @@ public struct ActiveConversation: Equatable {
 }
 
 public struct InactiveConversation: Equatable {
-    let recipient: JournalistKeyData
+    let recipient: JournalistData
     var messages: Set<Message> = []
 
     var containsExpiringMessages: Bool {
@@ -215,7 +215,7 @@ class InboxViewModel: ObservableObject {
         guard let inactiveMailbox, inactiveMailbox.count > 0 else { return nil }
 
         // 3. Find the remaining recipients
-        let recipients: [JournalistKeyData] = inactiveMailbox.compactMap {
+        let recipients: [JournalistData] = inactiveMailbox.compactMap {
             guard case let .incomingMessage(message: incomingMessageType) = $0 else { return nil }
             guard case let .textMessage(activeMessage) = incomingMessageType else {
                 return nil
@@ -230,7 +230,7 @@ class InboxViewModel: ObservableObject {
         }
     }
 
-    static func messagesForRecipient(recipient: JournalistKeyData, mailbox: Set<Message>?) -> Set<Message> {
+    static func messagesForRecipient(recipient: JournalistData, mailbox: Set<Message>?) -> Set<Message> {
         return mailbox?.filter {
             switch $0 {
             case let .outboundMessage(message: outbound):

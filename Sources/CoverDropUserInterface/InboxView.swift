@@ -34,7 +34,7 @@ struct InboxView: View {
     }
 
     @ViewBuilder
-    private func messagingTitle(for recipient: JournalistKeyData) -> Text {
+    private func messagingTitle(for recipient: JournalistData) -> Text {
         Text("Messaging with")
     }
 
@@ -191,10 +191,10 @@ struct PreviewView: View {
 
     var body: some View {
         switch state {
-        case .loading:
-            ProgressView().onAppear {
-                Task {
-                    let privateSendingQueueRepo = try? await PreviewView.initSendingQueue()
+            case .loading:
+                ProgressView().onAppear {
+                    Task {
+                        let privateSendingQueueRepo = try? await PreviewView.initSendingQueue()
 
                     let secretDataRepository = SecretDataRepository.shared
                     let initMessages = await PreviewView.initMessages(secretDataRepository: secretDataRepository)
@@ -202,7 +202,7 @@ struct PreviewView: View {
                 }
             }
         case .ready:
-            InboxView(viewModel: InboxViewModel(secretDataRepository: SecretDataRepository.shared), conversationViewModel: ConversationViewModel())
+            InboxView(viewModel: InboxViewModel(secretDataRepository: SecretDataRepository.shared), conversationViewModel: ConversationViewModel(verifiedPublicKeys: PublicDataRepository.shared.verifiedPublicKeysData))
         }
     }
 

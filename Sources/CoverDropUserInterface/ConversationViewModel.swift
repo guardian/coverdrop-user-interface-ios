@@ -17,14 +17,14 @@ struct MessageData {
     @ObservedObject var publicDataRepository = PublicDataRepository.shared
     @ObservedObject var secretDataRepository = SecretDataRepository.shared
 
-    @Published var messageRecipient: JournalistKeyData?
+    @Published var messageRecipient: JournalistData?
     @Published private(set) var recipients: MessageRecipients?
 
     @Published var message = ""
     @Published var topic = ""
     @Published var state = State.initial
 
-    init(verifiedPublicKeys: VerifiedPublicKeys? = PublicDataRepository.shared.verifiedPublicKeysData, recipient: JournalistKeyData? = nil) {
+    init(verifiedPublicKeys: VerifiedPublicKeys?, recipient: JournalistData? = nil) {
         // We will always set messageRecipient to the supplied one
         // but set it with the defaul journalist if we can get any message reciepients from the keys
         // and the supplied recipient is nil

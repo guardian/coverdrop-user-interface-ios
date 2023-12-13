@@ -2,8 +2,8 @@ import CoverDropCore
 import SwiftUI
 
 struct DeskRecipientItem: View {
-    let recipient: JournalistKeyData
-    @Binding var selectedRecipient: JournalistKeyData?
+    let recipient: JournalistData
+    @Binding var selectedRecipient: JournalistData?
     @Binding var isSelectRecipientViewOpen: Bool
 
     var body: some View {
