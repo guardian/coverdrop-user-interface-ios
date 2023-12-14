@@ -43,8 +43,8 @@ struct OutboundMessageView: View {
                     }
 
                 }.background(messageData.isCurrentUser ? Color.JournalistNewMessageView.messageViewCurrentUserColor : Color.JournalistNewMessageView.messageViewUnselectedUserColor)
-                .cornerRadius(10)
-                .padding([.bottom], Padding.medium)
+                    .cornerRadius(10)
+                    .padding([.bottom], Padding.medium)
             }
             .id(id)
             // And if we are not the current user put a spacer at the end!
@@ -69,6 +69,8 @@ struct OutboundMessageView: View {
                     .padding([.leading], Padding.medium)
                     .accessibilityIdentifier("Sent")
             }
+        }.onAppear {
+            Task { await outboundMessage.isInQueue() }
         }
     }
 }
@@ -77,9 +79,14 @@ struct OutboundMessageView_Previews: PreviewProvider {
     // swiftlint:disable force_try
     @MainActor struct Container: View {
         let privateSendingQueueRepo = initSendingQueue()
-        @State var nonExpiredMessage = OutboundMessageData(recipient: PublicKeysHelper.shared.testDefaultJournalist!, messageText: "hey", dateSent: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: try! PrivateSendingQueueSecret.fromSecureRandom().bytes, message: "hey".asBytes())))
+        @State var nonExpiredMessage = OutboundMessageData(
+            messageRecipient: PublicKeysHelper.shared.testDefaultJournalist!,
+            messageText: "hey",
+            dateSent: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))), hint: HintHmac(hint: [0x0])
+        )
 
         @MainActor var body: some View {
+            EmptyView()
             OutboundMessageView(outboundMessage: nonExpiredMessage, id: 1)
         }
     }

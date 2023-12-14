@@ -7,12 +7,14 @@ import XCTest
 final class ConversationViewModelTests: XCTestCase {
     func testMessageLengthProgressPercentage() throws {
         PublicDataRepository.setup(ApplicationConfig.config)
-        let conversationViewModel = ConversationViewModel(verifiedPublicKeys: PublicDataRepository.shared.verifiedPublicKeysData)
+        let testKeys = PublicKeysHelper.shared.testKeys
+        PublicDataRepository.shared.verifiedPublicKeysData = testKeys
+        let conversationViewModel = ConversationViewModel.shared
         guard let percentage = try? conversationViewModel.messageLengthProgressPercentage.get() else {
             XCTFail("Could not get percentage")
             return
         }
-        XCTAssertTrue(percentage == 0)
+        XCTAssertTrue(percentage == Double(0.0))
         conversationViewModel.message = "This is a test message"
 
         guard let percentage2 = try? conversationViewModel.messageLengthProgressPercentage.get() else {

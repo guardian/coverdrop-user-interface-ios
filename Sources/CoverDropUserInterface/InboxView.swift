@@ -135,18 +135,18 @@ struct InboxView: View {
             .alert("Delete all conversations",
                    isPresented: $showingDeleteAlert,
                    actions: {
-                    Button("Yes, delete conversations", role: .destructive) {
-                        Task {
-                            navigation.destination = .home
-                            try await viewModel.deleteAllMessagesAndCurrentSession()
-                            if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                                try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
-                            }
-                        }
-                    }
-                    Button("Cancel", role: .cancel) {}
+                       Button("Yes, delete conversations", role: .destructive) {
+                           Task {
+                               navigation.destination = .home
+                               try await viewModel.deleteAllMessagesAndCurrentSession()
+                               if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                                   try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
+                               }
+                           }
+                       }
+                       Button("Cancel", role: .cancel) {}
                    }, message: {
-                    Text("Deleting all conversations will remove all messages from your device, including pending message to be sent. These cannot be retrieved again. You will also not receive any replies to existing conversations. Would you like to proceed?")
+                       Text("Deleting all conversations will remove all messages from your device, including pending message to be sent. These cannot be retrieved again. You will also not receive any replies to existing conversations. Would you like to proceed?")
                    })
             Spacer()
         }
@@ -196,13 +196,13 @@ struct PreviewView: View {
                     Task {
                         let privateSendingQueueRepo = try? await PreviewView.initSendingQueue()
 
-                    let secretDataRepository = SecretDataRepository.shared
-                    let initMessages = await PreviewView.initMessages(secretDataRepository: secretDataRepository)
-                    state = .ready
+                        let secretDataRepository = SecretDataRepository.shared
+                        let initMessages = await PreviewView.initMessages(secretDataRepository: secretDataRepository)
+                        state = .ready
+                    }
                 }
-            }
-        case .ready:
-            InboxView(viewModel: InboxViewModel(secretDataRepository: SecretDataRepository.shared), conversationViewModel: ConversationViewModel(verifiedPublicKeys: PublicDataRepository.shared.verifiedPublicKeysData))
+            case .ready:
+                InboxView(viewModel: InboxViewModel(secretDataRepository: SecretDataRepository.shared), conversationViewModel: ConversationViewModel.shared)
         }
     }
 

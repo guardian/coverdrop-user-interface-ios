@@ -10,7 +10,8 @@ final class MessageViewModelTests: XCTestCase {
 
     func testReady() async {
         let testKeys = PublicKeysHelper.shared.testKeys
-        let sut = await ConversationViewModel(verifiedPublicKeys: testKeys)
+        PublicDataRepository.shared.verifiedPublicKeysData = testKeys
+        let sut = await ConversationViewModel.shared
 
         // the view model should be `ready` upon initialization
         let state = await sut.state
@@ -24,7 +25,8 @@ final class MessageViewModelTests: XCTestCase {
     func testMessageLengthWithShortMessage() {
         // GIVEN a `MessageViewModel`
         let testKeys = PublicKeysHelper.shared.testKeys
-        let sut = ConversationViewModel(verifiedPublicKeys: testKeys)
+        PublicDataRepository.shared.verifiedPublicKeysData = testKeys
+        let sut = ConversationViewModel.shared
 
         // WHEN a short message is added
         sut.topic = "This is a short topic"
@@ -38,7 +40,8 @@ final class MessageViewModelTests: XCTestCase {
     func testMessageLengthWithLongTopic() {
         // GIVEN a `MessageViewModel`
         let testKeys = PublicKeysHelper.shared.testKeys
-        let sut = ConversationViewModel(verifiedPublicKeys: testKeys)
+        PublicDataRepository.shared.verifiedPublicKeysData = testKeys
+        let sut = ConversationViewModel.shared
 
         // WHEN a long topic is added
         let shortTopic = "This will be an incredibly long topic."
@@ -58,7 +61,8 @@ final class MessageViewModelTests: XCTestCase {
     func testMessageLengthWithLongMessage() {
         // GIVEN a `MessageViewModel`
         let testKeys = PublicKeysHelper.shared.testKeys
-        let sut = ConversationViewModel(verifiedPublicKeys: testKeys)
+        PublicDataRepository.shared.verifiedPublicKeysData = testKeys
+        let sut = ConversationViewModel.shared
 
         // WHEN a long message is added
         let shortMessage = "This will be an incredibly long message."

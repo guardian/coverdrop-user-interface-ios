@@ -13,7 +13,7 @@ struct MessageData {
     var status: MessageStatus
 }
 
-@MainActor class ConversationViewModel: ObservableObject, MessageSending {
+@MainActor class ConversationViewModel: ObservableObject {
     @ObservedObject var publicDataRepository = PublicDataRepository.shared
     @ObservedObject var secretDataRepository = SecretDataRepository.shared
 
@@ -24,13 +24,17 @@ struct MessageData {
     @Published var topic = ""
     @Published var state = State.initial
 
-    init(verifiedPublicKeys: VerifiedPublicKeys?, recipient: JournalistData? = nil) {
+    public static let shared = ConversationViewModel()
+
+    private init() {
         // We will always set messageRecipient to the supplied one
         // but set it with the defaul journalist if we can get any message reciepients from the keys
         // and the supplied recipient is nil
+        let verifiedPublicKeys: VerifiedPublicKeys? = PublicDataRepository.shared.verifiedPublicKeysData
+
         state = .loading
 
-        messageRecipient = recipient
+        messageRecipient = nil
 
         // It is a valid scenario that there are no recipients available from the public keys data (ie they have all expired)
         // but we still was the user to be able to view a conversation
@@ -110,13 +114,13 @@ struct MessageData {
             return
         }
 
-        Debug.println("messageRecipient is \(String(describing: messageRecipient.getMessageKey()?.key.toBytes().hexStr))")
-
         do {
-            try await sendMessage(completeMessage(),
-                                  to: messageRecipient,
-                                  verifiedPublicKeys: keyHierarchy,
-                                  secretDataRepository: secretDataRepository, dateSent: dateSent)
+            if case let .unlockedSecretData(data) = secretDataRepository.secretData {
+                try await MessageSending.sendMessage(completeMessage(),
+                                                     to: messageRecipient,
+                                                     verifiedPublicKeys: keyHierarchy,
+                                                     unlockedSecretDataRepository: data, dateSent: dateSent)
+            }
         } catch {
             state = .error(message: error.localizedDescription)
         }

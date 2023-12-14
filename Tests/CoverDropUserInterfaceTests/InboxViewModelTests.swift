@@ -38,7 +38,7 @@ final class InboxViewModelTests: XCTestCase {
 
         let privateSendingQueueSecret = try PrivateSendingQueueSecret.fromSecureRandom()
         // GIVEN a mailbox with no messages
-        let recentOutboundMessage = try Message.outboundMessage(message: OutboundMessageData(recipient: firstTestJournalist,
+        let recentOutboundMessage = try Message.outboundMessage(message: OutboundMessageData(messageRecipient: firstTestJournalist,
                                                                                              messageText: messageText,
                                                                                              dateSent: testDate(), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
         // WHEN when finding the active conversation
@@ -55,11 +55,11 @@ final class InboxViewModelTests: XCTestCase {
 
         let messageText = "hello!"
         // GIVEN a mailbox with no messages
-        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(recipient: firstTestJournalist,
+        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(messageRecipient: firstTestJournalist,
                                                                                          messageText: messageText,
                                                                                          dateSent: testDate(hourFromNoon: 0), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
         // This message is send earlier than the first one
-        let recentOutboundMessage2 = Message.outboundMessage(message: OutboundMessageData(recipient: secondTestJournalist,
+        let recentOutboundMessage2 = Message.outboundMessage(message: OutboundMessageData(messageRecipient: secondTestJournalist,
                                                                                           messageText: messageText,
                                                                                           dateSent: testDate(hourFromNoon: -1), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
         // WHEN when finding the active conversation
@@ -138,7 +138,7 @@ final class InboxViewModelTests: XCTestCase {
                                                                                                        messageText: "how's it going?",
                                                                                                        dateReceived: testDate(hourFromNoon: 1))))
 
-        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(recipient: thirdTestJournalist,
+        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(messageRecipient: thirdTestJournalist,
                                                                                               messageText: messageText,
                                                                                               dateSent: testDate(hourFromNoon: 1), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
 
@@ -236,7 +236,7 @@ final class InboxViewModelTests: XCTestCase {
 
                                                                                                        dateReceived: testDate())))
 
-        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(recipient: thirdTestJournalist,
+        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(messageRecipient: thirdTestJournalist,
                                                                                               messageText: messageText,
 
                                                                                               dateSent: testDate(hourFromNoon: 10), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))

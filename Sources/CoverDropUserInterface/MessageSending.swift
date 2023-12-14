@@ -1,53 +1,38 @@
 import CoverDropCore
 import Foundation
 
-/// A protocol which describes the functionality for sending messages.
-protocol MessageSending {
-    /// Sends the given message to a specified recipient.
-    /// - Parameters:
-    ///   - message: The message body.
-    ///   - recipient: The given recipient.
-    ///   - covernodeMessagePublicKey: A reqiured CoverNodeMessagingPublicKey
-    ///   - secretDataRepository: A required instance of the SecretDataRepository
-    /// - Returns: An optional error message used for the purposes of debugging
-    func sendMessage(_ message: String,
-                     to recipient: JournalistData,
-                     verifiedPublicKeys: VerifiedPublicKeys,
-                     secretDataRepository: SecretDataRepository, dateSent: Date) async throws
+enum MessageSendingError: Error {
+    case failedToEncryptMessage
 }
 
-extension MessageSending {
+enum MessageSending {
     @MainActor
-    func sendMessage(_ message: String,
-                     to recipient: JournalistData,
-                     verifiedPublicKeys: VerifiedPublicKeys,
-                     secretDataRepository: SecretDataRepository, dateSent: Date) async throws {
+    static func sendMessage(_ message: String,
+                            to recipient: JournalistData,
+                            verifiedPublicKeys: VerifiedPublicKeys,
+                            unlockedSecretDataRepository: UnlockedSecretData,
+                            dateSent: Date) async throws {
         // add the current message to the private sending queue and
         // secret Data  Repository
-        switch secretDataRepository.secretData {
-        case let .unlockedSecretData(unlockedData: unlockedSecretData):
-            do {
-                let outboundMessage = OutboundMessageData(recipient: recipient,
-                                                                messageText: message,
-                                                                dateSent: dateSent)
-                let userKey = unlockedSecretData.userKey.publicKey
 
-                let coverNodeMessage = try await outboundMessage.toCoverNodeMessage(covernodeMessagePublicKey: verifiedPublicKeys,
-                                                                                    userPublicKey: userKey)
+        let userKey = unlockedSecretDataRepository.userKey.publicKey
 
-                let hint = try await PrivateSendingQueueRepository.shared.enqueue(secret: unlockedSecretData.privateSendingQueueSecret,
-                                                                                  message: coverNodeMessage)
-                outboundMessage.hint = hint
+        let encryptedMessage = try UserToCoverNodeMessageData.createMessage(message: message, messageRecipient: recipient, covernodeMessagePublicKey: verifiedPublicKeys, userPublicKey: userKey)
 
-                let newMessage: Message = .outboundMessage(message: outboundMessage)
+        let hint = try await PrivateSendingQueueRepository.shared.enqueue(
+            secret: unlockedSecretDataRepository.privateSendingQueueSecret,
+            message: encryptedMessage
+        )
 
-                unlockedSecretData.addMessage(message: newMessage)
+        let outboundMessage = OutboundMessageData(
+            messageRecipient: recipient,
+            messageText: message,
+            dateSent: dateSent,
+            hint: hint
+        )
 
-            } catch {
-                throw "Failed to enqueue message"
-            }
-        case _:
-            throw "Should not be in locked state on this page"
-        }
+        let newMessage: Message = .outboundMessage(message: outboundMessage)
+
+        try await unlockedSecretDataRepository.addMessage(message: newMessage)
     }
 }

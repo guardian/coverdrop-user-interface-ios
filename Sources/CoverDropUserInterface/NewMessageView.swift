@@ -32,7 +32,7 @@ struct NewMessageView: View {
     private func newMessage() -> some View {
         HeaderView(type: .home,
                    dismissAction: {
-                    showingDismissalAlert = true
+                       showingDismissalAlert = true
                    }) {
             ScrollView {
                 VStack(alignment: .leading) {
@@ -94,17 +94,17 @@ struct NewMessageView: View {
                 .alert("Leaving your inbox",
                        isPresented: $showingDismissalAlert,
                        actions: {
-                        Button("Yes, I want to leave") {
-                            Task {
-                                if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                                    navigation.destination = .inbox
-                                    try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
-                                }
-                            }
-                        }
-                        Button("Cancel", role: .cancel) {}
+                           Button("Yes, I want to leave") {
+                               Task {
+                                   if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                                       navigation.destination = .inbox
+                                       try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
+                                   }
+                               }
+                           }
+                           Button("Cancel", role: .cancel) {}
                        }, message: {
-                        Text("You will be leaving your secure inbox and your message will not be sent.\n Do you want to continue?")
+                           Text("You will be leaving your secure inbox and your message will not be sent.\n Do you want to continue?")
                        })
             }
         }
@@ -183,7 +183,8 @@ struct NewMessageView_Previews: PreviewProvider {
     }
 
     private static func viewModel() -> ConversationViewModel {
-        return ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
+        ConversationViewModel.shared.publicDataRepository.verifiedPublicKeysData = PublicKeysHelper.shared.testKeys
+        return ConversationViewModel.shared
     }
 
     private static func viewModelWithALongMessage() -> ConversationViewModel {
