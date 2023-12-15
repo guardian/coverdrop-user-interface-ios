@@ -17,7 +17,7 @@ struct DeskDetailView: View {
                     .textStyle(BodyStyle())
                 Spacer()
                 VStack(alignment: .center, spacing: 0) {
-                    Button("Select desk") {
+                    Button("Select team") {
                         selectedRecipient = viewModel.recipient
                         isSelectRecipientViewOpen = false
                     }

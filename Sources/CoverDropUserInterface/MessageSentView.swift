@@ -24,7 +24,7 @@ struct MessageSentView: View {
                             .foregroundColor(Color.MessageSentView.tickIconColor)
                     }
                     Text("Your message has been sent.").textStyle(GuardianHeaderTextStyle())
-                    Text("Thank you, we’ll be in touch shortly.").textStyle(BodyStyle())
+                    Text("Thank you. We hope to be in touch soon.").textStyle(BodyStyle())
                 }
                 .padding([.top], Padding.large)
 
@@ -32,8 +32,8 @@ struct MessageSentView: View {
 
                 VStack(alignment: .leading) {
                     Text("What to expect next?").textStyle(GuardianHeadlineSmallTextStyle())
-                    Text("Your message is now in our queue and will be received by our team soon").textStyle(BodyStyle())
-                    Text("Use your secure passphrase to check your secure inbox for a response. Once you have a response, keep the conversation going.").textStyle(BodyStyle())
+                    Text("Your message is now in our queue and will be received by our team soon.").textStyle(BodyStyle())
+                    Text("Use your passphrase to check your secure mailbox for a response. We recommend that you wait for your message to be received before sending another one. Messages will stay in your inbox for 14 days.").textStyle(BodyStyle())
 
                     Spacer()
 

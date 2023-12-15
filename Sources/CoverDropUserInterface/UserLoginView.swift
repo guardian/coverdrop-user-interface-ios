@@ -18,13 +18,13 @@ struct UserLoginView: View {
         }) {
             VStack(alignment: .leading) {
                 Text("Enter passphrase").textStyle(TitleStyle())
-                Text("Enter your passphrase to unlock your inbox and proceed.").textStyle(BodyStyle())
+                Text("Enter your passphrase to unlock your secure inbox and send your first message.").textStyle(BodyStyle())
 
                 switch viewModel.state {
                 case .errorIncorrectWords:
-                    InformationView(viewType: .error, title: "Incorrect word used", message: "One of these words doesn’t match our word list. Please try again.")
+                    InformationView(viewType: .error, title: "Incorrect word used", message: "The passphrase cannot be valid because it contains words that are not on the word list.")
                 case .errorUnableToUnlock:
-                    InformationView(viewType: .error, title: "Unable to unlock mailbox", message: "Either a wrong password was provided or Secure Messaging has never been used on this device.")
+                    InformationView(viewType: .error, title: "Unable to unlock mailbox", message: "The passphrase you entered does not match the generated one from the previous screen.")
                 case _:
                     EmptyView()
                 }
@@ -40,7 +40,7 @@ struct UserLoginView: View {
                 .keyboardShortcut(.defaultAction)
                 .buttonStyle(PrimaryButtonStyle(isDisabled: false))
             }.padding(Padding.medium)
-            .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+                .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
         }
     }
 
@@ -66,7 +66,7 @@ struct UserLoginView: View {
                         }, label: {
                             Image(systemName: "eye.fill")
                         }).accessibilityIdentifier("show \(id + 1)")
-                        .padding([.trailing], Padding.medium)
+                            .padding([.trailing], Padding.medium)
                     }
                 } else {
                     ZStack(alignment: .trailing) {
@@ -80,7 +80,7 @@ struct UserLoginView: View {
                         }, label: {
                             Image(systemName: "eye.slash.fill")
                         }).accessibilityIdentifier("hide \(id + 1)")
-                        .padding([.trailing], Padding.medium)
+                            .padding([.trailing], Padding.medium)
                     }
                 }
             }

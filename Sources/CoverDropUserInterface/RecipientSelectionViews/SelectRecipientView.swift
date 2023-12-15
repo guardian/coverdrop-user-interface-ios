@@ -21,7 +21,7 @@ struct SelectRecipientView: View {
         NavigationView {
             HeaderView(type: .selectRecipient) {
                 VStack(alignment: .leading) {
-                    Text("Select a desk or journalist")
+                    Text("Select a team or journalist")
                         .textStyle(TitleStyle())
                     Text("If you know who you'd like to contact, you can add them as a recipient.")
                         .textStyle(BodyStyle())

@@ -132,7 +132,7 @@ struct InboxView: View {
                 }
             }
             .accessibilityLabel("Delete your messages")
-            .alert("Delete all conversations",
+            .alert("Delete all conversations?",
                    isPresented: $showingDeleteAlert,
                    actions: {
                        Button("Yes, delete conversations", role: .destructive) {
@@ -146,7 +146,7 @@ struct InboxView: View {
                        }
                        Button("Cancel", role: .cancel) {}
                    }, message: {
-                       Text("Deleting all conversations will remove all messages from your device, including pending message to be sent. These cannot be retrieved again. You will also not receive any replies to existing conversations. Would you like to proceed?")
+                       Text("Deleting all conversations will remove all messages from your device. This cannot be undone. Would you like to proceed?")
                    })
             Spacer()
         }

@@ -23,19 +23,19 @@ struct StartCoverDropSessionView: View {
                     VStack(alignment: .leading) {
                         titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
 
-                        Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras condimentum, massa id interdum luctus, lacus velit pulvinar enim, eu malesuada metus turpis eu quam. Nunc augue magna, sodales a scelerisque eget, interdum vitae leo. Aliquam nec elementum lacus, a accumsan purus.").textStyle(BodyStyle())
+                        Text("Our Secure Messaging service was developed by the Guardian to allow you to share stories with us securely and privately using strong encryption. It is designed to prevent others from even knowing you are in communication with us.").textStyle(BodyStyle())
 
                         Spacer()
 
                         if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
                            coverDropServiceStatus.isAvailable == false {
                             VStack {
-                                Text("The SecureMessaging feature is currently not available. Please try again later. Below we show technical information that might be helpful.")
+                                Text("The Secure Messaging feature is currently not available. Please try again later. Below we show technical information that might be helpful.")
                                 Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
                             }
 
                         } else {
-                            Button("Start a new conversation") {
+                            Button("Get started") {
                                 showingNewMessageAlert = true
                             }
                             .disabled(!viewModel.keysAvailable)
@@ -45,9 +45,9 @@ struct StartCoverDropSessionView: View {
                                     navigation.destination = .onboarding
                                     viewModel.viewHidden()
                                 }
-                                Button("Cancel", role: .cancel) {}
+                                Button("No", role: .cancel) {}
                             }, message: {
-                                Text("This will remove any existing messages from your secure inbox. Do you want to continue?")
+                                Text("Starting a new conversation will remove any prior messages from your inbox, if they existed. Do you want to continue?")
                             })
 
                             Button("Check your inbox") {
@@ -57,12 +57,12 @@ struct StartCoverDropSessionView: View {
                         }
 
                     }.padding(Padding.large)
-                    .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+                        .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
 
                     if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
                        coverDropServiceStatus.isAvailable { customDivider()
                         HStack {
-                            Button("About CoverDrop") {
+                            Button("About Secure Messaging") {
                                 navigation.destination = .about
                                 viewModel.viewHidden()
                             }.buttonStyle(FooterButtonStyle())
@@ -80,7 +80,7 @@ struct StartCoverDropSessionView: View {
                         Spacer()
 
                     }.padding(10)
-                    .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+                        .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
                 }
             }
         }
@@ -88,8 +88,9 @@ struct StartCoverDropSessionView: View {
 
     var titleText: Text {
         Text("Send us a message ").foregroundColor(Color.StartCoverDropSessionView.firstLineTextForegroundColor)
-            +
-            Text("securely").foregroundColor(Color.StartCoverDropSessionView.secondLineTextForegroundColor)
+            + Text("securely").foregroundColor(Color.StartCoverDropSessionView.secondLineTextForegroundColor)
+            + Text(" and ").foregroundColor(Color.StartCoverDropSessionView.firstLineTextForegroundColor)
+            + Text("privately").foregroundColor(Color.StartCoverDropSessionView.secondLineTextForegroundColor)
     }
 }
 

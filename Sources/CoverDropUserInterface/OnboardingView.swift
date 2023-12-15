@@ -59,18 +59,18 @@ enum OnboardingViewModel {
     enum OnboardingSteps: String, CustomStringConvertible, CaseIterable, Identifiable {
         var id: Self { self }
 
-        case getPassphrase = "Memorise passphrase"
+        case getPassphrase = "Memorise your passphrase"
         case sendMessage = "Send a message"
         case checkResponse = "Check back for a response"
 
         var description: String {
             switch self {
             case .getPassphrase:
-                return "You’ll receive a passphrase which will be used to unlock your secure inbox. When you receive this, make sure you memorise it so you can continue your conversation later."
+                return "You will been shown a unique passphrase which you will use to unlock your secure inbox. Please make sure you memorise it so you can return to your secure inbox later."
             case .sendMessage:
-                return "You’ll send a new message to a journalist or a team of journalists. Our system will queue your message with other ‘cover’ messages so it can be sent anonymously and securely."
+                return "Your message will be sent anonymously and securely to a journalist or a team. It will be encrypted and indistinguishable from normal network traffic."
             case .checkResponse:
-                return "You’ll need to come back regularly to your secure inbox using your passphrase to check the status of your messages and continue your conversation."
+                return "Our journalists monitor secure messages regularly. If they wish to take your story further they will respond here. To stay in touch you will need to return to your secure inbox using your passphrase."
             }
         }
 

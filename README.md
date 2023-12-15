@@ -45,7 +45,7 @@ flowchart TD
     L -- viewConversation --> N[Conversation view]
     L -- inbox --> O[Inbox view]
     E -- Check your Inbox --> H[User Login View]
-    E -- Start a new conversation --> I[New passphrase]
+    E -- Get started --> I[New passphrase]
     I --> H[User Login View]
     H -- success --> B{Is user Logged in?}
 

@@ -18,7 +18,7 @@ struct UserNewSessionView: View {
         }) {
             VStack(alignment: .leading) {
                 Text("Remember Passphrase").textStyle(TitleStyle())
-                Text("Your passphrase will be used to access your conversation. You’ll need to remember this.").textStyle(BodyStyle())
+                Text("You will always need this passphrase to access your secure inbox. So please ensure you memorise it. It must be entered in the correct order with the correct spelling.").textStyle(BodyStyle())
 
                 passphraseWordListView()
 
@@ -55,20 +55,20 @@ struct UserNewSessionView: View {
                 }
 
             }.padding(Padding.large)
-            .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-            .onAppear {
-                self.viewModel.currentState = .hidden
-                do {
-                    try viewModel.newPassphrase()
-                } catch {
-                    self.viewModel.currentState = .error(NewSessionError.failedToGeneratePassphrase)
-                }
+                .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+                .onAppear {
+                    self.viewModel.currentState = .hidden
+                    do {
+                        try viewModel.newPassphrase()
+                    } catch {
+                        self.viewModel.currentState = .error(NewSessionError.failedToGeneratePassphrase)
+                    }
 
-                tertiaryButton(action: {
-                    navigation.destination = .login
-                },
-                text: "I already have a passphrase")
-            }
+                    tertiaryButton(action: {
+                                       navigation.destination = .login
+                                   },
+                                   text: "I already have a passphrase")
+                }
         }
     }
 

@@ -41,14 +41,12 @@ struct JournalistMessageView: View {
                     if !self.messageViewModel.isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation) {
                         viewingInactiveConversation()
                     } else if self.messageViewModel.isMostRecentMessageFromUser()
-                        && alreadySentMessage
-                    {
+                        && alreadySentMessage {
                         messageSendView()
                     } else {
                         if let messageRecipient = self.messageViewModel.messageRecipient,
                            let currentKey = messageRecipient.getLatestMessagingKey(),
-                           let config = config
-                        {
+                           let config = config {
                             if currentKey.isExpired(now: config.currentKeysPublishedTime()) {
                                 expiredKeysMessage(recipent: messageRecipient)
                             } else if alreadySentMessage {
@@ -116,7 +114,7 @@ struct JournalistMessageView: View {
 
     func chooseToSentAnotherMessage() -> some View {
         return VStack {
-            Text("Your message has been sent. We recommend waiting for a response before you send another message.").textStyle(UserNotificationTextStyle())
+            Text("Your message has been sent. We recommend that you wait for a response before you send another message.").textStyle(UserNotificationTextStyle())
             Button("Send a new message") {
                 self.alreadySentMessage = true
             }.buttonStyle(SecondaryButtonStyle(isDisabled: false))

@@ -44,7 +44,7 @@ struct NewMessageView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         Text("Who would you like to contact?")
                             .textStyle(FormLabelTextStyle())
-                        Text("Change the recipient if you know which desk or journalist you’d like to contact.")
+                        Text("Change the recipient if you know which team or journalist you would like to contact.")
                             .textStyle(BodyStyle())
                     }
 
@@ -68,7 +68,7 @@ struct NewMessageView: View {
                             }, label: {
                                 HStack(alignment: .center) {
                                     Image(systemName: "pencil").resizable().frame(width: 12, height: 12)
-                                    Text("Edit").textStyle(InlineTextButtonStyle())
+                                    Text("Change recipient").textStyle(InlineTextButtonStyle())
                                 }
                             }).sheet(isPresented: $isSelectRecipientViewOpen) {
                                 SelectRecipientView(isSelectRecipientViewOpen: $isSelectRecipientViewOpen,
@@ -152,9 +152,9 @@ struct NewMessageView: View {
     @ViewBuilder
     func messageCompose() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Topic")
+            Text("Subject")
                 .textStyle(FormLabelTextStyle())
-            Text("Describe your message in a few keywords.")
+            Text("Briefly say who did what.")
                 .textStyle(FormLabelSubtitleTextStyle())
         }
         TextEditor(text: $viewModel.topic)
