@@ -22,27 +22,33 @@ struct AppNavigationView: View {
     // This is used to track if the user is logging in with a new session
     @ObservedObject var navigation = Navigation.shared
 
+    @ObservedObject var securitySuite = SecuritySuite.shared
+
     var body: some View {
-        if case .unlockedSecretData = secretDataRepository.secretData {
-            InboxStateView()
-        } else {
-            switch navigation.destination {
-            case .about:
-                AboutCoverDropView()
-            case .privacy:
-                PrivacyPolicyView()
-            case .onboarding:
-                OnboardingView()
-            case .newPassphrase:
-                UserNewSessionView()
-            case .login:
-                UserLoginView()
-            case .newConversation:
-                UserLoginView()
-            case .home:
-                StartCoverDropSessionView()
-            case _:
-                StartCoverDropSessionView()
+        Group {
+            if !securitySuite.getEffectiveViolationsSet().isEmpty {
+                SecurityAlert()
+            } else if case .unlockedSecretData = secretDataRepository.secretData {
+                InboxStateView()
+            } else {
+                switch navigation.destination {
+                    case .about:
+                        AboutCoverDropView()
+                    case .privacy:
+                        PrivacyPolicyView()
+                    case .onboarding:
+                        OnboardingView()
+                    case .newPassphrase:
+                        UserNewSessionView()
+                    case .login:
+                        UserLoginView()
+                    case .newConversation:
+                        UserLoginView()
+                    case .home:
+                        StartCoverDropSessionView()
+                    case _:
+                        StartCoverDropSessionView()
+                }
             }
         }
     }
