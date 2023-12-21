@@ -6,6 +6,7 @@ struct InboxView: View {
     @ObservedObject var viewModel = InboxViewModel()
     @ObservedObject var conversationViewModel: ConversationViewModel
     @State private var showingDeleteAlert = false
+    var verifiedPublicKeys: VerifiedPublicKeys
 
     var body: some View {
         HeaderView(type: .inbox, dismissAction: {
@@ -21,7 +22,8 @@ struct InboxView: View {
                         .padding(Padding.large)
                 }
                 if let inactiveConversations = viewModel.inactiveConversations,
-                   inactiveConversations.count > 0 {
+                   inactiveConversations.count > 0
+                {
                     inactiveConversationsView(for: inactiveConversations)
                 }
                 Spacer()
@@ -34,7 +36,7 @@ struct InboxView: View {
     }
 
     @ViewBuilder
-    private func messagingTitle(for recipient: JournalistData) -> Text {
+    private func messagingTitle() -> Text {
         Text("Messaging with")
     }
 
@@ -42,7 +44,7 @@ struct InboxView: View {
     func activeConversationView(for activeConversation: ActiveConversation) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
-                messagingTitle(for: activeConversation.recipient)
+                messagingTitle()
                     .textStyle(GuardianHeadlineSmallTextStyle())
                     .foregroundColor(Color.InboxView.activeMessageSubHeaderColor)
                 Text(activeConversation.recipient.displayName)
@@ -70,7 +72,8 @@ struct InboxView: View {
             .padding([.leading, .trailing], Padding.large)
             .padding([.top, .bottom], Padding.medium)
             if let isExpired = viewModel.activeConversation?.containsExpiringMessages,
-               let expiredDate = viewModel.activeConversation?.messageExpiringDate {
+               let expiredDate = viewModel.activeConversation?.messageExpiringDate
+            {
                 customDivider()
                 expiredInformationText(expiredDate: expiredDate)
                     .padding([.leading], Padding.medium)
@@ -99,7 +102,7 @@ struct InboxView: View {
     @ViewBuilder
     func inactiveConversationsRow(for inactiveConversation: InactiveConversation) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            messagingTitle(for: inactiveConversation.recipient)
+            messagingTitle()
                 .textStyle(GuardianHeadlineXSmallHeaderTextStyle())
                 .foregroundColor(Color.InboxView.previousMessagesSubheaderColor)
             Text(inactiveConversation.recipient.displayName)
@@ -110,7 +113,8 @@ struct InboxView: View {
                     navigation.destination = .viewConversation
                 }
             if inactiveConversation.containsExpiringMessages != nil,
-               let expiredDate = inactiveConversation.messageExpiringDate {
+               let expiredDate = inactiveConversation.messageExpiringDate
+            {
                 expiredInformationText(expiredDate: expiredDate)
             }
         }
@@ -138,7 +142,7 @@ struct InboxView: View {
                        Button("Yes, delete conversations", role: .destructive) {
                            Task {
                                navigation.destination = .home
-                               try await viewModel.deleteAllMessagesAndCurrentSession()
+                               try await viewModel.deleteAllMessagesAndCurrentSession(verifiedPublicKeys: verifiedPublicKeys)
                                if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
                                    try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
                                }
@@ -179,51 +183,5 @@ struct InboxView: View {
             .foregroundColor(Color.NewMessageView.messageInformationStrokeColor)
             .padding([.top, .trailing, .bottom], Padding.medium)
             .padding([.leading], 0)
-    }
-}
-
-struct PreviewView: View {
-    enum LoadingState: Equatable {
-        case loading, ready
-    }
-
-    @State var state = LoadingState.loading
-
-    var body: some View {
-        switch state {
-            case .loading:
-                ProgressView().onAppear {
-                    Task {
-                        let privateSendingQueueRepo = try? await PreviewView.initSendingQueue()
-
-                        let secretDataRepository = SecretDataRepository.shared
-                        let initMessages = await PreviewView.initMessages(secretDataRepository: secretDataRepository)
-                        state = .ready
-                    }
-                }
-            case .ready:
-                InboxView(viewModel: InboxViewModel(secretDataRepository: SecretDataRepository.shared), conversationViewModel: ConversationViewModel.shared)
-        }
-    }
-
-    static func initMessages(secretDataRepository: SecretDataRepository) async {
-        if let messages = try? await MessageHelper.loadMessagesFromDeadDrop() {
-            await MainActor.run {
-                secretDataRepository.secretData = messages
-            }
-        }
-    }
-
-    static func initSendingQueue() async throws {
-        let verifiedPublicKeys = PublicKeysHelper.shared.testKeys
-        if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
-            try await PrivateSendingQueueRepository.shared.start(coverMessageFactory: coverMessageFactory)
-        }
-    }
-}
-
-struct InboxView_Previews: PreviewProvider {
-    static var previews: some View {
-        PreviewView()
     }
 }

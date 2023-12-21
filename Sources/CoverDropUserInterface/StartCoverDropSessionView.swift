@@ -5,7 +5,6 @@ import SwiftUI
 
 struct StartCoverDropSessionView: View {
     @ObservedObject var navigation = Navigation.shared
-    @ObservedObject var coverDropService: CoverDropServices = .shared
     @ObservedObject private var viewModel = StartCoverDropSessionViewModel()
     @ObservedObject private var publicDataRepository = PublicDataRepository.shared
 
@@ -19,68 +18,57 @@ struct StartCoverDropSessionView: View {
     var body: some View {
         NavigationView {
             HeaderView(type: .home) {
-                if coverDropService.isReady {
-                    VStack(alignment: .leading) {
-                        titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
+                VStack(alignment: .leading) {
+                    titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
 
-                        Text("Our Secure Messaging service was developed by the Guardian to allow you to share stories with us securely and privately using strong encryption. It is designed to prevent others from even knowing you are in communication with us.").textStyle(BodyStyle())
+                    Text("Our Secure Messaging service was developed by the Guardian to allow you to share stories with us securely and privately using strong encryption. It is designed to prevent others from even knowing you are in communication with us.").textStyle(BodyStyle())
 
-                        Spacer()
-
-                        if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
-                           coverDropServiceStatus.isAvailable == false {
-                            VStack {
-                                Text("The Secure Messaging feature is currently not available. Please try again later. Below we show technical information that might be helpful.")
-                                Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
-                            }
-
-                        } else {
-                            Button("Get started") {
-                                showingNewMessageAlert = true
-                            }
-                            .disabled(!viewModel.keysAvailable)
-                            .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.keysAvailable))
-                            .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
-                                Button("Yes, start conversation") {
-                                    navigation.destination = .onboarding
-                                    viewModel.viewHidden()
-                                }
-                                Button("No", role: .cancel) {}
-                            }, message: {
-                                Text("Starting a new conversation will remove any prior messages from your inbox, if they existed. Do you want to continue?")
-                            })
-
-                            Button("Check your inbox") {
-                                navigation.destination = .login
-                                viewModel.viewHidden()
-                            }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
-                        }
-
-                    }.padding(Padding.large)
-                        .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+                    Spacer()
 
                     if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
-                       coverDropServiceStatus.isAvailable { customDivider()
-                        HStack {
-                            Button("About Secure Messaging") {
-                                navigation.destination = .about
-                                viewModel.viewHidden()
-                            }.buttonStyle(FooterButtonStyle())
-                            Button("Privacy policy") {
-                                navigation.destination = .privacy
-                                viewModel.viewHidden()
-                            }.buttonStyle(FooterButtonStyle())
+                       coverDropServiceStatus.isAvailable == false {
+                        VStack {
+                            Text("The Secure Messaging feature is currently not available. Please try again later. Below we show technical information that might be helpful.")
+                            Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
                         }
-                    }
-                } else {
-                    VStack {
-                        Spacer()
-                        Text("Loading...").textStyle(TitleStyle()).font(Font.headline.leading(.loose))
-                        ProgressView().progressViewStyle(.circular).foregroundColor(.white)
-                        Spacer()
 
-                    }.padding(10)
-                        .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+                    } else {
+                        Button("Get started") {
+                            showingNewMessageAlert = true
+                        }
+                        .disabled(!viewModel.keysAvailable)
+                        .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.keysAvailable))
+                        .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
+                            Button("Yes, start conversation") {
+                                navigation.destination = .onboarding
+                                viewModel.viewHidden()
+                            }
+                            Button("No", role: .cancel) {}
+                        }, message: {
+                            Text("Starting a new conversation will remove any prior messages from your inbox, if they existed. Do you want to continue?")
+                        })
+
+                        Button("Check your inbox") {
+                            navigation.destination = .login
+                            viewModel.viewHidden()
+                        }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
+                    }
+
+                }.padding(Padding.large)
+                    .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
+
+                if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
+                   coverDropServiceStatus.isAvailable { customDivider()
+                    HStack {
+                        Button("About Secure Messaging") {
+                            navigation.destination = .about
+                            viewModel.viewHidden()
+                        }.buttonStyle(FooterButtonStyle())
+                        Button("Privacy policy") {
+                            navigation.destination = .privacy
+                            viewModel.viewHidden()
+                        }.buttonStyle(FooterButtonStyle())
+                    }
                 }
             }
         }

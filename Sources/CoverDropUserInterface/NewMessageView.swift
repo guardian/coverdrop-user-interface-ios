@@ -9,13 +9,12 @@ struct NewMessageView: View {
     var isInboxEmpty: Bool
 
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping will allow us to fail fast in the case of developer error.
-    @StateObject var viewModel: ConversationViewModel
+    @ObservedObject var viewModel: ConversationViewModel
 
     init(viewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
         UITextView.appearance().backgroundColor = .clear
-        self.isInboxEmpty = inboxIsEmpty
-
-        _viewModel = StateObject(wrappedValue: viewModel)
+        isInboxEmpty = inboxIsEmpty
+        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -183,8 +182,7 @@ struct NewMessageView_Previews: PreviewProvider {
     }
 
     private static func viewModel() -> ConversationViewModel {
-        ConversationViewModel.shared.publicDataRepository.verifiedPublicKeysData = PublicKeysHelper.shared.testKeys
-        return ConversationViewModel.shared
+        return ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
     }
 
     private static func viewModelWithALongMessage() -> ConversationViewModel {

@@ -18,20 +18,26 @@ class Navigation: ObservableObject {
 
 struct AppNavigationView: View {
     @ObservedObject var secretDataRepository = SecretDataRepository.shared
-
+    @ObservedObject var coverDropService: CoverDropServices = .shared
     // This is used to track if the user is logging in with a new session
     @ObservedObject var navigation = Navigation.shared
 
     @ObservedObject var securitySuite = SecuritySuite.shared
+    @State var verifiedPublicKeysOpt: VerifiedPublicKeys?
+    @State var conversationViewModelOpt: ConversationViewModel?
 
     var body: some View {
         Group {
-            if !securitySuite.getEffectiveViolationsSet().isEmpty {
-                SecurityAlert()
-            } else if case .unlockedSecretData = secretDataRepository.secretData {
-                InboxStateView()
-            } else {
-                switch navigation.destination {
+            if let verifiedPublicKeys = verifiedPublicKeysOpt,
+               let conversationViewModel = conversationViewModelOpt,
+               coverDropService.isReady
+            {
+                if !securitySuite.getEffectiveViolationsSet().isEmpty {
+                    SecurityAlert()
+                } else if case .unlockedSecretData = secretDataRepository.secretData {
+                    InboxStateView(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel)
+                } else {
+                    switch navigation.destination {
                     case .about:
                         AboutCoverDropView()
                     case .privacy:
@@ -48,7 +54,17 @@ struct AppNavigationView: View {
                         StartCoverDropSessionView()
                     case _:
                         StartCoverDropSessionView()
+                    }
                 }
+            } else {
+                LoadingView()
+                    .onAppear {
+                        Task {
+                            let myVerifiedPublicKeys = try await PublicDataRepository.shared.loadAndVerifyPublicKeys()
+                            self.verifiedPublicKeysOpt = myVerifiedPublicKeys
+                            self.conversationViewModelOpt = .init(verifiedPublicKeys: myVerifiedPublicKeys)
+                        }
+                    }
             }
         }
     }

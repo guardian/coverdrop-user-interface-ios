@@ -10,13 +10,14 @@ struct JournalistMessageView: View {
     @ObservedObject var navigation = Navigation.shared
     @StateObject var messageViewModel: ConversationViewModel
     var config: ConfigType?
+    var verifiedPublicKeys: VerifiedPublicKeys
 
     // by default we want to make the user have to choose to send another message
     @State var alreadySentMessage: Bool = false
 
     var journalist: JournalistData
 
-    init(journalist: JournalistData, viewModel: ConversationViewModel, config: ConfigType? = PublicDataRepository.appConfig) {
+    init(journalist: JournalistData, viewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: ConfigType? = PublicDataRepository.appConfig) {
         self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
@@ -26,6 +27,7 @@ struct JournalistMessageView: View {
             UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
         _messageViewModel = StateObject(wrappedValue: viewModel)
+        self.verifiedPublicKeys = verifiedPublicKeys
     }
 
     var body: some View {
@@ -36,33 +38,47 @@ struct JournalistMessageView: View {
             }
         }) {
             VStack(alignment: .leading, spacing: 0) {
-                messageListView()
-                VStack {
-                    if !self.messageViewModel.isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation) {
-                        viewingInactiveConversation()
-                    } else if self.messageViewModel.isMostRecentMessageFromUser()
-                        && alreadySentMessage {
-                        messageSendView()
-                    } else {
-                        if let messageRecipient = self.messageViewModel.messageRecipient,
-                           let currentKey = messageRecipient.getLatestMessagingKey(),
-                           let config = config {
-                            if currentKey.isExpired(now: config.currentKeysPublishedTime()) {
-                                expiredKeysMessage(recipent: messageRecipient)
-                            } else if alreadySentMessage {
-                                messageSendView()
-                            } else {
-                                chooseToSentAnotherMessage()
-                            }
-                        } else {
-                            messageSendView()
-                        }
-                    }
+                let recipientOpt = messageViewModel.messageRecipient
+                if let recipient = recipientOpt {
+                    messageListView()
+                    messageComposeView(recipient: recipient)
                 }
             }
             .navigationBarTitle("Secure chat with \(journalist.displayName)", displayMode: .inline)
             .navigationBarHidden(true)
         }
+    }
+
+    private func messageComposeView(recipient: JournalistData) -> some View {
+        @State var expired = false
+        return VStack {
+            let inactive = !self.messageViewModel.isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation)
+            let isMostRecentMessageFromUser = self.messageViewModel.isMostRecentMessageFromUser()
+
+            if expired {
+                expiredKeysMessage(recipient: recipient)
+            } else if inactive {
+                viewingInactiveConversation()
+            } else if isMostRecentMessageFromUser && !alreadySentMessage {
+                chooseToSentAnotherMessage()
+            } else {
+                messageSendView()
+            }
+
+        }.onAppear {
+            Task {
+                expired = await isCurrentKeyExpired(recipient: recipient)
+            }
+        }
+    }
+
+    func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
+        if let currentKey = await recipient.getLatestMessagingKey(),
+           let config = config
+        {
+            return currentKey.isExpired(now: config.currentKeysPublishedTime())
+        }
+        return false
     }
 
     private func messageListView() -> some View {
@@ -127,8 +143,8 @@ struct JournalistMessageView: View {
         return InformationView(viewType: .info, title: "This conversation has been closed", message: "Go to your active conversation to send a message.").padding(Padding.medium)
     }
 
-    func expiredKeysMessage(recipent: JournalistData) -> some View {
-        return InformationView(viewType: .info, title: "\(recipent.displayName) is currently unavailable.", message: "Check your internet connection or try again later.")
+    func expiredKeysMessage(recipient: JournalistData) -> some View {
+        return InformationView(viewType: .info, title: "\(recipient.displayName) is currently unavailable.", message: "Check your internet connection or try again later.")
             .padding(Padding.medium)
     }
 
@@ -184,32 +200,5 @@ struct JournalistMessageView: View {
         case _:
             return
         }
-    }
-}
-
-struct JournalistMessageView_Previews: PreviewProvider {
-    @MainActor struct Container: View {
-        let previewConfig = ConfigType.devConfig
-        @State var viewModel = PreviewHelper.getConversationViewModel(recipient: PublicKeysHelper.shared.testDefaultJournalist!)
-        @State var anotherViewModel = PreviewHelper.getConversationViewModel(recipient: PublicKeysHelper.shared.getTestDesk!)
-        let privateSendingQueueRepo = initSendingQueue()
-
-        @MainActor var body: some View {
-            JournalistMessageView(journalist: PublicKeysHelper.shared.testDefaultJournalist!, viewModel: viewModel, config: previewConfig)
-            JournalistMessageView(journalist: PublicKeysHelper.shared.getTestDesk!, viewModel: anotherViewModel)
-        }
-    }
-
-    static func initSendingQueue() {
-        Task {
-            let verifiedPublicKeys = PublicKeysHelper.shared.testKeys
-            if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
-                try await PrivateSendingQueueRepository.shared.start(coverMessageFactory: coverMessageFactory)
-            }
-        }
-    }
-
-    static var previews: some View {
-        Container()
     }
 }

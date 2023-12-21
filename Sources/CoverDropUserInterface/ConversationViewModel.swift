@@ -24,14 +24,10 @@ struct MessageData {
     @Published var topic = ""
     @Published var state = State.initial
 
-    public static let shared = ConversationViewModel()
-
-    private init() {
+    public init(verifiedPublicKeys: VerifiedPublicKeys) {
         // We will always set messageRecipient to the supplied one
         // but set it with the defaul journalist if we can get any message reciepients from the keys
         // and the supplied recipient is nil
-        let verifiedPublicKeys: VerifiedPublicKeys? = PublicDataRepository.shared.verifiedPublicKeysData
-
         state = .loading
 
         messageRecipient = nil
@@ -98,8 +94,7 @@ struct MessageData {
     // This handles any errors and updates the view state.
     @MainActor
     func sendMessage() async throws {
-        guard let keyHierarchy = publicDataRepository.verifiedPublicKeysData
-        else {
+        guard let keyHierarchy = try? await publicDataRepository.loadAndVerifyPublicKeys() else {
             state = .error(message: "Unable to load public key")
             return
         }

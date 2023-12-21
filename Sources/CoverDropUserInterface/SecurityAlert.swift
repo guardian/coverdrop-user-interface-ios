@@ -3,12 +3,12 @@ import Foundation
 import SVGView
 import SwiftUI
 
-struct SecurityAlert: View {
+public struct SecurityAlert: View {
     @ObservedObject var securitySuite = SecuritySuite.shared
     @ObservedObject var navigation = Navigation.shared
     @Environment(\.dismiss) private var dismiss
 
-    var body: some View {
+    public var body: some View {
         NavigationView {
             HeaderView(type: .about, dismissAction: {
                 dismiss()

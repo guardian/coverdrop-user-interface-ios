@@ -46,8 +46,8 @@ struct IncomingMessageView: View {
                     }
 
                 }.background(messageData.isCurrentUser ? Color.JournalistNewMessageView.messageViewCurrentUserColor : Color.JournalistNewMessageView.messageViewUnselectedUserColor)
-                .cornerRadius(10)
-                .padding([.bottom], Padding.medium)
+                    .cornerRadius(10)
+                    .padding([.bottom], Padding.medium)
             }
             .id(id)
             // And if we are not the current user put a spacer at the end!
@@ -61,20 +61,11 @@ struct IncomingMessageView: View {
 struct MessageView_Previews: PreviewProvider {
     // swiftlint:disable force_try
     @MainActor struct Container: View {
-        let privateSendingQueueRepo = initSendingQueue()
+        let privateSendingQueueRepo = PreviewHelper.initSendingQueue()
         @State var nonExpiredMessage = IncomingMessageData(sender: PublicKeysHelper.shared.testDefaultJournalist!, messageText: "hey", dateReceived: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))))
 
         @MainActor var body: some View {
             IncomingMessageView(message: nonExpiredMessage, id: 1)
-        }
-    }
-
-    static func initSendingQueue() {
-        Task {
-            let verifiedPublicKeys = PublicKeysHelper.shared.testKeys
-            if let coverMesageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
-                try await PrivateSendingQueueRepository.shared.start(coverMessageFactory: coverMesageFactory)
-            }
         }
     }
 

@@ -207,7 +207,8 @@ class InboxViewModel: ObservableObject {
         let inactiveMailbox = mailboxRemovingOutbound?.filter {
             if case let .incomingMessage(message: incomingMessageType) = $0,
                case let .textMessage(message) = incomingMessageType,
-               message.sender == activeMessage.sender {
+               message.sender == activeMessage.sender
+            {
                 return false
             }
             return true
@@ -254,10 +255,9 @@ class InboxViewModel: ObservableObject {
     ///  4. empties the private sending queue, so any pending messages are also removed, this is to allow users
     ///     to change their mind after sending a message.
     ///
-    public func deleteAllMessagesAndCurrentSession() async throws {
+    public func deleteAllMessagesAndCurrentSession(verifiedPublicKeys: VerifiedPublicKeys) async throws {
         let publicDataRepository = PublicDataRepository.shared
-        if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData,
-           let verifiedPublicKeys = publicDataRepository.verifiedPublicKeysData {
+        if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
             unlockedSecretData.messageMailbox = []
             try await secretDataRepository.lock(unlockedData: unlockedSecretData)
             try await EncryptedStorage.createOrResetStorageWithRandomPassphrase()

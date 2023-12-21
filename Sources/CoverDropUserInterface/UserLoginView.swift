@@ -125,9 +125,7 @@ extension UserLoginView {
                 if session != nil {
                     passphrase = UserLoginView.passphraseArray()
                     // try and decrypt the stored dead drops
-                    if let date = PublicDataRepository.appConfig?.currentTime() {
-                        try await DeadDropDecryptionService().decryptStoredDeadDrops(dateReceived: date)
-                    }
+                    try await DeadDropDecryptionService().decryptStoredDeadDrops()
                 } else {
                     state = .errorUnableToUnlock
                 }

@@ -5,9 +5,12 @@ import SwiftUI
 
 struct InboxStateView: View {
     @ObservedObject var secretDataRepository = SecretDataRepository.shared
+    var verifiedPublicKeys: VerifiedPublicKeys
+    var conversationViewModel: ConversationViewModel
+
     var body: some View {
         if case let .unlockedSecretData(unlockedData: secretData) = secretDataRepository.secretData {
-            UnlockedSecretDataStateSwitcher(unlockedSecretData: secretData)
+            UnlockedSecretDataStateSwitcher(unlockedSecretData: secretData, conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
         }
     }
 }
@@ -19,7 +22,8 @@ struct InboxStateView: View {
 struct UnlockedSecretDataStateSwitcher: View {
     @ObservedObject var navigation = Navigation.shared
     @ObservedObject var unlockedSecretData: UnlockedSecretData
-    @ObservedObject var conversationViewModel: ConversationViewModel = .shared
+    @ObservedObject var conversationViewModel: ConversationViewModel
+    var verifiedPublicKeys: VerifiedPublicKeys
 
     var body: some View {
         if unlockedSecretData.messageMailbox.isEmpty {
@@ -39,15 +43,15 @@ struct UnlockedSecretDataStateSwitcher: View {
             } else if case .viewConversation = navigation.destination {
                 if conversationViewModel.messageRecipient != nil {
                     // This scenario is viewing an existing conversation
-                    JournalistMessageView(journalist: conversationViewModel.messageRecipient!, viewModel: conversationViewModel)
+                    JournalistMessageView(journalist: conversationViewModel.messageRecipient!, viewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
                 } else {
-                    InboxView(conversationViewModel: conversationViewModel)
+                    InboxView(conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
                 }
             } else if case .inbox = navigation.destination {
                 // This scenario is when the user has logged in
-                InboxView(conversationViewModel: conversationViewModel)
+                InboxView(conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
             } else {
-                InboxView(conversationViewModel: conversationViewModel)
+                InboxView(conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
             }
         }
     }
