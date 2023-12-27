@@ -9,16 +9,16 @@ struct NewMessageView: View {
     var isInboxEmpty: Bool
 
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping will allow us to fail fast in the case of developer error.
-    @ObservedObject var viewModel: ConversationViewModel
+    @ObservedObject var conversationViewModel: ConversationViewModel
 
     init(viewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
         UITextView.appearance().backgroundColor = .clear
         isInboxEmpty = inboxIsEmpty
-        self.viewModel = viewModel
+        conversationViewModel = viewModel
     }
 
     var body: some View {
-        switch viewModel.state {
+        switch conversationViewModel.state {
         case .initial, .loading, .sending:
             ProgressView()
         case .ready:
@@ -48,7 +48,7 @@ struct NewMessageView: View {
                     }
 
                     ZStack(alignment: .trailing) {
-                        if let messageRecipient = viewModel.messageRecipient {
+                        if let messageRecipient = conversationViewModel.messageRecipient {
                             Text("\(messageRecipient.displayName)")
                                 .textStyle(SelectRecipientTextStyle())
                                 .disableAutocorrection(true)
@@ -61,7 +61,7 @@ struct NewMessageView: View {
                                 .autocapitalization(.none)
                                 .accessibilityIdentifier("Selected Recipient")
                         }
-                        if let recipients = viewModel.recipients {
+                        if let recipients = conversationViewModel.recipients {
                             Button(action: {
                                 isSelectRecipientViewOpen = true
                             }, label: {
@@ -71,7 +71,7 @@ struct NewMessageView: View {
                                 }
                             }).sheet(isPresented: $isSelectRecipientViewOpen) {
                                 SelectRecipientView(isSelectRecipientViewOpen: $isSelectRecipientViewOpen,
-                                                    selectedRecipient: $viewModel.messageRecipient,
+                                                    selectedRecipient: $conversationViewModel.messageRecipient,
                                                     recipients: recipients)
                             }
                             .accessibilityIdentifier("Select a Recipient")
@@ -97,7 +97,7 @@ struct NewMessageView: View {
                                Task {
                                    if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
                                        navigation.destination = .inbox
-                                       try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
+                                       await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
                                    }
                                }
                            }
@@ -114,23 +114,23 @@ struct NewMessageView: View {
         Spacer()
         Rectangle().fill(Color.NewMessageView.messageToLongErrorColor)
             .frame(height: 2)
-            .opacity(viewModel.messageIsTooLong ? 1 : 0)
+            .opacity(conversationViewModel.messageIsTooLong ? 1 : 0)
         ZStack {
             // Send button
             Button("Send message") {
                 Task {
                     do {
-                        try await viewModel.sendMessage()
-                        viewModel.clearMessage()
+                        try await conversationViewModel.sendMessage()
+                        conversationViewModel.clearMessage()
                         isMessageViewLinkActive = true
                     } catch {
                         // We drop errors sliently to avoid giving away any user interaction in logs
                     }
                 }
             }
-            .buttonStyle(PrimaryButtonStyle(isDisabled: viewModel.sendButtonDisabled))
-            .disabled(viewModel.sendButtonDisabled)
-            .opacity(viewModel.messageIsTooLong ? 0 : 1)
+            .buttonStyle(PrimaryButtonStyle(isDisabled: conversationViewModel.sendButtonDisabled))
+            .disabled(conversationViewModel.sendButtonDisabled)
+            .opacity(conversationViewModel.messageIsTooLong ? 0 : 1)
             // Show an error on top, in case the message is too long
             HStack {
                 VStack(alignment: .leading) {
@@ -143,7 +143,7 @@ struct NewMessageView: View {
                         .textStyle(BodyStyle())
                         .padding(.leading, 28)
                 }
-                .opacity(viewModel.messageIsTooLong ? 1 : 0)
+                .opacity(conversationViewModel.messageIsTooLong ? 1 : 0)
             }
         }
     }
@@ -156,7 +156,7 @@ struct NewMessageView: View {
             Text("Briefly say who did what.")
                 .textStyle(FormLabelSubtitleTextStyle())
         }
-        TextEditor(text: $viewModel.topic)
+        TextEditor(text: $conversationViewModel.topic)
             .style(ComposeMessageTextStyle())
             .accessibilityIdentifier("Your message topic")
             .frame(height: 44)
@@ -167,7 +167,7 @@ struct NewMessageView: View {
             Text("Please include a bit about yourself.")
                 .textStyle(FormLabelSubtitleTextStyle())
         }
-        TextEditor(text: $viewModel.message)
+        TextEditor(text: $conversationViewModel.message)
             .style(ComposeMessageTextStyle())
             .accessibilityIdentifier("Compose your message")
             .frame(height: 140)

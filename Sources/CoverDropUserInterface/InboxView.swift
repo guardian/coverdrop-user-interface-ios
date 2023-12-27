@@ -12,8 +12,9 @@ struct InboxView: View {
         HeaderView(type: .inbox, dismissAction: {
             Task {
                 if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                    try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
+                    await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
                 }
+                navigation.destination = .home
             }
         }) {
             VStack {
@@ -142,10 +143,7 @@ struct InboxView: View {
                        Button("Yes, delete conversations", role: .destructive) {
                            Task {
                                navigation.destination = .home
-                               try await viewModel.deleteAllMessagesAndCurrentSession(verifiedPublicKeys: verifiedPublicKeys)
-                               if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                                   try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
-                               }
+                               try? await viewModel.deleteAllMessagesAndCurrentSession(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel)
                            }
                        }
                        Button("Cancel", role: .cancel) {}
@@ -167,8 +165,9 @@ struct InboxView: View {
             Button("Leave inbox") {
                 Task {
                     if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                        try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
+                        await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
                     }
+                    navigation.destination = .home
                 }
             }
             .buttonStyle(XSmallFilledButtonStyle())

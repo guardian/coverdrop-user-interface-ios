@@ -83,7 +83,8 @@ struct MessageData {
 
     func isCurrentConversationActive(maybeActiveConversation: ActiveConversation?) -> Bool {
         if let activeConversation = maybeActiveConversation,
-           let lastConversationMessage = currentConversation.last {
+           let lastConversationMessage = currentConversation.last
+        {
             return activeConversation.messages.contains(where: { $0 == lastConversationMessage })
         } else {
             return false
@@ -182,6 +183,15 @@ struct MessageData {
         message = ""
         topic = ""
         state = .ready
+    }
+
+    // This clears the value of `message`, removes the current recipient and locks the secret data.
+    // These are coupled to avoid developer error in doing them seperatly.
+    // This is called in the various places the user can logout or delete messages.
+    public func clearModelDataAndLock(unlockedData: UnlockedSecretData) async {
+        messageRecipient = nil
+        clearMessage()
+        try? await SecretDataRepository.shared.lock(unlockedData: unlockedData)
     }
 
     static let messageDateFormat: DateFormatter = {

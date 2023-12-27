@@ -4,6 +4,7 @@ import SwiftUI
 
 struct MessageSentView: View {
     @ObservedObject var navigation = Navigation.shared
+    @ObservedObject var conversationViewModel: ConversationViewModel
 
     var body: some View {
         NavigationView {
@@ -11,7 +12,7 @@ struct MessageSentView: View {
                 Task {
                     navigation.destination = .home
                     if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                        try await SecretDataRepository.shared.lock(unlockedData: unlockedData)
+                        await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
                     }
                 }
             }) {

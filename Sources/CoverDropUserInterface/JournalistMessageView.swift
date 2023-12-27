@@ -8,7 +8,7 @@ enum MessageError: Error {
 struct JournalistMessageView: View {
     @ObservedObject var inboxViewModel = InboxViewModel()
     @ObservedObject var navigation = Navigation.shared
-    @StateObject var messageViewModel: ConversationViewModel
+    @StateObject var conversationViewModel: ConversationViewModel
     var config: ConfigType?
     var verifiedPublicKeys: VerifiedPublicKeys
 
@@ -17,7 +17,7 @@ struct JournalistMessageView: View {
 
     var journalist: JournalistData
 
-    init(journalist: JournalistData, viewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: ConfigType? = PublicDataRepository.appConfig) {
+    init(journalist: JournalistData, conversationViewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: ConfigType? = PublicDataRepository.appConfig) {
         self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
@@ -26,7 +26,7 @@ struct JournalistMessageView: View {
         UITextView.appearance().textContainerInset =
             UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
-        _messageViewModel = StateObject(wrappedValue: viewModel)
+        _conversationViewModel = StateObject(wrappedValue: conversationViewModel)
         self.verifiedPublicKeys = verifiedPublicKeys
     }
 
@@ -34,11 +34,10 @@ struct JournalistMessageView: View {
         HeaderView(type: .viewConversation, dismissAction: {
             Task {
                 navigation.destination = .inbox
-                messageViewModel.messageRecipient = nil
             }
         }) {
             VStack(alignment: .leading, spacing: 0) {
-                let recipientOpt = messageViewModel.messageRecipient
+                let recipientOpt = conversationViewModel.messageRecipient
                 if let recipient = recipientOpt {
                     messageListView()
                     messageComposeView(recipient: recipient)
@@ -52,8 +51,8 @@ struct JournalistMessageView: View {
     private func messageComposeView(recipient: JournalistData) -> some View {
         @State var expired = false
         return VStack {
-            let inactive = !self.messageViewModel.isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation)
-            let isMostRecentMessageFromUser = self.messageViewModel.isMostRecentMessageFromUser()
+            let inactive = !self.conversationViewModel.isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation)
+            let isMostRecentMessageFromUser = self.conversationViewModel.isMostRecentMessageFromUser()
 
             if expired {
                 expiredKeysMessage(recipient: recipient)
@@ -86,16 +85,16 @@ struct JournalistMessageView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading) {
                     VStack(alignment: .center) {
-                        if let recipient = self.messageViewModel.messageRecipient {
+                        if let recipient = self.conversationViewModel.messageRecipient {
                             Text("\(Image(systemName: "lock.fill")) This is a secure conversation with \(recipient.displayName)").bold()
                         }
                     }
-                    switch self.messageViewModel.state {
+                    switch self.conversationViewModel.state {
                     case .initial, .loading, .ready, .sending:
-                        switch self.messageViewModel.secretDataRepository.secretData {
+                        switch self.conversationViewModel.secretDataRepository.secretData {
                         case let .unlockedSecretData(unlockedData: data):
-                            ForEach(messageViewModel.currentConversation.indices, id: \.self) { index in
-                                switch messageViewModel.currentConversation[index] {
+                            ForEach(conversationViewModel.currentConversation.indices, id: \.self) { index in
+                                switch conversationViewModel.currentConversation[index] {
                                 // We have a seperate view for incoming and outbound messages
                                 // because outbound messages have message statuses which cannot be observed
                                 // when inside an enum
@@ -151,7 +150,7 @@ struct JournalistMessageView: View {
     func messageSendView() -> some View {
         return VStack {
             messageLengthView()
-            TextEditor(text: $messageViewModel.message)
+            TextEditor(text: $conversationViewModel.message)
                 .style(ComposeMessageTextStyle())
                 .frame(minHeight: 60, maxHeight: 80)
                 .padding(Padding.medium)
@@ -159,18 +158,18 @@ struct JournalistMessageView: View {
 
             Button("Send") {
                 Task {
-                    try? await messageViewModel.sendMessage()
-                    messageViewModel.clearMessage()
+                    try? await conversationViewModel.sendMessage()
+                    conversationViewModel.clearMessage()
                 }
-            }.disabled(messageViewModel.sendButtonDisabled)
-                .buttonStyle(PrimaryButtonStyle(isDisabled: messageViewModel.sendButtonDisabled))
+            }.disabled(conversationViewModel.sendButtonDisabled)
+                .buttonStyle(PrimaryButtonStyle(isDisabled: conversationViewModel.sendButtonDisabled))
                 .padding([.horizontal], Padding.medium)
         }
     }
 
     func messageLengthView() -> some View {
         return VStack {
-            switch messageViewModel.messageLengthProgressPercentage {
+            switch conversationViewModel.messageLengthProgressPercentage {
             case let .success(percentage):
                 ProgressView(value: percentage, total: 100)
                     .progressViewStyle(LinearProgressViewStyle(tint: Color.ProgressBarStyle.fillingColor))
@@ -191,7 +190,7 @@ struct JournalistMessageView: View {
     }
 
     private func scrollToLastMessage(scrollViewProxy: ScrollViewProxy) {
-        switch messageViewModel.secretDataRepository.secretData {
+        switch conversationViewModel.secretDataRepository.secretData {
         case let .unlockedSecretData(unlockedData: data):
             let unwrappedId = data.messageMailbox.count - 1
             withAnimation {

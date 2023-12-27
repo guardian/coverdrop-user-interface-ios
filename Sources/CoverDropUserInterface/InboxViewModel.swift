@@ -254,12 +254,13 @@ class InboxViewModel: ObservableObject {
     ///  3. overwrites the encrypted storage on disk with a new session with random passphrase
     ///  4. empties the private sending queue, so any pending messages are also removed, this is to allow users
     ///     to change their mind after sending a message.
+    ///  5. removes the current recipient from memory
     ///
-    public func deleteAllMessagesAndCurrentSession(verifiedPublicKeys: VerifiedPublicKeys) async throws {
+    public func deleteAllMessagesAndCurrentSession(verifiedPublicKeys: VerifiedPublicKeys, conversationViewModel: ConversationViewModel) async throws {
         let publicDataRepository = PublicDataRepository.shared
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
             unlockedSecretData.messageMailbox = []
-            try await secretDataRepository.lock(unlockedData: unlockedSecretData)
+            await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedSecretData)
             try await EncryptedStorage.createOrResetStorageWithRandomPassphrase()
 
             if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {

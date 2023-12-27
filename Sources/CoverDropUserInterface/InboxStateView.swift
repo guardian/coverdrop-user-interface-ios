@@ -39,11 +39,11 @@ struct UnlockedSecretDataStateSwitcher: View {
         } else if !unlockedSecretData.messageMailbox.isEmpty {
             if case .newConversation = navigation.destination {
                 // This scenario is when the user has just sent their first message for this session (after the new message flow)
-                MessageSentView()
+                MessageSentView(conversationViewModel: conversationViewModel)
             } else if case .viewConversation = navigation.destination {
                 if conversationViewModel.messageRecipient != nil {
                     // This scenario is viewing an existing conversation
-                    JournalistMessageView(journalist: conversationViewModel.messageRecipient!, viewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
+                    JournalistMessageView(journalist: conversationViewModel.messageRecipient!, conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
                 } else {
                     InboxView(conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
                 }
