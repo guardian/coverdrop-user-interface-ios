@@ -40,9 +40,6 @@ struct MessageSentView: View {
                     Button("Go to your inbox") {
                         navigation.destination = .inbox
                     }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
-
-                    Button("Show your passphrase") {}.buttonStyle(SecondaryButtonStyle(isDisabled: false))
-
                 }.padding(Padding.large)
             }.foregroundColor(Color.MessageSentView.foregroundColor)
         }
