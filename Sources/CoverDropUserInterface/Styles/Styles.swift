@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct Padding {
+enum Padding {
     static let xLarge: CGFloat = 21
     static let large: CGFloat = 16
     static let medium: CGFloat = 12
@@ -304,7 +304,7 @@ struct FooterButtonStyle: ButtonStyle {
         return configuration.label
             .frame(maxWidth: .infinity)
             .foregroundColor(Color.FooterButtonStyle.foregroundColor)
-            .padding([.bottom], Padding.xLarge)
+            .padding([.bottom], Padding.medium)
             .padding([.top], Padding.xLarge)
             .font(.textSansBold, size: FontSize.buttonText)
     }

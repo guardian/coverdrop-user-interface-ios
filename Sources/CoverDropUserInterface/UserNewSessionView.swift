@@ -23,19 +23,20 @@ struct UserNewSessionView: View {
                 passphraseWordListView()
 
                 // Show the hide passphrase button when the text is revealed
-                if case .shown = viewModel.currentState {
+                if case .shown = viewModel.passphraseVisibilityState {
                     HStack(alignment: .top) {
                         Spacer()
                         Button(action: {
-                            self.viewModel.currentState = .hidden
+                            self.viewModel.passphraseVisibilityState = .hidden
                         }, label: {
                             Label("Hide passphrase", systemImage: "eye.slash.fill")
                         }).buttonStyle(HideButtonStyle())
+                            .accessibilityIdentifier("Hide passphrase")
                     }
                 }
 
                 Spacer()
-                switch viewModel.currentState {
+                switch viewModel.passphraseVisibilityState {
                 case .shown:
                     Button("I have remembered my passphrase") {
                         Task {
@@ -46,7 +47,7 @@ struct UserNewSessionView: View {
                     }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
                 case .hidden:
                     Button(action: {
-                        self.viewModel.currentState = .shown
+                        self.viewModel.passphraseVisibilityState = .shown
                     }, label: {
                         Label("Reveal passphrase", systemImage: "eye.fill")
                     }).buttonStyle(PrimaryButtonStyle(isDisabled: false))
@@ -56,37 +57,42 @@ struct UserNewSessionView: View {
 
             }.padding(Padding.large)
                 .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-                .onAppear {
-                    self.viewModel.currentState = .hidden
-                    do {
-                        try viewModel.newPassphrase()
-                    } catch {
-                        self.viewModel.currentState = .error(NewSessionError.failedToGeneratePassphrase)
-                    }
-
-                    tertiaryButton(action: {
-                                       navigation.destination = .login
-                                   },
-                                   text: "I already have a passphrase")
-                }
+            tertiaryButton(action: {
+                               navigation.destination = .login
+                           },
+                           text: "I already have a passphrase")
         }
     }
 
     func passphraseWordListView() -> some View {
         VStack {
-            ForEach(Array(self.viewModel.passphraseWords.enumerated()), id: \.element) { id, word in
-                switch viewModel.currentState {
-                case .shown:
-                    Text(word)
-                        .textStyle(PassphraseTextStyle())
-                        .accessibilityIdentifier("Word \(id + 1)")
-                case .hidden:
-                    Text("●●●●●●").textStyle(PassphraseTextStyle())
-                case let .error(error):
-                    Text("Error: \(error.localizedDescription)")
+            if let passphraseWords = viewModel.passphraseWords {
+                ForEach(Array(passphraseWords.enumerated()), id: \.element) { id, word in
+                    switch viewModel.passphraseVisibilityState {
+                    case .shown:
+                        Text(word)
+                            .textStyle(PassphraseTextStyle())
+                            .accessibilityIdentifier("Word \(id + 1)")
+                    case .hidden:
+                        Text("●●●●●●").textStyle(PassphraseTextStyle())
+                    case let .error(error):
+                        Text("Error: \(error.localizedDescription)")
+                    }
+
+                }.frame(maxWidth: .infinity)
+            } else {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .tint(.white)
+                    .padding(Padding.large)
+            }
+        }.background(Color.UserNewSessionView.wordListBackgroundColor)
+            .frame(maxWidth: .infinity)
+            .onAppear {
+                Task {
+                    viewModel.initializeWithNewPassphrase()
                 }
-            }.frame(maxWidth: .infinity)
-        }.background(Color.UserNewSessionView.wordListBackgroundColor).frame(maxWidth: .infinity)
+            }
     }
 }
 
@@ -97,7 +103,7 @@ extension UserNewSessionView {
             case error(Error)
         }
 
-        @Published var currentState: State = .hidden
+        @Published var passphraseVisibilityState: State = .hidden
 
         @Published private(set) var passphrase: ValidPassword? {
             didSet {
@@ -105,11 +111,16 @@ extension UserNewSessionView {
             }
         }
 
-        @Published private(set) var passphraseWords: [String] = []
+        @Published private(set) var passphraseWords: [String]?
 
         public init() {}
 
-        func newPassphrase() throws {
+        func initializeWithNewPassphrase() {
+            passphraseVisibilityState = .hidden
+            newPassphrase()
+        }
+
+        func newPassphrase() {
             let newPassphrase = EncryptedStorage.newStoragePassphrase()
             passphrase = newPassphrase
         }
@@ -123,10 +134,10 @@ extension UserNewSessionView {
                 if let validPassphrase = passphrase {
                     _ = try await EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: validPassphrase)
                 } else {
-                    currentState = .error("Missing Passphrase")
+                    passphraseVisibilityState = .error("Missing Passphrase")
                 }
             } catch {
-                currentState = .error(error)
+                passphraseVisibilityState = .error(error)
             }
         }
     }

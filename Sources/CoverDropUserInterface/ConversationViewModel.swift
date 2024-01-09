@@ -130,13 +130,14 @@ struct MessageData {
         }
     }
 
-    // We want to disable the send button when the message box is empty, too long or we are in the sending state
+    // We want to disable the send button when the message box is empty,
+    // too long, no recipient is selected, or we are in the sending state
     var sendButtonDisabled: Bool {
         switch state {
         case .sending:
             return false
         case _:
-            return message.isEmpty || messageIsTooLong
+            return message.isEmpty || messageIsTooLong || messageRecipient == nil
         }
     }
 

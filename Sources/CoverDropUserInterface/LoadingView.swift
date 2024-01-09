@@ -7,8 +7,8 @@ struct LoadingView: View {
         HeaderView(type: .onboarding) {
             VStack {
                 Spacer()
-                Text("Loading...").textStyle(TitleStyle()).font(Font.headline.leading(.loose))
-                ProgressView().progressViewStyle(.circular).foregroundColor(.white)
+                Text("Loading...").font(Font.headline.leading(.loose))
+                ProgressView().progressViewStyle(.circular).tint(.white)
                 Spacer()
             }.padding(10)
                 .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
