@@ -6,10 +6,10 @@ enum MessageError: Error {
 }
 
 struct JournalistMessageView: View {
-    @ObservedObject var inboxViewModel = InboxViewModel()
+    @ObservedObject var inboxViewModel: InboxViewModel
     @ObservedObject var navigation = Navigation.shared
     @StateObject var conversationViewModel: ConversationViewModel
-    var config: ConfigType?
+    var config: ConfigType
     var verifiedPublicKeys: VerifiedPublicKeys
 
     // by default we want to make the user have to choose to send another message
@@ -17,7 +17,7 @@ struct JournalistMessageView: View {
 
     var journalist: JournalistData
 
-    init(journalist: JournalistData, conversationViewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: ConfigType? = PublicDataRepository.appConfig) {
+    init(journalist: JournalistData, conversationViewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: ConfigType) {
         self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
@@ -28,6 +28,7 @@ struct JournalistMessageView: View {
 
         _conversationViewModel = StateObject(wrappedValue: conversationViewModel)
         self.verifiedPublicKeys = verifiedPublicKeys
+        inboxViewModel = InboxViewModel(config: config)
     }
 
     var body: some View {
@@ -72,9 +73,7 @@ struct JournalistMessageView: View {
     }
 
     func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
-        if let currentKey = await recipient.getLatestMessagingKey(),
-           let config = config
-        {
+        if let currentKey = await recipient.getLatestMessagingKey() {
             return currentKey.isExpired(now: config.currentKeysPublishedTime())
         }
         return false

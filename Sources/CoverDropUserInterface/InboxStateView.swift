@@ -7,10 +7,11 @@ struct InboxStateView: View {
     @ObservedObject var secretDataRepository = SecretDataRepository.shared
     var verifiedPublicKeys: VerifiedPublicKeys
     var conversationViewModel: ConversationViewModel
+    var config: ConfigType
 
     var body: some View {
         if case let .unlockedSecretData(unlockedData: secretData) = secretDataRepository.secretData {
-            UnlockedSecretDataStateSwitcher(unlockedSecretData: secretData, conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
+            UnlockedSecretDataStateSwitcher(unlockedSecretData: secretData, conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys, config: config)
         }
     }
 }
@@ -24,6 +25,7 @@ struct UnlockedSecretDataStateSwitcher: View {
     @ObservedObject var unlockedSecretData: UnlockedSecretData
     @ObservedObject var conversationViewModel: ConversationViewModel
     var verifiedPublicKeys: VerifiedPublicKeys
+    var config: ConfigType
 
     var body: some View {
         if unlockedSecretData.messageMailbox.isEmpty {
@@ -43,15 +45,15 @@ struct UnlockedSecretDataStateSwitcher: View {
             } else if case .viewConversation = navigation.destination {
                 if conversationViewModel.messageRecipient != nil {
                     // This scenario is viewing an existing conversation
-                    JournalistMessageView(journalist: conversationViewModel.messageRecipient!, conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
+                    JournalistMessageView(journalist: conversationViewModel.messageRecipient!, conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys, config: config)
                 } else {
-                    InboxView(conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
+                    InboxView(inboxViewModel: InboxViewModel(config: config), conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
                 }
             } else if case .inbox = navigation.destination {
                 // This scenario is when the user has logged in
-                InboxView(conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
+                InboxView(inboxViewModel: InboxViewModel(config: config), conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
             } else {
-                InboxView(conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
+                InboxView(inboxViewModel: InboxViewModel(config: config), conversationViewModel: conversationViewModel, verifiedPublicKeys: verifiedPublicKeys)
             }
         }
     }

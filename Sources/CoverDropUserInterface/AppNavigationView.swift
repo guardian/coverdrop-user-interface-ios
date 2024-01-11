@@ -21,6 +21,7 @@ struct AppNavigationView: View {
     @ObservedObject var coverDropService: CoverDropServices = .shared
     // This is used to track if the user is logging in with a new session
     @ObservedObject var navigation = Navigation.shared
+    var config: ConfigType
 
     @ObservedObject var securitySuite = SecuritySuite.shared
     @State var verifiedPublicKeysOpt: VerifiedPublicKeys?
@@ -35,7 +36,7 @@ struct AppNavigationView: View {
                 if !securitySuite.getEffectiveViolationsSet().isEmpty {
                     SecurityAlert()
                 } else if case .unlockedSecretData = secretDataRepository.secretData {
-                    InboxStateView(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel)
+                    InboxStateView(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel, config: config)
                 } else {
                     switch navigation.destination {
                     case .about:
@@ -45,11 +46,11 @@ struct AppNavigationView: View {
                     case .onboarding:
                         OnboardingView()
                     case .newPassphrase:
-                        UserNewSessionView()
+                        UserNewSessionView(config: config)
                     case .login:
-                        UserLoginView()
+                        UserLoginView(config: config)
                     case .newConversation:
-                        UserLoginView()
+                        UserLoginView(config: config)
                     case .home:
                         StartCoverDropSessionView()
                     case _:

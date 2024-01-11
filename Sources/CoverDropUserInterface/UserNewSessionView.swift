@@ -9,6 +9,7 @@ enum NewSessionError: Error {
 }
 
 struct UserNewSessionView: View {
+    var config: ConfigType
     @ObservedObject var navigation = Navigation.shared
     @ObservedObject var viewModel: UserNewSessionView.UserNewSessionViewModel = UserNewSessionViewModel()
 
@@ -90,7 +91,7 @@ struct UserNewSessionView: View {
             .frame(maxWidth: .infinity)
             .onAppear {
                 Task {
-                    viewModel.initializeWithNewPassphrase()
+                    viewModel.initializeWithNewPassphrase(passphraseWordCount: config.passphraseWordCount)
                 }
             }
     }
@@ -115,13 +116,13 @@ extension UserNewSessionView {
 
         public init() {}
 
-        func initializeWithNewPassphrase() {
+        func initializeWithNewPassphrase(passphraseWordCount: Int) {
             passphraseVisibilityState = .hidden
-            newPassphrase()
+            newPassphrase(passphraseWordCount: passphraseWordCount)
         }
 
-        func newPassphrase() {
-            let newPassphrase = EncryptedStorage.newStoragePassphrase()
+        func newPassphrase(passphraseWordCount: Int) {
+            let newPassphrase = EncryptedStorage.newStoragePassphrase(passphraseWordCount: passphraseWordCount)
             passphrase = newPassphrase
         }
 

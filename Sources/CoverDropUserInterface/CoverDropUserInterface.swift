@@ -1,3 +1,4 @@
+import CoverDropCore
 import Foundation
 import SwiftUI
 
@@ -16,7 +17,7 @@ public enum CoverDropUserInterface {
         coverProvider.coverView.removeFromSuperview()
     }
 
-    public static func initialView() -> AnyView {
-        return AnyView(AppNavigationView())
+    public static func initialView(config: ConfigType) -> AnyView {
+        return AnyView(AppNavigationView(config: config))
     }
 }

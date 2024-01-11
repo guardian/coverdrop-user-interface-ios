@@ -127,6 +127,7 @@ public struct InactiveConversation: Equatable {
 
 @MainActor
 class InboxViewModel: ObservableObject {
+    var config: ConfigType
     private var mailbox: Set<Message>? {
         guard case let .unlockedSecretData(unlockedData: data) = secretDataRepository.secretData else { return nil }
         return data.messageMailbox
@@ -142,7 +143,8 @@ class InboxViewModel: ObservableObject {
 
     @ObservedObject private var secretDataRepository: SecretDataRepository = .shared
 
-    init(secretDataRepository: SecretDataRepository? = nil) {
+    init(config: ConfigType, secretDataRepository: SecretDataRepository? = nil) {
+        self.config = config
         if let secretDataRepository {
             self.secretDataRepository = secretDataRepository
         }
@@ -261,7 +263,7 @@ class InboxViewModel: ObservableObject {
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
             unlockedSecretData.messageMailbox = []
             await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedSecretData)
-            try await EncryptedStorage.createOrResetStorageWithRandomPassphrase()
+            try await EncryptedStorage.createOrResetStorageWithRandomPassphrase(passphraseWordCount: config.passphraseWordCount)
 
             if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
                 try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory: coverMessageFactory)

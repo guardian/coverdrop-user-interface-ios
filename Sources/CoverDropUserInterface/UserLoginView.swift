@@ -7,9 +7,11 @@ import SwiftUI
 struct UserLoginView: View {
     @ObservedObject var viewModel: UserLoginViewModel
     @ObservedObject var navigation = Navigation.shared
+    var config: ConfigType
 
-    public init() {
-        viewModel = UserLoginViewModel()
+    public init(config: ConfigType) {
+        viewModel = UserLoginViewModel(config: config)
+        self.config = config
     }
 
     var body: some View {
@@ -42,14 +44,6 @@ struct UserLoginView: View {
             }.padding(Padding.medium)
                 .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
         }
-    }
-
-    static func passphraseArray() -> [String] {
-        return [String](repeating: "", count: UserLoginView.UserLoginViewModel.passphraseLength)
-    }
-
-    static func passphraseVisibilityArray() -> [Bool] {
-        return [Bool](repeating: true, count: UserLoginView.UserLoginViewModel.passphraseLength)
     }
 
     private func passphraseWordListTextFieldView() -> some View {
@@ -91,25 +85,38 @@ struct UserLoginView: View {
 struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewWrapper(StatefulPreviewWrapper(false) { _ in
-            UserLoginView()
+            UserLoginView(config: .devConfig)
         })
     }
 }
 
 extension UserLoginView {
     class UserLoginViewModel: ObservableObject {
+        var config: ConfigType
         enum State {
             case inital, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
         }
 
-        public static let passphraseLength = ApplicationConfig.config.passphraseWordCount
-
-        @Published var passphrase: [String] = passphraseArray()
-        @Published var passphraseFieldsMasked: [Bool] = passphraseVisibilityArray()
+        @Published var passphrase: [String]
+        @Published var passphraseFieldsMasked: [Bool]
 
         @ObservedObject var secretDataRepository = SecretDataRepository.shared
 
         @Published var state: State = .inital
+
+        init(config: ConfigType) {
+            passphrase = UserLoginView.UserLoginViewModel.passphraseArray(passphraseWordCount: config.passphraseWordCount)
+            passphraseFieldsMasked = UserLoginView.UserLoginViewModel.passphraseVisibilityArray(passphraseWordCount: config.passphraseWordCount)
+            self.config = config
+        }
+
+        static func passphraseArray(passphraseWordCount: Int) -> [String] {
+            return [String](repeating: "", count: passphraseWordCount)
+        }
+
+        static func passphraseVisibilityArray(passphraseWordCount: Int) -> [Bool] {
+            return [Bool](repeating: true, count: passphraseWordCount)
+        }
 
         func login() async throws {
             state = .inital
@@ -123,7 +130,7 @@ extension UserLoginView {
                 let session = try? await secretDataRepository.unlock(passphrase: validPassphrase)
 
                 if session != nil {
-                    passphrase = UserLoginView.passphraseArray()
+                    passphrase = UserLoginView.UserLoginViewModel.passphraseArray(passphraseWordCount: config.passphraseWordCount)
                     // try and decrypt the stored dead drops
                     try await DeadDropDecryptionService().decryptStoredDeadDrops()
                 } else {

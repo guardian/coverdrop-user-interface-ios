@@ -3,7 +3,7 @@ import SwiftUI
 
 struct InboxView: View {
     @ObservedObject var navigation = Navigation.shared
-    @ObservedObject var viewModel = InboxViewModel()
+    @ObservedObject var inboxViewModel: InboxViewModel
     @ObservedObject var conversationViewModel: ConversationViewModel
     @State private var showingDeleteAlert = false
     var verifiedPublicKeys: VerifiedPublicKeys
@@ -18,11 +18,11 @@ struct InboxView: View {
             }
         }) {
             VStack {
-                if let activeConversation = viewModel.activeConversation {
+                if let activeConversation = inboxViewModel.activeConversation {
                     activeConversationView(for: activeConversation)
                         .padding(Padding.large)
                 }
-                if let inactiveConversations = viewModel.inactiveConversations,
+                if let inactiveConversations = inboxViewModel.inactiveConversations,
                    inactiveConversations.count > 0
                 {
                     inactiveConversationsView(for: inactiveConversations)
@@ -72,8 +72,8 @@ struct InboxView: View {
             }
             .padding([.leading, .trailing], Padding.large)
             .padding([.top, .bottom], Padding.medium)
-            if let isExpired = viewModel.activeConversation?.containsExpiringMessages,
-               let expiredDate = viewModel.activeConversation?.messageExpiringDate
+            if let isExpired = inboxViewModel.activeConversation?.containsExpiringMessages,
+               let expiredDate = inboxViewModel.activeConversation?.messageExpiringDate
             {
                 customDivider()
                 expiredInformationText(expiredDate: expiredDate)
@@ -143,7 +143,7 @@ struct InboxView: View {
                        Button("Yes, delete conversations", role: .destructive) {
                            Task {
                                navigation.destination = .home
-                               try? await viewModel.deleteAllMessagesAndCurrentSession(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel)
+                               try? await inboxViewModel.deleteAllMessagesAndCurrentSession(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel)
                            }
                        }
                        Button("Cancel", role: .cancel) {}
