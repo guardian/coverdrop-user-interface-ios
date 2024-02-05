@@ -127,7 +127,7 @@ extension UserLoginView {
                     return
                 }
 
-                let session = try? await secretDataRepository.unlock(passphrase: validPassphrase)
+                let session: ()? = try? await secretDataRepository.unlock(passphrase: validPassphrase)
 
                 if session != nil {
                     passphrase = UserLoginView.UserLoginViewModel.passphraseArray(passphraseWordCount: config.passphraseWordCount)

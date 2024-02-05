@@ -83,8 +83,7 @@ struct MessageData {
 
     func isCurrentConversationActive(maybeActiveConversation: ActiveConversation?) -> Bool {
         if let activeConversation = maybeActiveConversation,
-           let lastConversationMessage = currentConversation.last
-        {
+           let lastConversationMessage = currentConversation.last {
             return activeConversation.messages.contains(where: { $0 == lastConversationMessage })
         } else {
             return false

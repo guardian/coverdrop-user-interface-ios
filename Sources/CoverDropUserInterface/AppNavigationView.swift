@@ -31,8 +31,7 @@ struct AppNavigationView: View {
         Group {
             if let verifiedPublicKeys = verifiedPublicKeysOpt,
                let conversationViewModel = conversationViewModelOpt,
-               coverDropService.isReady
-            {
+               coverDropService.isReady {
                 if !securitySuite.getEffectiveViolationsSet().isEmpty {
                     SecurityAlert()
                 } else if case .unlockedSecretData = secretDataRepository.secretData {

@@ -23,8 +23,7 @@ struct InboxView: View {
                         .padding(Padding.large)
                 }
                 if let inactiveConversations = inboxViewModel.inactiveConversations,
-                   inactiveConversations.count > 0
-                {
+                   inactiveConversations.count > 0 {
                     inactiveConversationsView(for: inactiveConversations)
                 }
                 Spacer()
@@ -72,9 +71,8 @@ struct InboxView: View {
             }
             .padding([.leading, .trailing], Padding.large)
             .padding([.top, .bottom], Padding.medium)
-            if let isExpired = inboxViewModel.activeConversation?.containsExpiringMessages,
-               let expiredDate = inboxViewModel.activeConversation?.messageExpiringDate
-            {
+            if inboxViewModel.activeConversation?.containsExpiringMessages != nil,
+               let expiredDate = inboxViewModel.activeConversation?.messageExpiringDate {
                 customDivider()
                 expiredInformationText(expiredDate: expiredDate)
                     .padding([.leading], Padding.medium)
@@ -113,9 +111,8 @@ struct InboxView: View {
                     conversationViewModel.messageRecipient = inactiveConversation.recipient
                     navigation.destination = .viewConversation
                 }
-            if inactiveConversation.containsExpiringMessages != nil,
-               let expiredDate = inactiveConversation.messageExpiringDate
-            {
+            if inactiveConversation.containsExpiringMessages,
+               let expiredDate = inactiveConversation.messageExpiringDate {
                 expiredInformationText(expiredDate: expiredDate)
             }
         }

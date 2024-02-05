@@ -77,7 +77,7 @@ struct SelectRecipientView_Previews: PreviewProvider {
         PreviewWrapper(SelectRecipientView(isSelectRecipientViewOpen: .constant(true),
                                            selectedRecipient: .constant(testRecipients!.defaultRecipient!),
                                            recipients: testRecipients!))
-        var removedDesks = testRecipients?.removeDesks()
+        var _: ()? = testRecipients?.removeDesks()
         PreviewWrapper(SelectRecipientView(isSelectRecipientViewOpen: .constant(true),
                                            selectedRecipient: .constant(testRecipients!.defaultRecipient!),
                                            recipients: testRecipients!))

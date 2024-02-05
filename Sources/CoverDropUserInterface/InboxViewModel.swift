@@ -20,7 +20,7 @@ public struct ActiveConversation: Equatable {
                         return false
                     }
 
-                case let .handoverMessage(message: handover):
+                case .handoverMessage:
                     return false
                 }
             case let .outboundMessage(message: messageData):
@@ -83,7 +83,7 @@ public struct InactiveConversation: Equatable {
                         return false
                     }
 
-                case let .handoverMessage(message: handover):
+                case .handoverMessage:
                     return false
                 }
             case let .outboundMessage(message: messageData):
@@ -209,8 +209,7 @@ class InboxViewModel: ObservableObject {
         let inactiveMailbox = mailboxRemovingOutbound?.filter {
             if case let .incomingMessage(message: incomingMessageType) = $0,
                case let .textMessage(message) = incomingMessageType,
-               message.sender == activeMessage.sender
-            {
+               message.sender == activeMessage.sender {
                 return false
             }
             return true
@@ -259,7 +258,7 @@ class InboxViewModel: ObservableObject {
     ///  5. removes the current recipient from memory
     ///
     public func deleteAllMessagesAndCurrentSession(verifiedPublicKeys: VerifiedPublicKeys, conversationViewModel: ConversationViewModel) async throws {
-        let publicDataRepository = PublicDataRepository.shared
+        _ = PublicDataRepository.shared
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
             unlockedSecretData.messageMailbox = []
             await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedSecretData)

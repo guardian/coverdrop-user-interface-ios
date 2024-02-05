@@ -59,9 +59,9 @@ struct IncomingMessageView: View {
 }
 
 struct MessageView_Previews: PreviewProvider {
-    // swiftlint:disable force_try
+
     @MainActor struct Container: View {
-        let privateSendingQueueRepo = PreviewHelper.initSendingQueue()
+        let privateSendingQueueRepo: () = PreviewHelper.initSendingQueue()
         @State var nonExpiredMessage = IncomingMessageData(sender: PublicKeysHelper.shared.testDefaultJournalist!, messageText: "hey", dateReceived: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))))
 
         @MainActor var body: some View {

@@ -26,8 +26,7 @@ struct StartCoverDropSessionView: View {
                     Spacer()
 
                     if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
-                       coverDropServiceStatus.isAvailable == false
-                    {
+                       coverDropServiceStatus.isAvailable == false {
                         VStack {
                             Text("The Secure Messaging feature is currently not available. Please try again later. Below we show technical information that might be helpful.")
                             Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
@@ -59,8 +58,8 @@ struct StartCoverDropSessionView: View {
                     .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
 
                 if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
-                   coverDropServiceStatus.isAvailable
-                { customDivider()
+                   coverDropServiceStatus.isAvailable {
+                    customDivider()
                     HStack(alignment: .center) {
                         Button("About Secure Messaging") {
                             navigation.destination = .about
@@ -86,12 +85,12 @@ struct StartCoverDropSessionView: View {
 
 struct StartCoverDropSessionView_Previews: PreviewProvider {
     @MainActor struct Container: View {
-        let setup = setupView()
+        let setup: () = setupView()
 
         @MainActor var body: some View {
-            let available = setAvailabe()
+            let _: () = setAvailabe()
             PreviewWrapper(StartCoverDropSessionView())
-            let unavailable = setUnavailabe()
+            let _: () = setUnavailabe()
             PreviewWrapper(StartCoverDropSessionView())
         }
     }

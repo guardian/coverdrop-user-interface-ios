@@ -76,9 +76,8 @@ struct OutboundMessageView: View {
 }
 
 struct OutboundMessageView_Previews: PreviewProvider {
-    // swiftlint:disable force_try
     @MainActor struct Container: View {
-        let privateSendingQueueRepo = PreviewHelper.initSendingQueue()
+        let privateSendingQueueRepo: () = PreviewHelper.initSendingQueue()
         @State var nonExpiredMessage = OutboundMessageData(
             messageRecipient: PublicKeysHelper.shared.testDefaultJournalist!,
             messageText: "hey",
