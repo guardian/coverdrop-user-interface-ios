@@ -22,7 +22,7 @@ final class MessageViewModelTests: XCTestCase {
     @MainActor
     func testMessageLengthWithShortMessage() async {
         // GIVEN a `MessageViewModel`
-        let sut = await ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
+        let sut = ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
 
         // WHEN a short message is added
         sut.topic = "This is a short topic"
@@ -35,7 +35,7 @@ final class MessageViewModelTests: XCTestCase {
     @MainActor
     func testMessageLengthWithLongTopic() async {
         // GIVEN a `MessageViewModel`
-        let sut = await ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
+        let sut = ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
 
         // WHEN a long topic is added
         let shortTopic = "This will be an incredibly long topic."
@@ -54,7 +54,7 @@ final class MessageViewModelTests: XCTestCase {
     @MainActor
     func testMessageLengthWithLongMessage() async {
         // GIVEN a `MessageViewModel`
-        let sut = await ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
+        let sut = ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
 
         // WHEN a long message is added
         let shortMessage = "This will be an incredibly long message."
