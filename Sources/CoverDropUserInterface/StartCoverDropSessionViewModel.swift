@@ -25,7 +25,7 @@ class StartCoverDropSessionViewModel: ObservableObject {
     // new message process without sending a message
     func isInboxEmpty() -> Bool {
         if case let .unlockedSecretData(data) = SecretDataRepository.shared.secretData {
-            return data.messageMailbox.isEmpty
+            return data.unlockedData.messageMailbox.isEmpty
         } else {
             return false
         }

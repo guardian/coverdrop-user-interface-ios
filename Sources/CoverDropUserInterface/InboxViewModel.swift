@@ -130,7 +130,7 @@ class InboxViewModel: ObservableObject {
     var config: ConfigType
     private var mailbox: Set<Message>? {
         guard case let .unlockedSecretData(unlockedData: data) = secretDataRepository.secretData else { return nil }
-        return data.messageMailbox
+        return data.unlockedData.messageMailbox
     }
 
     var activeConversation: ActiveConversation? {
@@ -260,7 +260,7 @@ class InboxViewModel: ObservableObject {
     public func deleteAllMessagesAndCurrentSession(verifiedPublicKeys: VerifiedPublicKeys, conversationViewModel: ConversationViewModel) async throws {
         _ = PublicDataRepository.shared
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
-            unlockedSecretData.messageMailbox = []
+            unlockedSecretData.unlockedData.messageMailbox = []
             await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedSecretData)
             try await EncryptedStorage.createOrResetStorageWithRandomPassphrase(passphraseWordCount: config.passphraseWordCount)
 

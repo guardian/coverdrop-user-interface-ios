@@ -22,13 +22,13 @@ struct InboxStateView: View {
 // this `UnlockedSecretData` into a new view so that we can observe changes to the mailbox
 struct UnlockedSecretDataStateSwitcher: View {
     @ObservedObject var navigation = Navigation.shared
-    @ObservedObject var unlockedSecretData: UnlockedSecretData
+    @ObservedObject var unlockedSecretData: UnlockedSecretDataService
     @ObservedObject var conversationViewModel: ConversationViewModel
     var verifiedPublicKeys: VerifiedPublicKeys
     var config: ConfigType
 
     var body: some View {
-        if unlockedSecretData.messageMailbox.isEmpty {
+        if unlockedSecretData.unlockedData.messageMailbox.isEmpty {
             if case .newConversation = navigation.destination {
                 // This scenario is when the user has logged in for the first time
                 // after creating a new session and has never sent a message
@@ -38,7 +38,7 @@ struct UnlockedSecretDataStateSwitcher: View {
                 // session, and is re-logging in
                 NewMessageView(viewModel: conversationViewModel, inboxIsEmpty: true)
             }
-        } else if !unlockedSecretData.messageMailbox.isEmpty {
+        } else if !unlockedSecretData.unlockedData.messageMailbox.isEmpty {
             if case .newConversation = navigation.destination {
                 // This scenario is when the user has just sent their first message for this session (after the new message flow)
                 MessageSentView(conversationViewModel: conversationViewModel)

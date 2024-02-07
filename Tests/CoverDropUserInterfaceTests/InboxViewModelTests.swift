@@ -38,9 +38,9 @@ final class InboxViewModelTests: XCTestCase {
 
         let privateSendingQueueSecret = try PrivateSendingQueueSecret.fromSecureRandom()
         // GIVEN a mailbox with no messages
-        let recentOutboundMessage = try Message.outboundMessage(message: OutboundMessageData(messageRecipient: firstTestJournalist,
-                                                                                             messageText: messageText,
-                                                                                             dateSent: testDate(), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
+        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(messageRecipient: firstTestJournalist,
+                                                                                         messageText: messageText,
+                                                                                         dateSent: testDate(), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
         // WHEN when finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: [recentOutboundMessage])
 

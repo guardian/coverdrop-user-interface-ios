@@ -73,7 +73,7 @@ struct JournalistMessageView: View {
     }
 
     func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
-        if let currentKey = await recipient.getLatestMessagingKey() {
+        if let currentKey = await PublicDataRepository.getLatestMessagingKey(recipientId: recipient.recipientId) {
             return currentKey.isExpired(now: config.currentKeysPublishedTime())
         }
         return false
@@ -106,7 +106,7 @@ struct JournalistMessageView: View {
                                 case let .outboundMessage(message: outboundMessage):
                                     OutboundMessageView(outboundMessage: outboundMessage, id: index)
                                 }
-                            }.onChange(of: data.messageMailbox.count) { _ in
+                            }.onChange(of: data.unlockedData.messageMailbox.count) { _ in
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
                             }.onAppear {
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
@@ -191,7 +191,7 @@ struct JournalistMessageView: View {
     private func scrollToLastMessage(scrollViewProxy: ScrollViewProxy) {
         switch conversationViewModel.secretDataRepository.secretData {
         case let .unlockedSecretData(unlockedData: data):
-            let unwrappedId = data.messageMailbox.count - 1
+            let unwrappedId = data.unlockedData.messageMailbox.count - 1
             withAnimation {
                 scrollViewProxy.scrollTo(unwrappedId, anchor: .bottom)
             }

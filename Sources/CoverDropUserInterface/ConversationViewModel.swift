@@ -56,7 +56,7 @@ struct MessageData {
     var currentConversation: [Message] {
         switch secretDataRepository.secretData {
         case let .unlockedSecretData(unlockedData: data):
-            let filteredMailbox: [Message] = data.messageMailbox.filter { message in
+            let filteredMailbox: [Message] = data.unlockedData.messageMailbox.filter { message in
                 switch message {
                 case let .incomingMessage(message: messageData):
                     if case let .textMessage(message: incomingMessage) = messageData {
@@ -188,7 +188,7 @@ struct MessageData {
     // This clears the value of `message`, removes the current recipient and locks the secret data.
     // These are coupled to avoid developer error in doing them seperatly.
     // This is called in the various places the user can logout or delete messages.
-    public func clearModelDataAndLock(unlockedData: UnlockedSecretData) async {
+    public func clearModelDataAndLock(unlockedData: UnlockedSecretDataService) async {
         messageRecipient = nil
         clearMessage()
         try? await SecretDataRepository.shared.lock(unlockedData: unlockedData)
@@ -203,7 +203,7 @@ struct MessageData {
     func isMostRecentMessageFromUser() -> Bool {
         switch secretDataRepository.secretData {
         case let .unlockedSecretData(unlockedData: data):
-            if let recentMessage: Message = data.messageMailbox.sorted(by: >).first {
+            if let recentMessage: Message = data.unlockedData.messageMailbox.sorted(by: >).first {
                 switch recentMessage {
                 case .outboundMessage:
                     return true
