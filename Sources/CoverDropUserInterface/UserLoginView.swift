@@ -7,9 +7,9 @@ import SwiftUI
 struct UserLoginView: View {
     @ObservedObject var viewModel: UserLoginViewModel
     @ObservedObject var navigation = Navigation.shared
-    var config: ConfigType
+    var config: CoverDropConfig
 
-    public init(config: ConfigType) {
+    public init(config: CoverDropConfig) {
         viewModel = UserLoginViewModel(config: config)
         self.config = config
     }
@@ -85,14 +85,14 @@ struct UserLoginView: View {
 struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewWrapper(StatefulPreviewWrapper(false) { _ in
-            UserLoginView(config: .devConfig)
+            UserLoginView(config: StaticConfig.devConfig)
         })
     }
 }
 
 extension UserLoginView {
     class UserLoginViewModel: ObservableObject {
-        var config: ConfigType
+        var config: CoverDropConfig
         enum State {
             case inital, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
         }
@@ -104,7 +104,7 @@ extension UserLoginView {
 
         @Published var state: State = .inital
 
-        init(config: ConfigType) {
+        init(config: CoverDropConfig) {
             passphrase = UserLoginView.UserLoginViewModel.passphraseArray(passphraseWordCount: config.passphraseWordCount)
             passphraseFieldsMasked = UserLoginView.UserLoginViewModel.passphraseVisibilityArray(passphraseWordCount: config.passphraseWordCount)
             self.config = config

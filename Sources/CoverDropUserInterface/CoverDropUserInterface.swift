@@ -17,7 +17,7 @@ public enum CoverDropUserInterface {
         coverProvider.coverView.removeFromSuperview()
     }
 
-    public static func initialView(config: ConfigType) -> AnyView {
+    public static func initialView(config: CoverDropConfig) -> AnyView {
         return AnyView(AppNavigationView(config: config))
     }
 }

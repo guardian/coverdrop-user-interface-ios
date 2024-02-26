@@ -9,7 +9,7 @@ enum NewSessionError: Error {
 }
 
 struct UserNewSessionView: View {
-    var config: ConfigType
+    var config: CoverDropConfig
     @ObservedObject var navigation = Navigation.shared
     @ObservedObject var viewModel: UserNewSessionView.UserNewSessionViewModel = UserNewSessionViewModel()
 

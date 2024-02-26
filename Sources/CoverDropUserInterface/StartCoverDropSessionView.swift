@@ -104,7 +104,7 @@ struct StartCoverDropSessionView_Previews: PreviewProvider {
     }
 
     public static func setupView() {
-        PublicDataRepository.setup(ConfigType.devConfig)
+        PublicDataRepository.setup(StaticConfig.devConfig)
         PublicDataRepository.shared.areKeysAvailable = true
         CoverDropServices.shared.isReady = true
         PublicDataRepository.shared.coverDropServiceStatus = StatusData(status: .available, description: "", timestamp: RFC3339DateTimeString(date: Date()), isAvailable: true)

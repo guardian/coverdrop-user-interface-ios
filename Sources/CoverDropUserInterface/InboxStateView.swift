@@ -7,7 +7,7 @@ struct InboxStateView: View {
     @ObservedObject var secretDataRepository = SecretDataRepository.shared
     var verifiedPublicKeys: VerifiedPublicKeys
     var conversationViewModel: ConversationViewModel
-    var config: ConfigType
+    var config: CoverDropConfig
 
     var body: some View {
         if case let .unlockedSecretData(unlockedData: secretData) = secretDataRepository.secretData {
@@ -25,7 +25,7 @@ struct UnlockedSecretDataStateSwitcher: View {
     @ObservedObject var unlockedSecretData: UnlockedSecretDataService
     @ObservedObject var conversationViewModel: ConversationViewModel
     var verifiedPublicKeys: VerifiedPublicKeys
-    var config: ConfigType
+    var config: CoverDropConfig
 
     var body: some View {
         if unlockedSecretData.unlockedData.messageMailbox.isEmpty {

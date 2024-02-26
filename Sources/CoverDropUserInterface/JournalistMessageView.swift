@@ -9,7 +9,7 @@ struct JournalistMessageView: View {
     @ObservedObject var inboxViewModel: InboxViewModel
     @ObservedObject var navigation = Navigation.shared
     @StateObject var conversationViewModel: ConversationViewModel
-    var config: ConfigType
+    var config: CoverDropConfig
     var verifiedPublicKeys: VerifiedPublicKeys
 
     // by default we want to make the user have to choose to send another message
@@ -17,7 +17,7 @@ struct JournalistMessageView: View {
 
     var journalist: JournalistData
 
-    init(journalist: JournalistData, conversationViewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: ConfigType) {
+    init(journalist: JournalistData, conversationViewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: CoverDropConfig) {
         self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)

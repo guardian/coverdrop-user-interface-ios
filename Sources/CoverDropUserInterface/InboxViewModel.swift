@@ -127,7 +127,7 @@ public struct InactiveConversation: Equatable {
 
 @MainActor
 class InboxViewModel: ObservableObject {
-    var config: ConfigType
+    var config: CoverDropConfig
     private var mailbox: Set<Message>? {
         guard case let .unlockedSecretData(unlockedData: data) = secretDataRepository.secretData else { return nil }
         return data.unlockedData.messageMailbox
@@ -143,7 +143,7 @@ class InboxViewModel: ObservableObject {
 
     @ObservedObject private var secretDataRepository: SecretDataRepository = .shared
 
-    init(config: ConfigType, secretDataRepository: SecretDataRepository? = nil) {
+    init(config: CoverDropConfig, secretDataRepository: SecretDataRepository? = nil) {
         self.config = config
         if let secretDataRepository {
             self.secretDataRepository = secretDataRepository

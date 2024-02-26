@@ -21,7 +21,7 @@ struct AppNavigationView: View {
     @ObservedObject var coverDropService: CoverDropServices = .shared
     // This is used to track if the user is logging in with a new session
     @ObservedObject var navigation = Navigation.shared
-    var config: ConfigType
+    var config: CoverDropConfig
 
     @ObservedObject var securitySuite = SecuritySuite.shared
     @State var verifiedPublicKeysOpt: VerifiedPublicKeys?
