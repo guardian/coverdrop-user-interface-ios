@@ -133,6 +133,16 @@ struct SentMessageMetadata: ViewModifier {
     }
 }
 
+struct MessageTextErrorMessage: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Label(configuration)
+            .foregroundColor(Color.NewMessageView.messageToLongErrorColor)
+            .font(.textSansBold,
+                  size: FontSize.bodyText,
+                  lineHeight: 23)
+    }
+}
+
 struct UserNotificationTextStyle: ViewModifier {
     func body(content: Content) -> some View {
         content

@@ -141,21 +141,6 @@ struct NewMessageView: View {
             }
             .buttonStyle(PrimaryButtonStyle(isDisabled: conversationViewModel.sendButtonDisabled))
             .disabled(conversationViewModel.sendButtonDisabled)
-            .opacity(conversationViewModel.messageIsTooLong ? 0 : 1)
-            // Show an error on top, in case the message is too long
-            HStack {
-                VStack(alignment: .leading) {
-                    Label("Message limit reached", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundColor(Color.NewMessageView.messageToLongErrorColor)
-                        .font(.textSansBold,
-                              size: FontSize.bodyText,
-                              lineHeight: 23)
-                    Text("Please shorten your message")
-                        .textStyle(BodyStyle())
-                        .padding(.leading, 28)
-                }
-                .opacity(conversationViewModel.messageIsTooLong ? 1 : 0)
-            }
         }
     }
 
@@ -178,10 +163,13 @@ struct NewMessageView: View {
             Text("Please include a bit about yourself.")
                 .textStyle(FormLabelSubtitleTextStyle())
         }
-        TextEditor(text: $conversationViewModel.message)
-            .style(ComposeMessageTextStyle())
-            .accessibilityIdentifier("Compose your message")
-            .frame(height: 140)
+        VStack(alignment: .leading, spacing: 0) {
+            MessageLengthProgressView(messageLengthProgressPercentage: conversationViewModel.messageLengthProgressPercentage)
+            TextEditor(text: $conversationViewModel.message)
+                .style(ComposeMessageTextStyle())
+                .accessibilityIdentifier("Compose your message")
+                .frame(height: 140)
+        }
 
         Spacer()
     }
@@ -190,6 +178,7 @@ struct NewMessageView: View {
 struct NewMessageView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewWrapper(NewMessageView(viewModel: viewModel()))
+        PreviewWrapper(NewMessageView(viewModel: viewModelWithALongMessage()))
     }
 
     private static func viewModel() -> ConversationViewModel {
@@ -198,12 +187,23 @@ struct NewMessageView_Previews: PreviewProvider {
 
     private static func viewModelWithALongMessage() -> ConversationViewModel {
         let viewModel = viewModel()
-        let shortMessage = "This will be an incredibly long message."
+        let shortMessage = """
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dolor
+                nulla, ornare et tristique imperdiet, dictum sit amet velit. Curabitur pharetra erat sed
+                neque interdum, non mattis tortor auctor. Curabitur eu ipsum ac neque semper eleifend.
+                Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+                Integer erat mi, ultrices nec arcu ut, sagittis sollicitudin est. In hac habitasse
+                platea dictumst. Sed in efficitur elit. Curabitur nec commodo elit. Aliquam tincidunt
+                rutrum nisl ut facilisis. Aenean ornare ut mauris eget lacinia. Mauris a felis quis orci
+                auctor varius sit amet eget est. Curabitur a urna sit amet diam sagittis aliquet eget eu
+                sapien. Curabitur a pharetra purus.
+                Nulla facilisi. Suspendisse potenti. Morbi mollis aliquet sapien sed faucibus. Donec
+                aliquam nibh nibh, ac faucibus felis aliquam at. Pellentesque egestas enim sem, eu
+                tempor urna posuere eget. Cras fermentum commodo neque ac gravida.
+        """
         viewModel.message = shortMessage
 
-        for _ in 1 ... 2000 {
-            viewModel.message.append(contentsOf: shortMessage)
-        }
+        viewModel.message.append(contentsOf: shortMessage)
 
         return viewModel
     }

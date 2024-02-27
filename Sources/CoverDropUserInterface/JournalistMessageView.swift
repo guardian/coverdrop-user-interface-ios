@@ -168,8 +168,9 @@ struct JournalistMessageView: View {
     }
 
     func messageSendView() -> some View {
-        return VStack {
-            messageLengthView()
+        return VStack(alignment: .leading, spacing: 0) {
+            MessageLengthProgressView(messageLengthProgressPercentage: conversationViewModel.messageLengthProgressPercentage)
+                .padding([.horizontal], Padding.medium)
             TextEditor(text: $conversationViewModel.message)
                 .style(ComposeMessageTextStyle())
                 .frame(minHeight: 60, maxHeight: 80)
@@ -185,28 +186,6 @@ struct JournalistMessageView: View {
                 .buttonStyle(PrimaryButtonStyle(isDisabled: conversationViewModel.sendButtonDisabled))
                 .padding([.horizontal], Padding.medium)
         }
-    }
-
-    func messageLengthView() -> some View {
-        return VStack {
-            switch conversationViewModel.messageLengthProgressPercentage {
-            case let .success(percentage):
-                ProgressView(value: percentage, total: 100)
-                    .progressViewStyle(LinearProgressViewStyle(tint: Color.ProgressBarStyle.fillingColor))
-            case let .failure(errorType):
-                switch errorType {
-                case .invalidCharacter:
-                    Text("You've entered an invalid character")
-                case .textTooLong:
-                    Text("Message limit reached")
-                    Text("Please shorten your message")
-                    ProgressView(value: 100, total: 100)
-                        .progressViewStyle(LinearProgressViewStyle(tint: Color.ProgressBarStyle.fullColor))
-                case .compressionFailed, .unknownError:
-                    Text("Message error, please try again later")
-                }
-            }
-        }.foregroundColor(Color.JournalistNewMessageView.messageListForegroundColor)
     }
 
     private func scrollToLastMessage(scrollViewProxy: ScrollViewProxy) {
