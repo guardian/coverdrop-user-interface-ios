@@ -169,8 +169,10 @@ struct JournalistMessageView: View {
 
     func messageSendView() -> some View {
         return VStack(alignment: .leading, spacing: 0) {
-            MessageLengthProgressView(messageLengthProgressPercentage: conversationViewModel.messageLengthProgressPercentage)
-                .padding([.horizontal], Padding.medium)
+            MessageLengthProgressView(
+                messageLengthProgressPercentage: conversationViewModel.messageLengthProgressPercentage
+            )
+            .padding([.horizontal], Padding.medium)
             TextEditor(text: $conversationViewModel.message)
                 .style(ComposeMessageTextStyle())
                 .frame(minHeight: 60, maxHeight: 80)

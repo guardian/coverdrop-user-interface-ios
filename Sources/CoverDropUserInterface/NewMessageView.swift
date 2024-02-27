@@ -164,7 +164,9 @@ struct NewMessageView: View {
                 .textStyle(FormLabelSubtitleTextStyle())
         }
         VStack(alignment: .leading, spacing: 0) {
-            MessageLengthProgressView(messageLengthProgressPercentage: conversationViewModel.messageLengthProgressPercentage)
+            MessageLengthProgressView(
+                messageLengthProgressPercentage: conversationViewModel.messageLengthProgressPercentage
+            )
             TextEditor(text: $conversationViewModel.message)
                 .style(ComposeMessageTextStyle())
                 .accessibilityIdentifier("Compose your message")
