@@ -21,14 +21,26 @@ struct StartCoverDropSessionView: View {
                 VStack(alignment: .leading) {
                     titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
 
-                    Text("Our Secure Messaging service was developed by the Guardian to allow you to share stories with us securely and privately using strong encryption. It is designed to prevent others from even knowing you are in communication with us.").textStyle(BodyStyle())
+                    Text(
+                        """
+                            Our Secure Messaging service was developed by the Guardian to allow you to share
+                            stories with us securely and privately using strong encryption.
+                            It is designed to prevent others from even knowing you are in communication with us.
+                        """
+                    )
+                    .textStyle(BodyStyle())
 
                     Spacer()
 
                     if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
                        coverDropServiceStatus.isAvailable == false {
                         VStack {
-                            Text("The Secure Messaging feature is currently not available. Please try again later. Below we show technical information that might be helpful.")
+                            Text(
+                                """
+                                    The Secure Messaging feature is currently not available.
+                                    Please try again later. Below we show technical information that might be helpful.
+                                """
+                            )
                             Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
                         }
 
@@ -45,7 +57,12 @@ struct StartCoverDropSessionView: View {
                             }
                             Button("No", role: .cancel) {}
                         }, message: {
-                            Text("Starting a new conversation will remove any prior messages from your inbox, if they existed. Do you want to continue?")
+                            Text(
+                                """
+                                Starting a new conversation will remove any prior messages from your inbox,
+                                if they existed. Do you want to continue?
+                                """
+                            )
                         })
 
                         Button("Check your inbox") {
@@ -96,18 +113,33 @@ struct StartCoverDropSessionView_Previews: PreviewProvider {
     }
 
     public static func setAvailabe() {
-        PublicDataRepository.shared.coverDropServiceStatus = StatusData(status: .available, description: "Service is available", timestamp: RFC3339DateTimeString(date: Date()), isAvailable: true)
+        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
+            status: .available,
+            description: "Service is available",
+            timestamp: RFC3339DateTimeString(date: Date()),
+            isAvailable: true
+        )
     }
 
     public static func setUnavailabe() {
-        PublicDataRepository.shared.coverDropServiceStatus = StatusData(status: .noInformation, description: "Service is unavailable", timestamp: RFC3339DateTimeString(date: Date()), isAvailable: false)
+        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
+            status: .noInformation,
+            description: "Service is unavailable",
+            timestamp: RFC3339DateTimeString(date: Date()),
+            isAvailable: false
+        )
     }
 
     public static func setupView() {
         PublicDataRepository.setup(StaticConfig.devConfig)
         PublicDataRepository.shared.areKeysAvailable = true
         CoverDropServices.shared.isReady = true
-        PublicDataRepository.shared.coverDropServiceStatus = StatusData(status: .available, description: "", timestamp: RFC3339DateTimeString(date: Date()), isAvailable: true)
+        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
+            status: .available,
+            description: "",
+            timestamp: RFC3339DateTimeString(date: Date()),
+            isAvailable: true
+        )
     }
 
     static var previews: some View {

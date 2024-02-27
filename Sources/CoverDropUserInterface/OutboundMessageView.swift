@@ -41,10 +41,11 @@ struct OutboundMessageView: View {
                             .textStyle(MessageMetadata())
                             .padding([.trailing], Padding.medium)
                     }
-
-                }.background(messageData.isCurrentUser ? Color.JournalistNewMessageView.messageViewCurrentUserColor : Color.JournalistNewMessageView.messageViewUnselectedUserColor)
-                    .cornerRadius(10)
-                    .padding([.bottom], Padding.medium)
+                }
+                .background(messageData.isCurrentUser ? Color.JournalistNewMessageView
+                    .messageViewCurrentUserColor : Color.JournalistNewMessageView.messageViewUnselectedUserColor)
+                .cornerRadius(10)
+                .padding([.bottom], Padding.medium)
             }
             .id(id)
             // And if we are not the current user put a spacer at the end!
@@ -57,7 +58,8 @@ struct OutboundMessageView: View {
     private func messageSentStatus(expiringStatus: MessageStatus) -> some View {
         HStack {
             if case let .expiring(expiryDate) = expiringStatus {
-                Text("\(Image(systemName: "info.circle.fill")) Expiring in \(expiryDate)").textStyle(ExpiringMessageMetadata())
+                Text("\(Image(systemName: "info.circle.fill")) Expiring in \(expiryDate)")
+                    .textStyle(ExpiringMessageMetadata())
                     .padding([.leading], Padding.medium)
                     .accessibilityIdentifier("Expiring in")
             } else if outboundMessage.isPending {

@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// These colours represent the Guardian palette. The colour definitons themselves should not change, but new colours from the palette can of course be added as required. To change a colour in the UI, change the UI component's semantic colour definition by selecting a new Guardian palette colour.
+/// These colours represent the Guardian palette. The colour definitons themselves should not change, but new colours
+/// from the palette can of course be added as required. To change a colour in the UI, change the UI component's
+/// semantic colour definition by selecting a new Guardian palette colour.
 private extension Color {
     enum GuardianColor {
         static let lightGrey = Color(red: 250 / 255, green: 250 / 255, blue: 250 / 255)
@@ -22,7 +24,8 @@ private extension Color {
     }
 }
 
-/// Coverdrop does not currently support appearances (i.e. light/dark mode). When adding support, ensure that every semantic colour below returns a dynamic colour, providing a separate colour value for each appearance
+/// Coverdrop does not currently support appearances (i.e. light/dark mode). When adding support, ensure that every
+/// semantic colour below returns a dynamic colour, providing a separate colour value for each appearance
 extension Color {
     enum PrimaryButtonStyle {
         static let backgroundColor = GuardianColor.brandAlt400

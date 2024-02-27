@@ -19,7 +19,14 @@ struct UserNewSessionView: View {
         }) {
             VStack(alignment: .leading) {
                 Text("Remember Passphrase").textStyle(TitleStyle())
-                Text("You will always need this passphrase to access your secure inbox. So please ensure you memorise it. It must be entered in the correct order with the correct spelling.").textStyle(BodyStyle())
+                Text(
+                    """
+                    You will always need this passphrase to access your secure inbox.
+                    So please ensure you memorise it.
+                    It must be entered in the correct order with the correct spelling.
+                    """
+                )
+                .textStyle(BodyStyle())
 
                 passphraseWordListView()
 

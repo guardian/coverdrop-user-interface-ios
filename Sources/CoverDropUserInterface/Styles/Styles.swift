@@ -38,7 +38,10 @@ struct PassphraseFieldStyle: TextFieldStyle {
             .padding(Padding.large)
             .font(.textSansRegular, size: FontSize.textField)
             .background(
-                RoundedRectangle(cornerRadius: CornerRadius.small).stroke(Color.PassphraseFieldStyle.strokeColor, lineWidth: 1)
+                RoundedRectangle(cornerRadius: CornerRadius.small).stroke(
+                    Color.PassphraseFieldStyle.strokeColor,
+                    lineWidth: 1
+                )
             )
             .background(Color.PassphraseFieldStyle.backgroundColor)
     }
@@ -326,7 +329,12 @@ struct PrimaryButtonStyle: ButtonStyle {
     let foregroundColor = Color.PrimaryButtonStyle.foregroundColor
 
     func makeBody(configuration: Self.Configuration) -> some View {
-        return LargeButtonStyle(backgroundColor: backgroundColor, foregroundColor: foregroundColor, isDisabled: isDisabled, stroke: false).makeBody(configuration: configuration)
+        return LargeButtonStyle(
+            backgroundColor: backgroundColor,
+            foregroundColor: foregroundColor,
+            isDisabled: isDisabled,
+            stroke: false
+        ).makeBody(configuration: configuration)
     }
 }
 
@@ -336,7 +344,12 @@ struct SecondaryButtonStyle: ButtonStyle {
     let foregroundColor = Color.SecondaryButtonStyle.foregroundColor
 
     func makeBody(configuration: Self.Configuration) -> some View {
-        return LargeButtonStyle(backgroundColor: backgroundColor, foregroundColor: foregroundColor, isDisabled: isDisabled, stroke: true).makeBody(configuration: configuration)
+        return LargeButtonStyle(
+            backgroundColor: backgroundColor,
+            foregroundColor: foregroundColor,
+            isDisabled: isDisabled,
+            stroke: true
+        ).makeBody(configuration: configuration)
     }
 }
 
@@ -362,17 +375,22 @@ struct LargeButtonStyle: ButtonStyle {
     let stroke: Bool
 
     func makeBody(configuration: Self.Configuration) -> some View {
-        let currentForegroundColor = isDisabled || configuration.isPressed ? Color.LargeButtonStyle.highlightForegroundColor : foregroundColor
+        let currentForegroundColor = isDisabled || configuration.isPressed ? Color.LargeButtonStyle
+            .highlightForegroundColor : foregroundColor
         return configuration.label
             .frame(maxWidth: .infinity)
             .padding(Padding.medium)
             .padding([.leading, .trailing], Padding.xLarge)
             .foregroundColor(currentForegroundColor)
-            .background(isDisabled || configuration.isPressed ? Color.LargeButtonStyle.highlightBackgroundColor : backgroundColor)
+            .background(isDisabled || configuration.isPressed ? Color.LargeButtonStyle
+                .highlightBackgroundColor : backgroundColor)
             // This is the key part, we are using both an overlay as well as cornerRadius
             .cornerRadius(CornerRadius.large)
             .overlay(
-                stroke ? RoundedRectangle(cornerRadius: CornerRadius.large).stroke(currentForegroundColor, lineWidth: 1) : nil
+                stroke ? RoundedRectangle(cornerRadius: CornerRadius.large).stroke(
+                    currentForegroundColor,
+                    lineWidth: 1
+                ) : nil
             )
             .padding([.top, .bottom], Padding.small)
             .font(.textSansBold, size: FontSize.buttonText)
@@ -387,8 +405,12 @@ struct XSmallButtonStyle: ButtonStyle {
                 .padding([.top, .bottom], Padding.xSmall)
                 .background(
                     Capsule()
-                        .stroke(configuration.isPressed ? Color.XSmallButtonStyle.highlightStrokeColor : Color.XSmallButtonStyle.strokeColor,
-                                lineWidth: 1))
+                        .stroke(
+                            configuration.isPressed ? Color.XSmallButtonStyle.highlightStrokeColor : Color
+                                .XSmallButtonStyle.strokeColor,
+                            lineWidth: 1
+                        )
+                )
         }
         .foregroundColor(Color.XSmallButtonStyle.foregroundColor)
         .padding(10) // this ensures a larger, invisible tap area
@@ -404,7 +426,8 @@ struct XSmallFilledButtonStyle: ButtonStyle {
                 .padding([.top, .bottom], Padding.xSmall)
                 .background(
                     Capsule()
-                        .foregroundColor(Color.XSmallFilledButtonStyle.buttonColor))
+                        .foregroundColor(Color.XSmallFilledButtonStyle.buttonColor)
+                )
         }
         .foregroundColor(Color.XSmallFilledButtonStyle.textColor)
         .padding(10) // this ensures a larger, invisible tap area
@@ -434,14 +457,18 @@ private struct RecipientListItemStyle: ViewModifier {
 
 // MARK: Segmented control styling
 
-// Native segmented controls do not support much styling, but we can override their appearance proxy to make some adjustments.
+// Native segmented controls do not support much styling, but we can override their appearance proxy to make some
+// adjustments.
 enum SegmentedControlAppearance {
     static func setup() {
-        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.SegmentedControlAppearance.selectedSegmentTintColor)
+        UISegmentedControl.appearance()
+            .selectedSegmentTintColor = UIColor(Color.SegmentedControlAppearance.selectedSegmentTintColor)
         guard let font = UIFont(name: CoverDropFonts.GuardianFontStyle.textSansBold.fontName,
                                 size: FontSize.segmentedControlText) else { return }
-        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor(Color.SegmentedControlAppearance.textForegroundColor),
-                              NSAttributedString.Key.font: font]
+        let textAttributes = [
+            NSAttributedString.Key.foregroundColor: UIColor(Color.SegmentedControlAppearance.textForegroundColor),
+            NSAttributedString.Key.font: font
+        ]
         UISegmentedControl.appearance().setTitleTextAttributes(textAttributes, for: .normal)
         UISegmentedControl.appearance().setTitleTextAttributes(textAttributes, for: .selected)
     }

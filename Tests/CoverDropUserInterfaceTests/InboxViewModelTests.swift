@@ -16,7 +16,10 @@ final class InboxViewModelTests: XCTestCase {
         { return date } else { return Date() }
     }
 
-    private static let recipients = try! MessageRecipients(verifiedPublicKeys: PublicKeysHelper.shared.testKeys, excludingDefaultRecipient: false)
+    private static let recipients = try! MessageRecipients(
+        verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
+        excludingDefaultRecipient: false
+    )
 
     private let firstTestJournalist = recipients.journalists[0]
     private let secondTestJournalist = recipients.journalists[1]
@@ -38,9 +41,15 @@ final class InboxViewModelTests: XCTestCase {
 
         let privateSendingQueueSecret = try PrivateSendingQueueSecret.fromSecureRandom()
         // GIVEN a mailbox with no messages
-        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(messageRecipient: firstTestJournalist,
-                                                                                         messageText: messageText,
-                                                                                         dateSent: testDate(), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
+        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(
+            messageRecipient: firstTestJournalist,
+            messageText: messageText,
+            dateSent: testDate(),
+            hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(
+                secretKey: privateSendingQueueSecret.bytes,
+                message: messageText.asBytes()
+            ))
+        ))
         // WHEN when finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: [recentOutboundMessage])
 
@@ -55,13 +64,25 @@ final class InboxViewModelTests: XCTestCase {
 
         let messageText = "hello!"
         // GIVEN a mailbox with no messages
-        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(messageRecipient: firstTestJournalist,
-                                                                                         messageText: messageText,
-                                                                                         dateSent: testDate(hourFromNoon: 0), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
+        let recentOutboundMessage = Message.outboundMessage(message: OutboundMessageData(
+            messageRecipient: firstTestJournalist,
+            messageText: messageText,
+            dateSent: testDate(hourFromNoon: 0),
+            hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(
+                secretKey: privateSendingQueueSecret.bytes,
+                message: messageText.asBytes()
+            ))
+        ))
         // This message is send earlier than the first one
-        let recentOutboundMessage2 = Message.outboundMessage(message: OutboundMessageData(messageRecipient: secondTestJournalist,
-                                                                                          messageText: messageText,
-                                                                                          dateSent: testDate(hourFromNoon: -1), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
+        let recentOutboundMessage2 = Message.outboundMessage(message: OutboundMessageData(
+            messageRecipient: secondTestJournalist,
+            messageText: messageText,
+            dateSent: testDate(hourFromNoon: -1),
+            hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(
+                secretKey: privateSendingQueueSecret.bytes,
+                message: messageText.asBytes()
+            ))
+        ))
         // WHEN when finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: [recentOutboundMessage2, recentOutboundMessage])
 
@@ -72,9 +93,11 @@ final class InboxViewModelTests: XCTestCase {
     func testActiveConversationWith1Messages() {
         let messageText = "hello!"
         // GIVEN a mailbox with a single message
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                       messageText: messageText,
-                                                                                                       dateReceived: testDate())))
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: messageText,
+            dateReceived: testDate()
+        )))
 
         // WHEN finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: [recentMessage])
@@ -89,19 +112,26 @@ final class InboxViewModelTests: XCTestCase {
     func testActiveConversationWith2MessageToSameRecipient() {
         let messageText = "hello!"
         // GIVEN a mailbox with two messages to the same recipient
-        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                      messageText: messageText,
-                                                                                                      dateReceived: testDate(hourFromNoon: 0))))
+        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: messageText,
+            dateReceived: testDate(hourFromNoon: 0)
+        )))
 
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                       messageText: "how's it going?",
-                                                                                                       dateReceived: testDate(hourFromNoon: 1))))
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "how's it going?",
+            dateReceived: testDate(hourFromNoon: 1)
+        )))
 
         // WHEN finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: [olderMessage, recentMessage])
 
         let expectedActiveMessage = ActiveConversation(recipient: firstTestJournalist,
-                                                       lastMessageUpdated: testDate(hourFromNoon: 1), messages: [olderMessage, recentMessage])
+                                                       lastMessageUpdated: testDate(hourFromNoon: 1), messages: [
+                                                           olderMessage,
+                                                           recentMessage
+                                                       ])
 
         // THEN the active conversation is the most recent one
         XCTAssert(activeMessage == expectedActiveMessage)
@@ -109,13 +139,17 @@ final class InboxViewModelTests: XCTestCase {
 
     func testActiveConversationWith2MessageToDifferentRecipients() {
         // GIVEN a mailbox with two messages to different recipient
-        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                      messageText: "hello!",
-                                                                                                      dateReceived: testDate(hourFromNoon: -1))))
+        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "hello!",
+            dateReceived: testDate(hourFromNoon: -1)
+        )))
 
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: secondTestJournalist,
-                                                                                                       messageText: "how's it going?",
-                                                                                                       dateReceived: testDate(hourFromNoon: 0))))
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: secondTestJournalist,
+            messageText: "how's it going?",
+            dateReceived: testDate(hourFromNoon: 0)
+        )))
 
         // WHEN finding the active conversation
         let activeMessage = InboxViewModel.findActiveConversation(in: [recentMessage, olderMessage])
@@ -130,23 +164,38 @@ final class InboxViewModelTests: XCTestCase {
 
         let privateSendingQueueSecret = try PrivateSendingQueueSecret.fromSecureRandom()
         // GIVEN a mailbox with two messages to different recipient
-        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                      messageText: messageText,
-                                                                                                      dateReceived: testDate(hourFromNoon: 0))))
+        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: messageText,
+            dateReceived: testDate(hourFromNoon: 0)
+        )))
 
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: secondTestJournalist,
-                                                                                                       messageText: "how's it going?",
-                                                                                                       dateReceived: testDate(hourFromNoon: 1))))
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: secondTestJournalist,
+            messageText: "how's it going?",
+            dateReceived: testDate(hourFromNoon: 1)
+        )))
 
-        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(messageRecipient: thirdTestJournalist,
-                                                                                              messageText: messageText,
-                                                                                              dateSent: testDate(hourFromNoon: 1), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
+        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(
+            messageRecipient: thirdTestJournalist,
+            messageText: messageText,
+            dateSent: testDate(hourFromNoon: 1),
+            hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(
+                secretKey: privateSendingQueueSecret.bytes,
+                message: messageText.asBytes()
+            ))
+        ))
 
         // WHEN finding the active conversation
-        let activeMessage = InboxViewModel.findActiveConversation(in: [olderMessage, recentMessage, recentMessageToCurrentUser])
+        let activeMessage = InboxViewModel.findActiveConversation(in: [
+            olderMessage,
+            recentMessage,
+            recentMessageToCurrentUser
+        ])
 
         let expectedActiveMessage = ActiveConversation(recipient: secondTestJournalist,
-                                                       lastMessageUpdated: testDate(hourFromNoon: 1), messages: [recentMessage])
+                                                       lastMessageUpdated: testDate(hourFromNoon: 1),
+                                                       messages: [recentMessage])
 
         // THEN the active conversation is the most recent one, that is not to the current user
         XCTAssert(activeMessage == expectedActiveMessage)
@@ -167,9 +216,11 @@ final class InboxViewModelTests: XCTestCase {
 
     func testInactiveConversationWith1Messages() {
         // GIVEN a mailbox with a single message
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                       messageText: "hello!",
-                                                                                                       dateReceived: testDate())))
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "hello!",
+            dateReceived: testDate()
+        )))
 
         // WHEN finding an inactive conversation
         let inactiveMessages = InboxViewModel.findInactiveMessages(in: [recentMessage])
@@ -180,15 +231,22 @@ final class InboxViewModelTests: XCTestCase {
 
     func testInactiveConversationWith2MessagesSameRecipient() {
         // GIVEN a mailbox with two messages to the same recipient
-        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                      messageText: "hello!",
+        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "hello!",
 
-                                                                                                      dateReceived: testDate())))
+            dateReceived: testDate(
+            )
+        )))
 
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                       messageText: "how's it going?",
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "how's it going?",
 
-                                                                                                       dateReceived: testDate(hourFromNoon: 10))))
+            dateReceived: testDate(
+                hourFromNoon: 10
+            )
+        )))
 
         // WHEN finding the inactive conversation
         let inactiveMessage = InboxViewModel.findInactiveMessages(in: [olderMessage, recentMessage])
@@ -199,15 +257,22 @@ final class InboxViewModelTests: XCTestCase {
 
     func testInActiveConversationWith2MessageToDifferentRecipients() {
         // GIVEN a mailbox with two messages to different recipient
-        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                      messageText: "hello!",
+        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "hello!",
 
-                                                                                                      dateReceived: testDate(hourFromNoon: 10))))
+            dateReceived: testDate(
+                hourFromNoon: 10
+            )
+        )))
 
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: secondTestJournalist,
-                                                                                                       messageText: "how's it going?",
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: secondTestJournalist,
+            messageText: "how's it going?",
 
-                                                                                                       dateReceived: testDate())))
+            dateReceived: testDate(
+            )
+        )))
 
         // WHEN finding the inactive conversation
         let inactiveMessage = InboxViewModel.findInactiveMessages(in: [olderMessage, recentMessage])
@@ -226,23 +291,42 @@ final class InboxViewModelTests: XCTestCase {
 
         let privateSendingQueueSecret = try PrivateSendingQueueSecret.fromSecureRandom()
         // GIVEN a mailbox with two messages to different recipient
-        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                      messageText: "hello!",
+        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "hello!",
 
-                                                                                                      dateReceived: testDate(hourFromNoon: 10))))
+            dateReceived: testDate(
+                hourFromNoon: 10
+            )
+        )))
 
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: secondTestJournalist,
-                                                                                                       messageText: "how's it going?",
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: secondTestJournalist,
+            messageText: "how's it going?",
 
-                                                                                                       dateReceived: testDate())))
+            dateReceived: testDate(
+            )
+        )))
 
-        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(messageRecipient: thirdTestJournalist,
-                                                                                              messageText: messageText,
+        let recentMessageToCurrentUser = Message.outboundMessage(message: OutboundMessageData(
+            messageRecipient: thirdTestJournalist,
+            messageText: messageText,
 
-                                                                                              dateSent: testDate(hourFromNoon: 10), hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(secretKey: privateSendingQueueSecret.bytes, message: messageText.asBytes()))))
+            dateSent: testDate(
+                hourFromNoon: 10
+            ),
+            hint: HintHmac(hint: PrivateSendingQueueHmac.hmac(
+                secretKey: privateSendingQueueSecret.bytes,
+                message: messageText.asBytes()
+            ))
+        ))
 
         // WHEN finding the inactive conversation
-        let inactiveMessages = InboxViewModel.findInactiveMessages(in: [olderMessage, recentMessage, recentMessageToCurrentUser])
+        let inactiveMessages = InboxViewModel.findInactiveMessages(in: [
+            olderMessage,
+            recentMessage,
+            recentMessageToCurrentUser
+        ])
 
         let expectedInactiveMessage = InactiveConversation(recipient: secondTestJournalist, messages: [recentMessage])
 
@@ -252,26 +336,40 @@ final class InboxViewModelTests: XCTestCase {
 
     func testInActiveConversationsWith3Messages() {
         // GIVEN a mailbox with three messages to different recipients
-        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: firstTestJournalist,
-                                                                                                      messageText: "hello!",
+        let olderMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: firstTestJournalist,
+            messageText: "hello!",
 
-                                                                                                      dateReceived: testDate())))
+            dateReceived: testDate(
+            )
+        )))
 
-        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: secondTestJournalist,
-                                                                                                       messageText: "how's it going?",
+        let recentMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: secondTestJournalist,
+            messageText: "how's it going?",
 
-                                                                                                       dateReceived: testDate(hourFromNoon: 10))))
+            dateReceived: testDate(
+                hourFromNoon: 10
+            )
+        )))
 
-        let recentestMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(sender: thirdTestJournalist,
-                                                                                                          messageText: "It's going great",
+        let recentestMessage = Message.incomingMessage(message: .textMessage(message: IncomingMessageData(
+            sender: thirdTestJournalist,
+            messageText: "It's going great",
 
-                                                                                                          dateReceived: testDate(hourFromNoon: 11))))
+            dateReceived: testDate(
+                hourFromNoon: 11
+            )
+        )))
 
         // WHEN finding the inactive conversation
         let inactiveMessages = InboxViewModel.findInactiveMessages(in: [recentMessage, olderMessage, recentestMessage])
 
         let expectedInactiveMessage = InactiveConversation(recipient: secondTestJournalist, messages: [recentMessage])
-        let expectedSecondInactiveMessage = InactiveConversation(recipient: firstTestJournalist, messages: [olderMessage])
+        let expectedSecondInactiveMessage = InactiveConversation(
+            recipient: firstTestJournalist,
+            messages: [olderMessage]
+        )
 
         // THEN the inactive conversation are the two older ones
         XCTAssert(inactiveMessages!.count == 2)

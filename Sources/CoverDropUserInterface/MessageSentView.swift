@@ -11,7 +11,8 @@ struct MessageSentView: View {
             HeaderView(type: .messageSent, dismissAction: {
                 Task {
                     navigation.destination = .home
-                    if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                    if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared
+                        .secretData {
                         await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
                     }
                 }
@@ -33,8 +34,16 @@ struct MessageSentView: View {
 
                 VStack(alignment: .leading) {
                     Text("What to expect next?").textStyle(GuardianHeadlineSmallTextStyle())
-                    Text("Your message is now in our queue and will be received by our team soon.").textStyle(BodyStyle())
-                    Text("Use your passphrase to check your secure mailbox for a response. We recommend that you wait for your message to be received before sending another one. Messages will stay in your inbox for 14 days.").textStyle(BodyStyle())
+                    Text("Your message is now in our queue and will be received by our team soon.")
+                        .textStyle(BodyStyle())
+                    Text(
+                        """
+                        Use your passphrase to check your secure mailbox for a response.
+                        We recommend that you wait for your message to be received before sending another one.
+                        Messages will stay in your inbox for 14 days.
+                        """
+                    )
+                    .textStyle(BodyStyle())
 
                     Spacer()
 

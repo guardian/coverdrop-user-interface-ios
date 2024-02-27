@@ -16,7 +16,12 @@ public struct SecurityAlert: View {
                 VStack(alignment: .leading, spacing: Padding.medium) {
                     Text("Secure Messaging is not available. We believe that this device might not be secure.")
                     getViolationMessages(violations: securitySuite.getEffectiveViolationsSet())
-                    Text("If you believe these are false positives, you can ignore this warning for this session using the button below.")
+                    Text(
+                        """
+                        If you believe these are false positives,
+                        you can ignore this warning for this session using the button below.
+                        """
+                    )
                     Spacer()
                     Button("Dismiss and ignore warnings") {
                         securitySuite.snooze(ignoreViolations: securitySuite.getEffectiveViolationsSet())

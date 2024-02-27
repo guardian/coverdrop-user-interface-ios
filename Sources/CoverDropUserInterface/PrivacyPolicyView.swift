@@ -13,11 +13,19 @@ struct PrivacyPolicyView: View {
                 VStack(alignment: .leading) {
                     Text("Privacy Policy").textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
 
-                    Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras condimentum, massa id interdum luctus, lacus velit pulvinar enim, eu malesuada metus turpis eu quam. Nunc augue magna, sodales a scelerisque eget, interdum vitae leo. Aliquam nec elementum lacus, a accumsan purus.").textStyle(BodyStyle())
+                    Text(
+                        """
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Cras condimentum, massa id interdum luctus, lacus velit pulvinar enim,
+                        eu malesuada metus turpis eu quam. Nunc augue magna, sodales a scelerisque eget,
+                        interdum vitae leo. Aliquam nec elementum lacus, a accumsan purus.
+                        """
+                    )
+                    .textStyle(BodyStyle())
                 }.padding(Padding.large)
                 Spacer()
             }
         }.foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-        .navigationBarHidden(true)
+            .navigationBarHidden(true)
     }
 }

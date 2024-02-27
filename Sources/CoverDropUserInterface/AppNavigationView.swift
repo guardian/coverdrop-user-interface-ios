@@ -35,7 +35,11 @@ struct AppNavigationView: View {
                 if !securitySuite.getEffectiveViolationsSet().isEmpty {
                     SecurityAlert()
                 } else if case .unlockedSecretData = secretDataRepository.secretData {
-                    InboxStateView(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel, config: config)
+                    InboxStateView(
+                        verifiedPublicKeys: verifiedPublicKeys,
+                        conversationViewModel: conversationViewModel,
+                        config: config
+                    )
                 } else {
                     switch navigation.destination {
                     case .about:

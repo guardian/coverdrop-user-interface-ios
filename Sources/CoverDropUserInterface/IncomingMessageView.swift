@@ -35,7 +35,8 @@ struct IncomingMessageView: View {
                     customDivider()
                     HStack(alignment: .top) {
                         if case let .expiring(expiryDate) = messageData.status {
-                            Text("\(Image(systemName: "info.circle.fill")) Expiring in \(expiryDate)").textStyle(ExpiringMessageMetadata())
+                            Text("\(Image(systemName: "info.circle.fill")) Expiring in \(expiryDate)")
+                                .textStyle(ExpiringMessageMetadata())
                                 .padding([.leading], Padding.medium)
                                 .accessibilityIdentifier("Expiring in")
                         }
@@ -44,10 +45,11 @@ struct IncomingMessageView: View {
                             .textStyle(MessageMetadata())
                             .padding([.trailing], Padding.medium)
                     }
-
-                }.background(messageData.isCurrentUser ? Color.JournalistNewMessageView.messageViewCurrentUserColor : Color.JournalistNewMessageView.messageViewUnselectedUserColor)
-                    .cornerRadius(10)
-                    .padding([.bottom], Padding.medium)
+                }
+                .background(messageData.isCurrentUser ? Color.JournalistNewMessageView
+                    .messageViewCurrentUserColor : Color.JournalistNewMessageView.messageViewUnselectedUserColor)
+                .cornerRadius(10)
+                .padding([.bottom], Padding.medium)
             }
             .id(id)
             // And if we are not the current user put a spacer at the end!
@@ -59,10 +61,13 @@ struct IncomingMessageView: View {
 }
 
 struct MessageView_Previews: PreviewProvider {
-
     @MainActor struct Container: View {
         let privateSendingQueueRepo: () = PreviewHelper.initSendingQueue()
-        @State var nonExpiredMessage = IncomingMessageData(sender: PublicKeysHelper.shared.testDefaultJournalist!, messageText: "hey", dateReceived: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))))
+        @State var nonExpiredMessage = IncomingMessageData(
+            sender: PublicKeysHelper.shared.testDefaultJournalist!,
+            messageText: "hey",
+            dateReceived: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2)))
+        )
 
         @MainActor var body: some View {
             IncomingMessageView(message: nonExpiredMessage, id: 1)

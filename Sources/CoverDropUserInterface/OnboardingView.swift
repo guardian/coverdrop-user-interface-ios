@@ -66,11 +66,21 @@ enum OnboardingViewModel {
         var description: String {
             switch self {
             case .getPassphrase:
-                return "You will been shown a unique passphrase which you will use to unlock your secure inbox. Please make sure you memorise it so you can return to your secure inbox later."
+                return """
+                    You will been shown a unique passphrase which you will use to unlock your secure inbox.
+                    Please make sure you memorise it so you can return to your secure inbox later.
+                """
             case .sendMessage:
-                return "Your message will be sent anonymously and securely to a journalist or a team. It will be encrypted and indistinguishable from normal network traffic."
+                return """
+                    Your message will be sent anonymously and securely to a journalist or a team.
+                    It will be encrypted and indistinguishable from normal network traffic.
+                """
             case .checkResponse:
-                return "Our journalists monitor secure messages regularly. If they wish to take your story further they will respond here. To stay in touch you will need to return to your secure inbox using your passphrase."
+                return """
+                    Our journalists monitor secure messages regularly.
+                    If they wish to take your story further they will respond here.
+                    To stay in touch you will need to return to your secure inbox using your passphrase.
+                """
             }
         }
 

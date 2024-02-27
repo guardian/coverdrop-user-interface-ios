@@ -6,7 +6,8 @@ struct HeaderView<Content: View>: View {
     let type: Destination
     @State private var showingScreenshotDetectedAlert = false
 
-    /// An optional closure to allow a view to implement its own dismissal logic. If `nil`, the parent view will be dismissed when the back button is pressed.
+    /// An optional closure to allow a view to implement its own dismissal logic. If `nil`, the parent view will be
+    /// dismissed when the back button is pressed.
     let dismissAction: (() -> Void)?
 
     @Environment(\.presentationMode) var presentation: Binding<PresentationMode>
@@ -55,7 +56,13 @@ struct HeaderView<Content: View>: View {
                 customDivider()
 
                 content
-            }.alert("You took a screenshot. These screenshots can appear in your photo library, so this may be a security risk.", isPresented: $showingScreenshotDetectedAlert) {
+            }.alert(
+                """
+                You took a screenshot.
+                These screenshots can appear in your photo library, so this may be a security risk.
+                """,
+                isPresented: $showingScreenshotDetectedAlert
+            ) {
                 Button("OK", role: .cancel) {
                     showingScreenshotDetectedAlert = false
                 }

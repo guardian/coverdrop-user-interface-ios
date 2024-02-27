@@ -39,7 +39,8 @@ struct DeskDetailViewModel {
 
 struct DeskDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let testRecipient = try? MessageRecipients(verifiedPublicKeys: PublicKeysHelper.shared.testKeys).defaultRecipient!
+        let testRecipient = try? MessageRecipients(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
+            .defaultRecipient!
         let viewModel = DeskDetailViewModel(recipient: testRecipient!)
         PreviewWrapper(DeskDetailView(selectedRecipient: .constant(testRecipient),
                                       isSelectRecipientViewOpen: .constant(true),

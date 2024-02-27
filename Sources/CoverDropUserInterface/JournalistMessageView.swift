@@ -17,7 +17,12 @@ struct JournalistMessageView: View {
 
     var journalist: JournalistData
 
-    init(journalist: JournalistData, conversationViewModel: ConversationViewModel, verifiedPublicKeys: VerifiedPublicKeys, config: CoverDropConfig) {
+    init(
+        journalist: JournalistData,
+        conversationViewModel: ConversationViewModel,
+        verifiedPublicKeys: VerifiedPublicKeys,
+        config: CoverDropConfig
+    ) {
         self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
@@ -52,7 +57,8 @@ struct JournalistMessageView: View {
     private func messageComposeView(recipient: JournalistData) -> some View {
         @State var expired = false
         return VStack {
-            let inactive = !self.conversationViewModel.isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation)
+            let inactive = !self.conversationViewModel
+                .isCurrentConversationActive(maybeActiveConversation: inboxViewModel.activeConversation)
             let isMostRecentMessageFromUser = self.conversationViewModel.isMostRecentMessageFromUser()
 
             if expired {
@@ -85,7 +91,11 @@ struct JournalistMessageView: View {
                 VStack(alignment: .leading) {
                     VStack(alignment: .center) {
                         if let recipient = self.conversationViewModel.messageRecipient {
-                            Text("\(Image(systemName: "lock.fill")) This is a secure conversation with \(recipient.displayName)").bold()
+                            let headerMessage = "This is a secure conversation with \(recipient.displayName)"
+                            Text(
+                                "\(Image(systemName: "lock.fill")) \(headerMessage)"
+                            )
+                            .bold()
                         }
                     }
                     switch self.conversationViewModel.state {
@@ -128,7 +138,10 @@ struct JournalistMessageView: View {
 
     func chooseToSentAnotherMessage() -> some View {
         return VStack {
-            Text("Your message has been sent. We recommend that you wait for a response before you send another message.").textStyle(UserNotificationTextStyle())
+            Text(
+                "Your message has been sent. We recommend that you wait for a response before you send another message."
+            )
+            .textStyle(UserNotificationTextStyle())
             Button("Send a new message") {
                 self.alreadySentMessage = true
             }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
@@ -138,12 +151,20 @@ struct JournalistMessageView: View {
     }
 
     func viewingInactiveConversation() -> some View {
-        return InformationView(viewType: .info, title: "This conversation has been closed", message: "Go to your active conversation to send a message.").padding(Padding.medium)
+        return InformationView(
+            viewType: .info,
+            title: "This conversation has been closed",
+            message: "Go to your active conversation to send a message."
+        ).padding(Padding.medium)
     }
 
     func expiredKeysMessage(recipient: JournalistData) -> some View {
-        return InformationView(viewType: .info, title: "\(recipient.displayName) is currently unavailable.", message: "Check your internet connection or try again later.")
-            .padding(Padding.medium)
+        return InformationView(
+            viewType: .info,
+            title: "\(recipient.displayName) is currently unavailable.",
+            message: "Check your internet connection or try again later."
+        )
+        .padding(Padding.medium)
     }
 
     func messageSendView() -> some View {

@@ -73,7 +73,10 @@ struct SelectRecipientView: View {
 
 struct SelectRecipientView_Previews: PreviewProvider {
     static var previews: some View {
-        var testRecipients = try? MessageRecipients(verifiedPublicKeys: PublicKeysHelper.shared.testKeys, excludingDefaultRecipient: false)
+        var testRecipients = try? MessageRecipients(
+            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
+            excludingDefaultRecipient: false
+        )
         PreviewWrapper(SelectRecipientView(isSelectRecipientViewOpen: .constant(true),
                                            selectedRecipient: .constant(testRecipients!.defaultRecipient!),
                                            recipients: testRecipients!))

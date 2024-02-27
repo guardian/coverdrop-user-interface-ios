@@ -150,7 +150,8 @@ class InboxViewModel: ObservableObject {
         }
     }
 
-    /// Finds the most recent conversation in a mailbox, and returns an Active Conversation. If there are no messages in the mailbox, this returns nil.
+    /// Finds the most recent conversation in a mailbox, and returns an Active Conversation. If there are no messages in
+    /// the mailbox, this returns nil.
     static func findActiveConversation(in mailbox: Set<Message>?) -> ActiveConversation? {
         guard let existingMailbox = mailbox else {
             return nil
@@ -166,7 +167,11 @@ class InboxViewModel: ObservableObject {
             let messages = existingMailbox.sorted(by: >)
             if let message = messages.first {
                 if case let .outboundMessage(data) = message {
-                    return ActiveConversation(recipient: data.recipient, lastMessageUpdated: data.dateQueued, messages: Set(messages))
+                    return ActiveConversation(
+                        recipient: data.recipient,
+                        lastMessageUpdated: data.dateQueued,
+                        messages: Set(messages)
+                    )
                 }
             }
         }
@@ -182,9 +187,13 @@ class InboxViewModel: ObservableObject {
 
         if case let .incomingMessage(message: incomingMessageType) = mostRecentMessage {
             if case let .textMessage(message: incomingMessage) = incomingMessageType {
-                let allMessagesInConversation = messagesForRecipient(recipient: incomingMessage.sender, mailbox: mailbox)
+                let allMessagesInConversation = messagesForRecipient(
+                    recipient: incomingMessage.sender,
+                    mailbox: mailbox
+                )
                 return ActiveConversation(recipient: incomingMessage.sender,
-                                          lastMessageUpdated: incomingMessage.dateReceived, messages: allMessagesInConversation)
+                                          lastMessageUpdated: incomingMessage.dateReceived,
+                                          messages: allMessagesInConversation)
             } else {
                 return nil
             }
@@ -192,7 +201,9 @@ class InboxViewModel: ObservableObject {
         return nil
     }
 
-    /// Finds the inactive conversations in the inbox. If there are no messages in the mailbox, this returns nil. If there is 1 message in the mailbox, this returns nil - since 1 message would be considered the active conversation.
+    /// Finds the inactive conversations in the inbox. If there are no messages in the mailbox, this returns nil. If
+    /// there is 1 message in the mailbox, this returns nil - since 1 message would be considered the active
+    /// conversation.
     static func findInactiveMessages(in mailbox: Set<Message>?) -> [InactiveConversation]? {
         // 1. Remove all outbound messages
         let mailboxRemovingOutbound = mailbox?.filter {
@@ -201,7 +212,9 @@ class InboxViewModel: ObservableObject {
         }
 
         // 2. Remove messages from the active message recipient
-        guard case let .incomingMessage(incomingMessage) = mailboxRemovingOutbound?.sorted(by: >).first else { return nil }
+        guard case let .incomingMessage(incomingMessage) = mailboxRemovingOutbound?.sorted(by: >).first else {
+            return nil
+        }
         guard case let .textMessage(activeMessage) = incomingMessage else {
             return nil
         }
@@ -257,14 +270,19 @@ class InboxViewModel: ObservableObject {
     ///     to change their mind after sending a message.
     ///  5. removes the current recipient from memory
     ///
-    public func deleteAllMessagesAndCurrentSession(verifiedPublicKeys: VerifiedPublicKeys, conversationViewModel: ConversationViewModel) async throws {
+    public func deleteAllMessagesAndCurrentSession(
+        verifiedPublicKeys: VerifiedPublicKeys,
+        conversationViewModel: ConversationViewModel
+    ) async throws {
         _ = PublicDataRepository.shared
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
             unlockedSecretData.unlockedData.messageMailbox = []
             await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedSecretData)
-            try await EncryptedStorage.createOrResetStorageWithRandomPassphrase(passphraseWordCount: config.passphraseWordCount)
+            try await EncryptedStorage
+                .createOrResetStorageWithRandomPassphrase(passphraseWordCount: config.passphraseWordCount)
 
-            if let coverMessageFactory = try? PublicDataRepository.getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
+            if let coverMessageFactory = try? PublicDataRepository
+                .getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
                 try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory: coverMessageFactory)
             }
         }

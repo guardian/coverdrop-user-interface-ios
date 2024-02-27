@@ -20,13 +20,24 @@ struct UserLoginView: View {
         }) {
             VStack(alignment: .leading) {
                 Text("Enter passphrase").textStyle(TitleStyle())
-                Text("Enter your passphrase to unlock your secure inbox and send your first message.").textStyle(BodyStyle())
+                Text("Enter your passphrase to unlock your secure inbox and send your first message.")
+                    .textStyle(BodyStyle())
 
                 switch viewModel.state {
                 case .errorIncorrectWords:
-                    InformationView(viewType: .error, title: "Incorrect word used", message: "The passphrase cannot be valid because it contains words that are not on the word list.")
+                    InformationView(
+                        viewType: .error,
+                        title: "Incorrect word used",
+                        message:
+                        "The passphrase cannot be valid because it contains words that are not on the word list."
+                    )
                 case .errorUnableToUnlock:
-                    InformationView(viewType: .error, title: "Unable to unlock mailbox", message: "The passphrase you entered does not match the generated one from the previous screen.")
+                    InformationView(
+                        viewType: .error,
+                        title: "Unable to unlock mailbox",
+                        message:
+                        "The passphrase you entered does not match the generated one from the previous screen."
+                    )
                 case _:
                     EmptyView()
                 }
@@ -105,8 +116,10 @@ extension UserLoginView {
         @Published var state: State = .inital
 
         init(config: CoverDropConfig) {
-            passphrase = UserLoginView.UserLoginViewModel.passphraseArray(passphraseWordCount: config.passphraseWordCount)
-            passphraseFieldsMasked = UserLoginView.UserLoginViewModel.passphraseVisibilityArray(passphraseWordCount: config.passphraseWordCount)
+            passphrase = UserLoginView.UserLoginViewModel
+                .passphraseArray(passphraseWordCount: config.passphraseWordCount)
+            passphraseFieldsMasked = UserLoginView.UserLoginViewModel
+                .passphraseVisibilityArray(passphraseWordCount: config.passphraseWordCount)
             self.config = config
         }
 
@@ -122,7 +135,8 @@ extension UserLoginView {
             state = .inital
 
             if isPassphraseInputValid(passphrase: passphrase) {
-                guard let validPassphrase = try? PasswordGenerator.checkValid(passwordInput: passphrase.joined(separator: " ")) else {
+                guard let validPassphrase = try? PasswordGenerator
+                    .checkValid(passwordInput: passphrase.joined(separator: " ")) else {
                     state = .errorIncorrectWords
                     return
                 }
@@ -130,7 +144,8 @@ extension UserLoginView {
                 let session: ()? = try? await secretDataRepository.unlock(passphrase: validPassphrase)
 
                 if session != nil {
-                    passphrase = UserLoginView.UserLoginViewModel.passphraseArray(passphraseWordCount: config.passphraseWordCount)
+                    passphrase = UserLoginView.UserLoginViewModel
+                        .passphraseArray(passphraseWordCount: config.passphraseWordCount)
                     // try and decrypt the stored dead drops
                     try await DeadDropDecryptionService().decryptStoredDeadDrops()
                 } else {

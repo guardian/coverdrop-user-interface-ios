@@ -8,7 +8,8 @@ struct NewMessageView: View {
     @State private var showingDismissalAlert = false
     var isInboxEmpty: Bool
 
-    // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping will allow us to fail fast in the case of developer error.
+    // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping
+    // will allow us to fail fast in the case of developer error.
     @ObservedObject var conversationViewModel: ConversationViewModel
 
     init(viewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
@@ -36,7 +37,11 @@ struct NewMessageView: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     if isInboxEmpty {
-                        InformationView(viewType: .info, title: "Looks like you haven’t sent your message yet", message: "Enter your message to start a conversation.")
+                        InformationView(
+                            viewType: .info,
+                            title: "Looks like you haven’t sent your message yet",
+                            message: "Enter your message to start a conversation."
+                        )
                     }
                     Text("What do you want to share with us?")
                         .textStyle(TitleStyle())
@@ -95,7 +100,8 @@ struct NewMessageView: View {
                        actions: {
                            Button("Yes, I want to leave") {
                                Task {
-                                   if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                                   if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository
+                                       .shared.secretData {
                                        navigation.destination = .inbox
                                        await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
                                    }
@@ -103,7 +109,12 @@ struct NewMessageView: View {
                            }
                            Button("Cancel", role: .cancel) {}
                        }, message: {
-                           Text("You will be leaving your secure inbox and your message will not be sent.\n Do you want to continue?")
+                           Text(
+                               """
+                                You will be leaving your secure inbox and your message will not be sent.\n
+                                Do you want to continue?
+                               """
+                           )
                        })
             }
         }

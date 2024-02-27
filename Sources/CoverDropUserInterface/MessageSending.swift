@@ -17,7 +17,12 @@ enum MessageSending {
 
         let userKey = unlockedSecretDataRepository.unlockedData.userKey.publicKey
 
-        let encryptedMessage = try await UserToCoverNodeMessageData.createMessage(message: message, messageRecipient: recipient, covernodeMessagePublicKey: verifiedPublicKeys, userPublicKey: userKey)
+        let encryptedMessage = try await UserToCoverNodeMessageData.createMessage(
+            message: message,
+            messageRecipient: recipient,
+            covernodeMessagePublicKey: verifiedPublicKeys,
+            userPublicKey: userKey
+        )
 
         let hint = try await PrivateSendingQueueRepository.shared.enqueue(
             secret: unlockedSecretDataRepository.unlockedData.privateSendingQueueSecret,

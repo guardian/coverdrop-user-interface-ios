@@ -3,7 +3,10 @@ import Foundation
 import SwiftUI
 
 public enum CoverDropUserInterface {
-    public static func application(_: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier) -> Bool {
+    public static func application(
+        _: UIApplication,
+        shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier
+    ) -> Bool {
         return extensionPointIdentifier != .keyboard
     }
 

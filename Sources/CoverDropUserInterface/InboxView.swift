@@ -140,12 +140,20 @@ struct InboxView: View {
                        Button("Yes, delete conversations", role: .destructive) {
                            Task {
                                navigation.destination = .home
-                               try? await inboxViewModel.deleteAllMessagesAndCurrentSession(verifiedPublicKeys: verifiedPublicKeys, conversationViewModel: conversationViewModel)
+                               try? await inboxViewModel.deleteAllMessagesAndCurrentSession(
+                                   verifiedPublicKeys: verifiedPublicKeys,
+                                   conversationViewModel: conversationViewModel
+                               )
                            }
                        }
                        Button("Cancel", role: .cancel) {}
                    }, message: {
-                       Text("Deleting all conversations will remove all messages from your device. This cannot be undone. Would you like to proceed?")
+                       Text(
+                           """
+                           Deleting all conversations will remove all messages from your device.
+                           This cannot be undone. Would you like to proceed?
+                           """
+                       )
                    })
             Spacer()
         }
@@ -161,7 +169,8 @@ struct InboxView: View {
             Spacer()
             Button("Leave inbox") {
                 Task {
-                    if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
+                    if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared
+                        .secretData {
                         await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
                     }
                     navigation.destination = .home

@@ -32,10 +32,14 @@ struct MessageData {
 
         messageRecipient = nil
 
-        // It is a valid scenario that there are no recipients available from the public keys data (ie they have all expired)
+        // It is a valid scenario that there are no recipients available from the public keys data (ie they have all
+        // expired)
         // but we still was the user to be able to view a conversation
         if messageRecipient == nil {
-            if let messageRecipientsFromKeys = try? MessageRecipients(verifiedPublicKeys: verifiedPublicKeys, excludingDefaultRecipient: false) {
+            if let messageRecipientsFromKeys = try? MessageRecipients(
+                verifiedPublicKeys: verifiedPublicKeys,
+                excludingDefaultRecipient: false
+            ) {
                 recipients = messageRecipientsFromKeys
                 if messageRecipientsFromKeys.defaultRecipient != nil {
                     messageRecipient = messageRecipientsFromKeys.defaultRecipient

@@ -11,14 +11,20 @@ public enum VerticalTrim {
 }
 
 public struct FontPad: ViewModifier {
-    init(fontName: String, fontSize: CGFloat, lineHeight: CGFloat? = nil, relativeStyle: Font.TextStyle, verticalTrim: VerticalTrim) {
+    init(
+        fontName: String,
+        fontSize: CGFloat,
+        lineHeight: CGFloat? = nil,
+        relativeStyle: Font.TextStyle,
+        verticalTrim: VerticalTrim
+    ) {
         self.fontName = fontName
         self.fontSize = fontSize
         self.lineHeight = lineHeight
         self.relativeStyle = relativeStyle
         self.verticalTrim = verticalTrim
 
-        self.font = UIFont(name: fontName, size: fontSize)
+        font = UIFont(name: fontName, size: fontSize)
     }
 
     let fontName: String
@@ -71,7 +77,8 @@ public class CoverDropFonts {
     /// Each case corresponds to a specific font style.
     ///
     /// - Note: The font files and the CDN URLs at which they are hosted may only be used for Guardian websites or apps.
-    /// All fonts are the property of Schwartzco, Inc., t/a Commercial Type (https://commercialtype.com/), and may not be reproduced without permission.
+    /// All fonts are the property of Schwartzco, Inc., t/a Commercial Type (https://commercialtype.com/), and may not
+    /// be reproduced without permission.
     @objc public enum GuardianFontStyle: Int, CaseIterable {
         /// Titlepiece font style in bold.
         case titlepieceBold
@@ -206,11 +213,16 @@ public extension View {
 public extension CoverDropFonts.GuardianFontStyle {
     var relativeStyle: Font.TextStyle {
         switch self {
-        case .headlineLight, .headlineRegular, .headlineMedium, .headlineBold, .headlineSemibold, .headlineRegularItalic, .headlineLightItalic, .headlineMediumItalic, .headlineSemiboldItalic, .headlineBoldItalic, .headlineBlack, .headlineBlackItalic:
+        case .headlineLight, .headlineRegular, .headlineMedium, .headlineBold, .headlineSemibold,
+             .headlineRegularItalic,
+             .headlineLightItalic, .headlineMediumItalic, .headlineSemiboldItalic, .headlineBoldItalic, .headlineBlack,
+             .headlineBlackItalic:
             return .headline
-        case .textSansBold, .textSansBoldItalic, .textSansRegular, .textSansRegularItalic, .textSansMedium, .textSansMediumItalic, .textSansBlack, .textSansBlackItalic:
+        case .textSansBold, .textSansBoldItalic, .textSansRegular, .textSansRegularItalic, .textSansMedium,
+             .textSansMediumItalic, .textSansBlack, .textSansBlackItalic:
             return .body
-        case .textEgyptianRegular, .textEgyptianRegularItalic, .textEgyptianMedium, .textEgyptianMediumItalic, .textEgyptianBold, .textEgyptianBoldItalic, .textEgyptianBlack, .textEgyptianBlackItalic:
+        case .textEgyptianRegular, .textEgyptianRegularItalic, .textEgyptianMedium, .textEgyptianMediumItalic,
+             .textEgyptianBold, .textEgyptianBoldItalic, .textEgyptianBlack, .textEgyptianBlackItalic:
             return .body
         case .titlepieceBold:
             return .title
