@@ -45,13 +45,9 @@ struct UserLoginView: View {
 
                 Spacer()
 
-                Button("Confirm passphrase") {
-                    Task {
-                        try await viewModel.login()
-                    }
+                AsyncActionButton(buttonText: "Confirm passphrase", isInProgress: viewModel.state == .submitted) {
+                    try await viewModel.login()
                 }
-                .keyboardShortcut(.defaultAction)
-                .buttonStyle(PrimaryButtonStyle(isDisabled: false))
             }.padding(Padding.medium)
                 .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
         }
@@ -105,7 +101,7 @@ extension UserLoginView {
     class UserLoginViewModel: ObservableObject {
         var config: CoverDropConfig
         enum State {
-            case inital, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
+            case inital, submitted, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
         }
 
         @Published var passphrase: [String]
@@ -132,8 +128,7 @@ extension UserLoginView {
         }
 
         func login() async throws {
-            state = .inital
-
+            state = .submitted
             if isPassphraseInputValid(passphrase: passphrase) {
                 guard let validPassphrase = try? PasswordGenerator
                     .checkValid(passwordInput: passphrase.joined(separator: " ")) else {

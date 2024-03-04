@@ -31,11 +31,11 @@ struct UserNewSessionView: View {
                 passphraseWordListView()
 
                 // Show the hide passphrase button when the text is revealed
-                if case .shown = viewModel.passphraseVisibilityState {
+                if case .shown = viewModel.passphraseState {
                     HStack(alignment: .top) {
                         Spacer()
                         Button(action: {
-                            self.viewModel.passphraseVisibilityState = .hidden
+                            self.viewModel.passphraseState = .hidden
                         }, label: {
                             Label("Hide passphrase", systemImage: "eye.slash.fill")
                         }).buttonStyle(HideButtonStyle())
@@ -44,18 +44,19 @@ struct UserNewSessionView: View {
                 }
 
                 Spacer()
-                switch viewModel.passphraseVisibilityState {
-                case .shown:
-                    Button("I have remembered my passphrase") {
-                        Task {
-                            await viewModel.createNewStorage()
-                            viewModel.clearPassphrase()
-                            navigation.destination = .newConversation
-                        }
-                    }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
+                switch viewModel.passphraseState {
+                case .shown, .submitted:
+                    AsyncActionButton(
+                        buttonText: "I have remembered my passphrase",
+                        isInProgress: viewModel.isSubmitted
+                    ) {
+                        await viewModel.createNewStorage()
+                        viewModel.clearPassphrase()
+                        navigation.destination = .newConversation
+                    }
                 case .hidden:
                     Button(action: {
-                        self.viewModel.passphraseVisibilityState = .shown
+                        self.viewModel.passphraseState = .shown
                     }, label: {
                         Label("Reveal passphrase", systemImage: "eye.fill")
                     }).buttonStyle(PrimaryButtonStyle(isDisabled: false))
@@ -76,8 +77,8 @@ struct UserNewSessionView: View {
         VStack {
             if let passphraseWords = viewModel.passphraseWords {
                 ForEach(Array(passphraseWords.enumerated()), id: \.element) { id, word in
-                    switch viewModel.passphraseVisibilityState {
-                    case .shown:
+                    switch viewModel.passphraseState {
+                    case .shown, .submitted:
                         Text(word)
                             .textStyle(PassphraseTextStyle())
                             .accessibilityIdentifier("Word \(id + 1)")
@@ -107,11 +108,11 @@ struct UserNewSessionView: View {
 extension UserNewSessionView {
     @MainActor class UserNewSessionViewModel: ObservableObject {
         enum State {
-            case shown, hidden
+            case shown, hidden, submitted
             case error(Error)
         }
 
-        @Published var passphraseVisibilityState: State = .hidden
+        @Published var passphraseState: State = .hidden
 
         @Published private(set) var passphrase: ValidPassword? {
             didSet {
@@ -123,8 +124,14 @@ extension UserNewSessionView {
 
         public init() {}
 
+        var isSubmitted: Bool {
+            if case .submitted = passphraseState {
+                return true
+            } else { return false }
+        }
+
         func initializeWithNewPassphrase(passphraseWordCount: Int) {
-            passphraseVisibilityState = .hidden
+            passphraseState = .hidden
             newPassphrase(passphraseWordCount: passphraseWordCount)
         }
 
@@ -138,14 +145,15 @@ extension UserNewSessionView {
         }
 
         func createNewStorage() async {
+            passphraseState = .submitted
             do {
                 if let validPassphrase = passphrase {
                     _ = try await EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: validPassphrase)
                 } else {
-                    passphraseVisibilityState = .error("Missing Passphrase")
+                    passphraseState = .error("Missing Passphrase")
                 }
             } catch {
-                passphraseVisibilityState = .error(error)
+                passphraseState = .error(error)
             }
         }
     }
