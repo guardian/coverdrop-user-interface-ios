@@ -139,7 +139,10 @@ struct JournalistMessageView: View {
     func chooseToSentAnotherMessage() -> some View {
         return VStack {
             Text(
-                "Your message has been sent. We recommend that you exit Secure Messaging and wait for a response before you send another message."
+                """
+                Your message has been sent. \
+                We recommend that you exit Secure Messaging and wait for a response before you send another message.
+                """
             )
             .textStyle(UserNotificationTextStyle())
             Button("Send a new message") {
