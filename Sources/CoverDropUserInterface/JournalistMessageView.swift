@@ -80,7 +80,7 @@ struct JournalistMessageView: View {
 
     func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
         if let currentKey = await PublicDataRepository.getLatestMessagingKey(recipientId: recipient.recipientId) {
-            return currentKey.isExpired(now: config.now())
+            return currentKey.isExpired(now: config.currentKeysPublishedTime())
         }
         return false
     }
@@ -187,6 +187,7 @@ struct JournalistMessageView: View {
             }.disabled(conversationViewModel.sendButtonDisabled)
                 .buttonStyle(PrimaryButtonStyle(isDisabled: conversationViewModel.sendButtonDisabled))
                 .padding([.horizontal], Padding.medium)
+                .accessibilityLabel("Send")
         }
     }
 
