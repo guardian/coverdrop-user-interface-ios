@@ -108,10 +108,7 @@ struct MessageData {
             return
         }
 
-        guard let dateSent = PublicDataRepository.appConfig?.currentTime() else {
-            state = .error(message: "Cannot get config")
-            return
-        }
+        let dateSent = DateFunction.currentTime()
 
         do {
             if case let .unlockedSecretData(data) = secretDataRepository.secretData {

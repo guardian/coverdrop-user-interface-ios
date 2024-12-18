@@ -80,7 +80,7 @@ struct JournalistMessageView: View {
 
     func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
         if let currentKey = await PublicDataRepository.getLatestMessagingKey(recipientId: recipient.recipientId) {
-            return currentKey.isExpired(now: config.currentKeysPublishedTime())
+            return currentKey.isExpired(now: DateFunction.currentKeysPublishedTime())
         }
         return false
     }
