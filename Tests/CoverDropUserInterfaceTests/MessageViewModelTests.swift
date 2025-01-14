@@ -25,30 +25,10 @@ final class MessageViewModelTests: XCTestCase {
         let sut = ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
 
         // WHEN a short message is added
-        sut.topic = "This is a short topic"
         sut.message = "This is a short message"
 
         // THEN the message is not too long
         XCTAssertFalse(sut.messageIsTooLong)
-    }
-
-    @MainActor
-    func testMessageLengthWithLongTopic() async {
-        // GIVEN a `MessageViewModel`
-        let sut = ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
-
-        // WHEN a long topic is added
-        let shortTopic = "This will be an incredibly long topic."
-        sut.topic = shortTopic
-
-        for _ in 1 ... 6000 {
-            sut.topic.append(contentsOf: shortTopic)
-        }
-
-        sut.message = "This is a short message"
-
-        // THEN the complete message too long
-        XCTAssert(sut.messageIsTooLong)
     }
 
     @MainActor
@@ -63,8 +43,6 @@ final class MessageViewModelTests: XCTestCase {
         for _ in 1 ... 6000 {
             sut.message.append(contentsOf: shortMessage)
         }
-
-        sut.topic = "This is a short topic"
 
         // THEN the complete message too long
         XCTAssert(sut.messageIsTooLong)

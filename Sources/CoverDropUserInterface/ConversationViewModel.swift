@@ -21,7 +21,6 @@ struct MessageData {
     @Published private(set) var recipients: MessageRecipients?
 
     @Published var message = ""
-    @Published var topic = ""
     @Published var state = State.initial
 
     public init(verifiedPublicKeys: VerifiedPublicKeys) {
@@ -112,21 +111,13 @@ struct MessageData {
 
         do {
             if case let .unlockedSecretData(data) = secretDataRepository.secretData {
-                try await MessageSending.sendMessage(completeMessage(),
+                try await MessageSending.sendMessage(message,
                                                      to: messageRecipient,
                                                      verifiedPublicKeys: keyHierarchy,
                                                      unlockedSecretDataRepository: data, dateSent: dateSent)
             }
         } catch {
             state = .error(message: error.localizedDescription)
-        }
-    }
-
-    private func completeMessage() -> String {
-        if topic.isEmpty {
-            return message
-        } else {
-            return topic + "\n\n" + message
         }
     }
 
@@ -143,7 +134,7 @@ struct MessageData {
 
     var messageIsTooLong: Bool {
         do {
-            try PaddedCompressedString.compressCheckingLength(from: completeMessage())
+            try PaddedCompressedString.compressCheckingLength(from: message)
             return false
         } catch PaddedCompressedStringError.compressedStringTooLong {
             return true
@@ -182,7 +173,6 @@ struct MessageData {
     // Or when the users first focuses on the input
     func clearMessage() {
         message = ""
-        topic = ""
         state = .ready
     }
 

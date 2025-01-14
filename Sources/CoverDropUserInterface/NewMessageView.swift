@@ -147,17 +147,6 @@ struct NewMessageView: View {
     @ViewBuilder
     func messageCompose() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Subject")
-                .textStyle(FormLabelTextStyle())
-            Text("Briefly say who did what.")
-                .textStyle(FormLabelSubtitleTextStyle())
-        }
-        TextEditor(text: $conversationViewModel.topic)
-            .style(ComposeMessageTextStyle())
-            .accessibilityIdentifier("Your message topic")
-            .frame(height: 44)
-        Spacer()
-        VStack(alignment: .leading, spacing: 0) {
             Text("What's your message?")
                 .textStyle(FormLabelTextStyle())
             Text("Please include a bit about yourself.")
@@ -170,7 +159,7 @@ struct NewMessageView: View {
             TextEditor(text: $conversationViewModel.message)
                 .style(ComposeMessageTextStyle())
                 .accessibilityIdentifier("Compose your message")
-                .frame(height: 140)
+                .frame(height: 240)
         }
 
         Spacer()
