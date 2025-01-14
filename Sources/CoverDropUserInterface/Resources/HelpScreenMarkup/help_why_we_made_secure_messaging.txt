@@ -1,0 +1,27 @@
+# Why we made Secure Messaging
+
+The Guardian’s Secure Messaging tool allows users of our app to tip off our journalists about newsworthy stories.
+
+It’s a unique new system based on proposals by the University of Cambridge’s Department of Computer Science and Technology.
+
+The Cambridge researchers sought to address problems faced by people who wish to tell news organisations about misdeeds. Such sources are acting in the public interest, but that doesn't necessarily mean they welcome publicity, censure or even retaliation. They need a safe communication method that doesn't reveal what is said, or who is saying it.  
+
+DIVIDER
+
+BLOCKQUOTE
+Democracy demands information.
+Antoine Deltour
+Source of the LuxLeaks
+
+SPACE
+
+Many of the traditional methods are just not secure enough. And the best of them still have problems. They may require advance knowledge of private contact details. They can be difficult to use. And they can involve software that itself could raise suspicion.  
+
+Secure Messaging is designed to tackle these problems by introducing a system for contacting journalists into the normal Guardian app. It's easy to use and extremely secure. And, critically, every copy of the Guardian app behaves the same way, whether it's being used for Secure Messaging or not. This means sources look no different to millions of other users. 
+
+DIVIDER
+
+BUTTON
+How Secure Messaging works
+Read more
+button_how_secure_messaging_works

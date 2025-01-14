@@ -182,4 +182,28 @@ extension Color {
         static let deleteMessageButtonColor = GuardianColor.neutral100
         static let aboutButtonColor = GuardianColor.neutral100
     }
+
+    enum HelpExample {
+        static let highlightColor = GuardianColor.brandAlt400
+        static let backgroundColor = GuardianColor.specialReport200
+        static let borderColor = GuardianColor.neutral46
+    }
+
+    enum HelpBlockQuote {
+        static let highlightColor = GuardianColor.brandAlt400
+    }
+
+    enum HelpList {
+        static let bulletColor = GuardianColor.brandAlt400
+    }
+
+    enum HelpButton {
+        static let backgroundColor = GuardianColor.investigationsBase
+        static let backgroundPressedColor = GuardianColor.neutral46
+        static let borderColor = GuardianColor.neutral46
+    }
+
+    enum HelpDivider {
+        static let lineColor = GuardianColor.neutral46
+    }
 }

@@ -1,6 +1,7 @@
 import Foundation
 import SVGView
 import SwiftUI
+
 struct HeaderView<Content: View>: View {
     let content: Content
     let type: Destination
@@ -76,7 +77,8 @@ struct HeaderView<Content: View>: View {
         switch type {
         case .login, .viewConversation, .onboarding, .inbox:
             return "Close \(type)"
-        case .home, .privacy, .about, .messageSent, .newConversation, .deskDetail, .selectRecipient, .newPassphrase:
+        case .home, .privacy, .about, .messageSent, .newConversation,
+             .deskDetail, .selectRecipient, .newPassphrase, .help:
             return "Go Back"
         }
     }

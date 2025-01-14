@@ -10,8 +10,8 @@ enum HelpScreenComponent {
     case listItem(String)
     case divider
     case space
-    case example(AttributedString)
-    case blockQuote(text: String, authorName: String, authorTagLine: String)
+    case example(TextWithHighlights)
+    case blockQuote(text: String, authorName: String, tagLine: String)
     case button(firstLine: String, secondLine: String, identifier: String)
     case passphraseBoxes(words: [String])
 }
@@ -21,14 +21,20 @@ enum HelpScreenMarkupParsingError: Error {
     case invalidBlockQuote
 }
 
-class HelpScreenMarkupParser {
-    private let highlightedTextParser: HighlightedTextParser
+enum AttributedRun: Equatable {
+    case none(text: String)
+    case highlighted(text: String)
+}
 
-    init(highlightColor: Color) {
-        highlightedTextParser = HighlightedTextParser(highlightColor: highlightColor)
-    }
+struct TextWithHighlights {
+    var runs: [AttributedRun]
+}
+
+class HelpScreenMarkupParser {
+    private let highlightedTextParser = HighlightedTextParser()
 
     func parseHelpScreenMarkup(markup: String) throws -> [HelpScreenComponent] {
+        let markup = markup.trimmingCharacters(in: .newlines)
         let sections = markup.components(separatedBy: "\n\n")
         return try sections.map { section in
             if section.hasPrefix("# ") {
@@ -80,13 +86,13 @@ class HelpScreenMarkupParser {
         return .blockQuote(
             text: quoteParts[0],
             authorName: quoteParts[1],
-            authorTagLine: quoteParts[2]
+            tagLine: quoteParts[2]
         )
     }
 
     func parseExampleBox(_ section: String) throws -> HelpScreenComponent {
         let exampleText = section.replacingOccurrences(of: "EXAMPLE\n", with: "")
-        let annotatedText = highlightedTextParser.parseIntoAttributedString(exampleText)
+        let annotatedText = highlightedTextParser.parseIntoTextWithHighlights(exampleText)
         return .example(annotatedText)
     }
 }
@@ -96,26 +102,18 @@ class HelpScreenMarkupParser {
   * the text between ~ characters will be attributed with the given highlight color.
  */
 class HighlightedTextParser {
-    private let highlightColor: Color
-
-    init(highlightColor: Color) {
-        self.highlightColor = highlightColor
-    }
-
-    func parseIntoAttributedString(_ text: String) -> AttributedString {
+    func parseIntoTextWithHighlights(_ text: String) -> TextWithHighlights {
         let parts = text.split(separator: "~")
-        var attributedString = AttributedString()
+        var attributedRuns = [AttributedRun]()
 
         for (index, part) in parts.enumerated() {
             if index % 2 == 0 {
-                attributedString.append(AttributedString(String(part)))
+                attributedRuns.append(.none(text: String(part)))
             } else {
-                var highlightedPart = AttributedString(String(part))
-                highlightedPart.foregroundColor = highlightColor
-                attributedString.append(highlightedPart)
+                attributedRuns.append(.highlighted(text: String(part)))
             }
         }
 
-        return attributedString
+        return TextWithHighlights(runs: attributedRuns)
     }
 }

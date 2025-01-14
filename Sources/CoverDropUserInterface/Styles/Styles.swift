@@ -445,6 +445,21 @@ struct XSmallFilledButtonStyle: ButtonStyle {
     }
 }
 
+struct HelpButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        let currentBackgroundColor = configuration.isPressed
+            ? Color.HelpButton.backgroundPressedColor
+            : Color.HelpButton.backgroundColor
+        return configuration.label
+            .background(currentBackgroundColor)
+            .cornerRadius(CornerRadius.medium)
+            .overlay(
+                RoundedRectangle(cornerRadius: CornerRadius.medium)
+                    .stroke(Color.HelpButton.borderColor, lineWidth: 1)
+            )
+    }
+}
+
 // MARK: List item modifiers
 
 extension View {

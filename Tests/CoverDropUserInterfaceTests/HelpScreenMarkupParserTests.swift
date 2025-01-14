@@ -7,29 +7,17 @@ final class HelpScreenContentTests: XCTestCase {
     func testParseHighlightedStringIntoAttributedString() {
         let input = "We strive to ~highlight~ only the important parts. Especially, in ~long examples~."
 
-        let parser = HighlightedTextParser(highlightColor: .yellow)
-        let attributedString = parser.parseIntoAttributedString(input)
+        let parser = HighlightedTextParser()
+        let textWithHighlights = parser.parseIntoTextWithHighlights(input)
 
-        let runs = attributedString.runs
+        let runs = textWithHighlights.runs
         XCTAssertEqual(runs.count, 5)
 
-        let texts = runs.makeIterator().map { run in String(attributedString[run.range].characters) }
-        let colors = runs.makeIterator().map { run in run.foregroundColor }
-
-        XCTAssertEqual(texts[0], "We strive to ")
-        XCTAssertEqual(colors[0], nil)
-
-        XCTAssertEqual(texts[1], "highlight")
-        XCTAssertEqual(colors[1], .yellow)
-
-        XCTAssertEqual(texts[2], " only the important parts. Especially, in ")
-        XCTAssertEqual(colors[2], nil)
-
-        XCTAssertEqual(texts[3], "long examples")
-        XCTAssertEqual(colors[3], .yellow)
-
-        XCTAssertEqual(texts[4], ".")
-        XCTAssertEqual(colors[4], nil)
+        XCTAssertEqual(runs[0], .none(text: "We strive to "))
+        XCTAssertEqual(runs[1], .highlighted(text: "highlight"))
+        XCTAssertEqual(runs[2], .none(text: " only the important parts. Especially, in "))
+        XCTAssertEqual(runs[3], .highlighted(text: "long examples"))
+        XCTAssertEqual(runs[4], .none(text: "."))
     }
 
     func testParseHelpScreenMarkup_allComponentsValid() throws {
@@ -73,7 +61,7 @@ final class HelpScreenContentTests: XCTestCase {
         button_id_somewhere
         """
 
-        let parser = HelpScreenMarkupParser(highlightColor: .yellow)
+        let parser = HelpScreenMarkupParser()
         let components = try parser.parseHelpScreenMarkup(markup: input)
 
         XCTAssertEqual(components.count, 15)
@@ -192,7 +180,7 @@ final class HelpScreenContentTests: XCTestCase {
         is missing its third line
         """
 
-        let parser = HelpScreenMarkupParser(highlightColor: .yellow)
+        let parser = HelpScreenMarkupParser()
         XCTAssertThrowsError(try parser.parseHelpScreenMarkup(markup: input)) { error in
             XCTAssertEqual(error as! HelpScreenMarkupParsingError, HelpScreenMarkupParsingError.invalidButton)
         }
@@ -205,7 +193,7 @@ final class HelpScreenContentTests: XCTestCase {
         is missing its third line
         """
 
-        let parser = HelpScreenMarkupParser(highlightColor: .yellow)
+        let parser = HelpScreenMarkupParser()
         XCTAssertThrowsError(try parser.parseHelpScreenMarkup(markup: input)) { error in
             XCTAssertEqual(error as! HelpScreenMarkupParsingError, HelpScreenMarkupParsingError.invalidBlockQuote)
         }
