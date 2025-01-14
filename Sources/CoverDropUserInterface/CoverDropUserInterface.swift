@@ -21,6 +21,8 @@ public enum CoverDropUserInterface {
     }
 
     public static func initialView(config: CoverDropConfig) -> AnyView {
+        // Removes the beta banner setting from the app so the user is reminded on startup
+        UserDefaults.standard.removeObject(forKey: "showBetaBanner")
         return AnyView(AppNavigationView(config: config))
     }
 }

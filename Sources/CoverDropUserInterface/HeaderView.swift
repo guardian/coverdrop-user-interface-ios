@@ -6,6 +6,8 @@ struct HeaderView<Content: View>: View {
     let content: Content
     let type: Destination
     @State private var showingScreenshotDetectedAlert = false
+    @State private var showingBetaBannerAlert = false
+    @AppStorage("showBetaBanner") var showBetaBanner: Bool = true
 
     /// An optional closure to allow a view to implement its own dismissal logic. If `nil`, the parent view will be
     /// dismissed when the back button is pressed.
@@ -54,6 +56,13 @@ struct HeaderView<Content: View>: View {
                 .background(Color.HeaderView.backgroundColor)
                 .padding(0)
 
+                if showBetaBanner {
+                    BetaBannerView(
+                        showBetaBanner: $showBetaBanner,
+                        showBetaBannerAlert: $showingBetaBannerAlert
+                    )
+                }
+
                 customDivider()
 
                 content
@@ -66,6 +75,28 @@ struct HeaderView<Content: View>: View {
             ) {
                 Button("OK", role: .cancel) {
                     showingScreenshotDetectedAlert = false
+                }
+            }
+            .alert(
+                """
+                This is a test version of a new feature.
+
+                You can try it out but please do not yet use it to \
+                tell us anything that is very important or sensitive.
+
+                We cannot guarantee your message will be read.
+
+                When the feature is ready for full use we will remove the 'Beta' warnings.
+
+                You can temporarily hide the warning banner for this session.
+                """,
+                isPresented: $showingBetaBannerAlert
+            ) {
+                Button("Ok", role: .cancel) {
+
+                }
+                Button("Hide warning", role: .destructive) {
+                    showBetaBanner = false
                 }
             }
         }.onReceive(NotificationCenter.default.publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in

@@ -125,6 +125,11 @@ extension Color {
         static let foregroundColor = GuardianColor.neutral100
     }
 
+    enum BetaBannerView {
+        static let textForegroundColor = Color.black
+        static let backgroundColor = GuardianColor.error500
+    }
+
     enum UserLoginView {
         static let errorMessageForegroundColor = GuardianColor.error500
         static let errorMessageStrokeColor = GuardianColor.error500
