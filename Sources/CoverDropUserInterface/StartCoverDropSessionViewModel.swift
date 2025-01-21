@@ -9,7 +9,7 @@ class StartCoverDropSessionViewModel: ObservableObject {
 
     private var keysAvailableSubscriber: AnyCancellable?
 
-    init(publicDataRepository: PublicDataRepository = PublicDataRepository.shared) {
+    init(publicDataRepository: PublicDataRepository) {
         keysAvailableSubscriber = publicDataRepository.$areKeysAvailable
             .sink { [weak self] newValue in
                 self?.keysAvailable = newValue

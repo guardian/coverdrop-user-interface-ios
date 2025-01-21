@@ -37,11 +37,17 @@ struct UnlockedSecretDataStateSwitcher: View {
             if case .newConversation = navigation.destination {
                 // This scenario is when the user has logged in for the first time
                 // after creating a new session and has never sent a message
-                NewMessageView(viewModel: conversationViewModel, inboxIsEmpty: false)
+                NewMessageView(
+                    viewModel: conversationViewModel,
+                    inboxIsEmpty: false
+                )
             } else if case .login = navigation.destination {
                 // This scenario is when the user had abandoned sending their initial message, but had created a
                 // session, and is re-logging in
-                NewMessageView(viewModel: conversationViewModel, inboxIsEmpty: true)
+                NewMessageView(
+                    viewModel: conversationViewModel,
+                    inboxIsEmpty: true
+                )
             }
         } else if !unlockedSecretData.unlockedData.messageMailbox.isEmpty {
             if case .newConversation = navigation.destination {
@@ -61,7 +67,8 @@ struct UnlockedSecretDataStateSwitcher: View {
                     InboxView(
                         inboxViewModel: InboxViewModel(config: config),
                         conversationViewModel: conversationViewModel,
-                        verifiedPublicKeys: verifiedPublicKeys
+                        verifiedPublicKeys: verifiedPublicKeys,
+                        config: config
                     )
                 }
             } else if case .inbox = navigation.destination {
@@ -69,13 +76,15 @@ struct UnlockedSecretDataStateSwitcher: View {
                 InboxView(
                     inboxViewModel: InboxViewModel(config: config),
                     conversationViewModel: conversationViewModel,
-                    verifiedPublicKeys: verifiedPublicKeys
+                    verifiedPublicKeys: verifiedPublicKeys,
+                    config: config
                 )
             } else {
                 InboxView(
                     inboxViewModel: InboxViewModel(config: config),
                     conversationViewModel: conversationViewModel,
-                    verifiedPublicKeys: verifiedPublicKeys
+                    verifiedPublicKeys: verifiedPublicKeys,
+                    config: config
                 )
             }
         }

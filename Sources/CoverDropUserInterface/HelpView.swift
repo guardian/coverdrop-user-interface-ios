@@ -24,7 +24,7 @@ enum HelpScreenContent: Error, Equatable {
         case .privacyPolicy:
             "help_privacy_policy"
         case .replyExpectations:
-            "help_reply_expectation"
+            "help_reply_expectations"
         case .sourceProtection:
             "help_source_protection"
         case .whyWeMadeSecureMessaging:

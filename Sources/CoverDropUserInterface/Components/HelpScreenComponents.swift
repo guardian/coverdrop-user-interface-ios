@@ -13,8 +13,7 @@ struct HelpHeadline: View {
                 .padding(.bottom, Padding.large)
         case .headline2:
             Text(text)
-                .font(.title2)
-                .padding(.bottom, Padding.large)
+                .textStyle(GuardianHeaderTextStyle())
         case .headline3:
             Text(text)
                 .fontWeight(.bold)

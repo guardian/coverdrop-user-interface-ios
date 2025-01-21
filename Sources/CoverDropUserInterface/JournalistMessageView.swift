@@ -73,13 +73,16 @@ struct JournalistMessageView: View {
 
         }.onAppear {
             Task {
-                expired = await isCurrentKeyExpired(recipient: recipient)
+                expired = await isCurrentKeyExpired(recipient: recipient, verifiedPublicKeys: verifiedPublicKeys)
             }
         }
     }
 
-    func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
-        if let currentKey = await PublicDataRepository.getLatestMessagingKey(recipientId: recipient.recipientId) {
+    func isCurrentKeyExpired(recipient: JournalistData, verifiedPublicKeys: VerifiedPublicKeys) async -> Bool {
+        if let currentKey = await PublicDataRepository.getLatestMessagingKey(
+            recipientId: recipient.recipientId,
+            verifiedPublicKeys: verifiedPublicKeys
+        ) {
             return currentKey.isExpired(now: DateFunction.currentKeysPublishedTime())
         }
         return false

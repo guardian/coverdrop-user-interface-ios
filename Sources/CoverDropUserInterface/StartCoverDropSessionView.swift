@@ -5,14 +5,16 @@ import SwiftUI
 
 struct StartCoverDropSessionView: View {
     @ObservedObject var navigation = Navigation.shared
-    @ObservedObject private var viewModel = StartCoverDropSessionViewModel()
-    @ObservedObject private var publicDataRepository = PublicDataRepository.shared
+    @ObservedObject private var viewModel: StartCoverDropSessionViewModel
+    @ObservedObject private var publicDataRepository: PublicDataRepository
 
     /// Controls whether the alert is shown before starting a new conversation
     @State private var showingNewMessageAlert = false
 
-    init() {
+    init(publicDataRepository: PublicDataRepository, viewModel: StartCoverDropSessionViewModel) {
         UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).adjustsFontSizeToFitWidth = true
+        self.publicDataRepository = publicDataRepository
+        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -23,12 +25,28 @@ struct StartCoverDropSessionView: View {
 
                     Text(
                         """
-                            Our Secure Messaging service was developed by the Guardian to allow you to share
-                            stories with us securely and privately using strong encryption.
-                            It is designed to prevent others from even knowing you are in communication with us.
+                        Our Secure Messaging service was developed by the Guardian to allow you to share \
+                        stories with us securely and privately using strong encryption. \
+                        It is designed to prevent others from even knowing you are in\
+                        communication with us.
                         """
                     )
                     .textStyle(BodyStyle())
+                    .padding(.vertical, Padding.medium)
+
+                    Button(action: {
+                        navigation.destination = .about
+                        viewModel.viewHidden()
+                    }) {
+                        Text("About Secure Messaging")
+                            .fontWeight(.bold)
+                        Image(systemName: "chevron.forward")
+                            .resizable()
+                            .fontWeight(.black)
+                            .frame(width: 7, height: 11)
+                            .foregroundColor(Color.ChevronButtonList.chevronColor)
+                            .padding([.trailing], Padding.small)
+                    }
 
                     Spacer()
 
@@ -73,21 +91,6 @@ struct StartCoverDropSessionView: View {
 
                 }.padding(Padding.large)
                     .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-
-                if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
-                   coverDropServiceStatus.isAvailable {
-                    customDivider()
-                    HStack(alignment: .center) {
-                        Button("About Secure Messaging") {
-                            navigation.destination = .about
-                            viewModel.viewHidden()
-                        }.buttonStyle(FooterButtonStyle())
-                        Button("Privacy policy") {
-                            navigation.destination = .privacy
-                            viewModel.viewHidden()
-                        }.buttonStyle(FooterButtonStyle())
-                    }.padding([.leading], Padding.small)
-                }
             }
         }
     }
@@ -103,12 +106,15 @@ struct StartCoverDropSessionView: View {
 struct StartCoverDropSessionView_Previews: PreviewProvider {
     @MainActor struct Container: View {
         let setup: () = setupView()
+        var setupRepo: () = PublicDataRepository.setup(StaticConfig.devConfig)
+        let publicDataRepository: PublicDataRepository = PublicDataRepository.shared
+        let viewModel = StartCoverDropSessionViewModel(publicDataRepository: PublicDataRepository.shared)
 
         @MainActor var body: some View {
             let _: () = setAvailabe()
-            PreviewWrapper(StartCoverDropSessionView())
+            PreviewWrapper(StartCoverDropSessionView(publicDataRepository: publicDataRepository, viewModel: viewModel))
             let _: () = setUnavailabe()
-            PreviewWrapper(StartCoverDropSessionView())
+            PreviewWrapper(StartCoverDropSessionView(publicDataRepository: publicDataRepository, viewModel: viewModel))
         }
     }
 

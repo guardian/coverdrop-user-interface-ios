@@ -5,14 +5,8 @@ import SVGView
 import SwiftUI
 
 struct UserLoginView: View {
-    @ObservedObject var viewModel: UserLoginViewModel
+    @ObservedObject var userLoginViewModel: UserLoginViewModel
     @ObservedObject var navigation = Navigation.shared
-    var config: CoverDropConfig
-
-    public init(config: CoverDropConfig) {
-        viewModel = UserLoginViewModel(config: config)
-        self.config = config
-    }
 
     var body: some View {
         HeaderView(type: .login, dismissAction: {
@@ -23,7 +17,7 @@ struct UserLoginView: View {
                 Text("Enter your passphrase to unlock your secure inbox and send your first message.")
                     .textStyle(BodyStyle())
 
-                switch viewModel.state {
+                switch userLoginViewModel.state {
                 case .errorIncorrectWords:
                     InformationView(
                         viewType: .error,
@@ -45,8 +39,11 @@ struct UserLoginView: View {
 
                 Spacer()
 
-                AsyncActionButton(buttonText: "Confirm passphrase", isInProgress: viewModel.state == .submitted) {
-                    try await viewModel.login()
+                AsyncActionButton(
+                    buttonText: "Confirm passphrase",
+                    isInProgress: userLoginViewModel.state == .submitted
+                ) {
+                    try await userLoginViewModel.login()
                 }
             }.padding(Padding.medium)
                 .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
@@ -55,15 +52,15 @@ struct UserLoginView: View {
 
     private func passphraseWordListTextFieldView() -> some View {
         VStack {
-            ForEach(0 ... viewModel.passphrase.count - 1, id: \.self) { id in
-                if viewModel.passphraseFieldsMasked[id] {
+            ForEach(0 ... userLoginViewModel.passphrase.count - 1, id: \.self) { id in
+                if userLoginViewModel.passphraseFieldsMasked[id] {
                     ZStack(alignment: .trailing) {
-                        SecureField("", text: $viewModel.passphrase[id])
+                        SecureField("", text: $userLoginViewModel.passphrase[id])
                             .textContentType(.password)
                             .textFieldStyle(PassphraseFieldStyle())
                             .accessibilityIdentifier("Passphrase Word \(id + 1)")
                         Button(action: {
-                            viewModel.passphraseFieldsMasked[id] = false
+                            userLoginViewModel.passphraseFieldsMasked[id] = false
                         }, label: {
                             Image(systemName: "eye.fill")
                         }).accessibilityIdentifier("show \(id + 1)")
@@ -71,13 +68,13 @@ struct UserLoginView: View {
                     }
                 } else {
                     ZStack(alignment: .trailing) {
-                        TextField("", text: $viewModel.passphrase[id])
+                        TextField("", text: $userLoginViewModel.passphrase[id])
                             .textFieldStyle(PassphraseFieldStyle())
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
                             .accessibilityIdentifier("Passphrase Word \(id + 1)")
                         Button(action: {
-                            viewModel.passphraseFieldsMasked[id] = true
+                            userLoginViewModel.passphraseFieldsMasked[id] = true
                         }, label: {
                             Image(systemName: "eye.slash.fill")
                         }).accessibilityIdentifier("hide \(id + 1)")
@@ -92,75 +89,80 @@ struct UserLoginView: View {
 struct UserLoginView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewWrapper(StatefulPreviewWrapper(false) { _ in
-            UserLoginView(config: StaticConfig.devConfig)
+            UserLoginView(userLoginViewModel: UserLoginViewModel(
+                config: StaticConfig.devConfig,
+                verifiedPublicKeys: PublicKeysHelper.shared.testKeys
+            ))
         })
     }
 }
 
-extension UserLoginView {
-    class UserLoginViewModel: ObservableObject {
-        var config: CoverDropConfig
-        enum State {
-            case inital, submitted, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
-        }
+class UserLoginViewModel: ObservableObject {
+    var config: CoverDropConfig
+    var verifiedPublicKeys: VerifiedPublicKeys
+    enum State {
+        case inital, submitted, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
+    }
 
-        @Published var passphrase: [String]
-        @Published var passphraseFieldsMasked: [Bool]
+    @Published var passphrase: [String]
+    @Published var passphraseFieldsMasked: [Bool]
 
-        @ObservedObject var secretDataRepository = SecretDataRepository.shared
+    @ObservedObject var secretDataRepository = SecretDataRepository.shared
 
-        @Published var state: State = .inital
+    @Published var state: State = .inital
 
-        init(config: CoverDropConfig) {
-            passphrase = UserLoginView.UserLoginViewModel
-                .passphraseArray(passphraseWordCount: config.passphraseWordCount)
-            passphraseFieldsMasked = UserLoginView.UserLoginViewModel
-                .passphraseVisibilityArray(passphraseWordCount: config.passphraseWordCount)
-            self.config = config
-        }
+    init(config: CoverDropConfig, verifiedPublicKeys: VerifiedPublicKeys) {
+        passphrase = UserLoginViewModel
+            .passphraseArray(passphraseWordCount: config.passphraseWordCount)
+        passphraseFieldsMasked = UserLoginViewModel
+            .passphraseVisibilityArray(passphraseWordCount: config.passphraseWordCount)
+        self.config = config
+        self.verifiedPublicKeys = verifiedPublicKeys
+    }
 
-        static func passphraseArray(passphraseWordCount: Int) -> [String] {
-            return [String](repeating: "", count: passphraseWordCount)
-        }
+    static func passphraseArray(passphraseWordCount: Int) -> [String] {
+        return [String](repeating: "", count: passphraseWordCount)
+    }
 
-        static func passphraseVisibilityArray(passphraseWordCount: Int) -> [Bool] {
-            return [Bool](repeating: true, count: passphraseWordCount)
-        }
+    static func passphraseVisibilityArray(passphraseWordCount: Int) -> [Bool] {
+        return [Bool](repeating: true, count: passphraseWordCount)
+    }
 
-        func login() async throws {
-            state = .submitted
-            if isPassphraseInputValid(passphrase: passphrase) {
-                guard let validPassphrase = try? PasswordGenerator
-                    .checkValid(passwordInput: passphrase.joined(separator: " ")) else {
-                    state = .errorIncorrectWords
-                    return
-                }
-
-                let session: ()? = try? await secretDataRepository.unlock(passphrase: validPassphrase)
-
-                if session != nil {
-                    passphrase = UserLoginView.UserLoginViewModel
-                        .passphraseArray(passphraseWordCount: config.passphraseWordCount)
-                    // try and decrypt the stored dead drops
-                    try await DeadDropDecryptionService().decryptStoredDeadDrops()
-                } else {
-                    state = .errorUnableToUnlock
-                }
-            } else {
+    func login() async throws {
+        state = .submitted
+        if isPassphraseInputValid(passphrase: passphrase) {
+            guard let validPassphrase = try? PasswordGenerator
+                .checkValid(passwordInput: passphrase.joined(separator: " ")) else {
                 state = .errorIncorrectWords
+                return
             }
-        }
 
-        func isPassphraseInputValid(passphrase: [String]) -> Bool {
-            let anyEmpty: [String] = passphrase.filter {
-                $0.trimmingCharacters(in: .whitespacesAndNewlines) == ""
+            let session: ()? = try? await secretDataRepository.unlock(passphrase: validPassphrase)
+
+            if session != nil {
+                passphrase = UserLoginViewModel
+                    .passphraseArray(passphraseWordCount: config.passphraseWordCount)
+                // try and decrypt the stored dead drops
+                try await DeadDropDecryptionService().decryptStoredDeadDrops(
+                    verifiedPublicKeys: verifiedPublicKeys
+                )
+            } else {
+                state = .errorUnableToUnlock
             }
-            do {
-                _ = try PasswordGenerator.checkValid(passwordInput: passphrase.joined(separator: " "))
-                return anyEmpty.count == 0
-            } catch {
-                return false
-            }
+        } else {
+            state = .errorIncorrectWords
+        }
+    }
+
+    func isPassphraseInputValid(passphrase: [String]) -> Bool {
+        let anyEmpty: [String] = passphrase.filter {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines) == ""
+        }
+        do {
+            _ = try PasswordGenerator.checkValid(passwordInput: passphrase.joined(separator: " "))
+            return anyEmpty.count == 0
+        } catch {
+            return false
         }
     }
 }

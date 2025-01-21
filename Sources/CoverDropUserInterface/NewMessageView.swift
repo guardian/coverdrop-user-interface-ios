@@ -169,11 +169,16 @@ struct NewMessageView: View {
 struct NewMessageView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewWrapper(NewMessageView(viewModel: viewModel()))
-        PreviewWrapper(NewMessageView(viewModel: viewModelWithALongMessage()))
+        PreviewWrapper(NewMessageView(
+            viewModel: viewModelWithALongMessage()
+        ))
     }
 
     private static func viewModel() -> ConversationViewModel {
-        return ConversationViewModel(verifiedPublicKeys: PublicKeysHelper.shared.testKeys)
+        return ConversationViewModel(
+            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
+            config: StaticConfig.devConfig
+        )
     }
 
     private static func viewModelWithALongMessage() -> ConversationViewModel {

@@ -272,9 +272,9 @@ class InboxViewModel: ObservableObject {
     ///
     public func deleteAllMessagesAndCurrentSession(
         verifiedPublicKeys: VerifiedPublicKeys,
-        conversationViewModel: ConversationViewModel
+        conversationViewModel: ConversationViewModel,
+        config: CoverDropConfig
     ) async throws {
-        _ = PublicDataRepository.shared
         if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
             unlockedSecretData.unlockedData.messageMailbox = []
             await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedSecretData)
@@ -282,7 +282,9 @@ class InboxViewModel: ObservableObject {
                 .createOrResetStorageWithRandomPassphrase(passphraseWordCount: config.passphraseWordCount)
 
             if let coverMessageFactory = try? PublicDataRepository
-                .getCoverMessageFactory(verifiedPublicKeys: verifiedPublicKeys) {
+                .getCoverMessageFactory(
+                    verifiedPublicKeys: verifiedPublicKeys
+                ) {
                 try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory: coverMessageFactory)
             }
         }

@@ -211,4 +211,10 @@ extension Color {
     enum HelpDivider {
         static let lineColor = GuardianColor.neutral46
     }
+
+    enum ChevronButtonList {
+        static let dividerColor = GuardianColor.neutral46
+        static let backgroundColor = GuardianColor.specialReport200
+        static let chevronColor = GuardianColor.neutral100
+    }
 }

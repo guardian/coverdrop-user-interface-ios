@@ -2,6 +2,52 @@ import Foundation
 import SVGView
 import SwiftUI
 
+struct ChevronButtonData {
+    var text: String
+    var target: HelpScreenContent
+}
+
+struct ChevronButtonList: View {
+    @ObservedObject var navigation = Navigation.shared
+    @State var buttonData = [ChevronButtonData]()
+
+    func navigateToHelp(contentVariant: HelpScreenContent) {
+        navigation.destination = .help(contentVariant: contentVariant)
+    }
+
+    var body: some View {
+        VStack {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(buttonData.indices, id: \.self) { index in
+                    let data = buttonData[index]
+                    Button(action: {navigateToHelp(contentVariant: data.target)}) {
+                        HStack {
+                            Text(data.text)
+                                .fontWeight(.semibold)
+                                .padding(.vertical, 8)
+                            Spacer()
+                            Image(systemName: "chevron.forward")
+                                .resizable()
+                                .fontWeight(.semibold)
+                                .frame(width: 7, height: 11)
+                                .foregroundColor(Color.ChevronButtonList.chevronColor)
+                                .padding([.trailing], Padding.small)
+                        }
+                    }
+                    if index < buttonData.count - 1 {
+                        Rectangle()
+                            .fill(Color.ChevronButtonList.dividerColor)
+                            .frame(height: 1)
+                            .padding(.vertical, Padding.small)
+                    }
+                }
+            }.padding(.horizontal, Padding.medium)
+                .padding(.vertical, Padding.small)
+        }.background(Color.ChevronButtonList.backgroundColor)
+            .cornerRadius(CornerRadius.medium)
+    }
+}
+
 struct AboutCoverDropView: View {
     @ObservedObject var navigation = Navigation.shared
 
@@ -15,34 +61,62 @@ struct AboutCoverDropView: View {
                 navigation.destination = .home
             }) {
                 VStack(alignment: .leading) {
-                    Text("About Secure Messaging").textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
+                    Text("About Secure Messaging")
+                        .textStyle(LargeTitleStyle())
+                        .font(Font.headline.leading(.loose))
 
-                    // TODO: Only placeholders for now, see: https://github.com/guardian/coverdrop/issues/2399
-                    Button(action: { navigateToHelp(contentVariant: .howSecureMessagingWorks) }) {
-                        Text("How Secure Messaging works")
-                    }
-                    Button(action: { navigateToHelp(contentVariant: .whyWeMadeSecureMessaging) }) {
-                        Text("Why we made Secure Messaging")
-                    }
-                    Button(action: { navigateToHelp(contentVariant: .faq) }) {
-                        Text("FAQs")
-                    }
-                    Button(action: { navigateToHelp(contentVariant: .privacyPolicy) }) {
-                        Text("Privacy policy")
-                    }
-                    Button(action: { navigateToHelp(contentVariant: .craftMessage) }) {
-                        Text("Craft your first message")
-                    }
-                    Button(action: { navigateToHelp(contentVariant: .keepingPassphraseSafe) }) {
-                        Text("Keeping passphrases safe")
-                    }
-                    Button(action: { navigateToHelp(contentVariant: .replyExpectations) }) {
-                        Text("What to expect as a reply")
-                    }
-                    Button(action: { navigateToHelp(contentVariant: .sourceProtection) }) {
-                        Text("Source protection")
-                    }
+                    Text("What this is for")
+                        .textStyle(GuardianHeaderTextStyle())
+                        .padding([.top], Padding.large)
+                        .padding([.bottom], Padding.small)
+                    ChevronButtonList(buttonData: [
+                        ChevronButtonData(
+                            text: "Why we made Secure Messaging",
+                            target: .whyWeMadeSecureMessaging
+                        ),
+                        ChevronButtonData(
+                            text: "How Secure Messaging works",
+                            target: .howSecureMessagingWorks
+                        ),
+                        ChevronButtonData(
+                            text: "FAQs",
+                            target: .faq
+                        ),
+                        ChevronButtonData(
+                            text: "Privacy policy",
+                            target: .privacyPolicy
+                        )
+                    ])
 
+                    Text("Getting started")
+                        .textStyle(GuardianHeaderTextStyle())
+                        .padding([.top], Padding.large)
+                        .padding([.bottom], Padding.small)
+                    ChevronButtonList(buttonData: [
+                        ChevronButtonData(
+                            text: "Craft your first message",
+                            target: .craftMessage
+                        ),
+                        ChevronButtonData(
+                            text: "Keeping passphrases safe",
+                            target: .keepingPassphraseSafe
+                        )
+                    ])
+
+                    Text("As the conversation progresses")
+                        .textStyle(GuardianHeaderTextStyle())
+                        .padding([.top], Padding.large)
+                        .padding([.bottom], Padding.small)
+                    ChevronButtonList(buttonData: [
+                        ChevronButtonData(
+                            text: "What to expect as a reply",
+                            target: .replyExpectations
+                        ),
+                        ChevronButtonData(
+                            text: "Source protection",
+                            target: .sourceProtection
+                        )
+                    ])
                 }.padding(Padding.large)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 Spacer()

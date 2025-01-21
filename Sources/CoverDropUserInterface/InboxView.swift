@@ -7,6 +7,7 @@ struct InboxView: View {
     @ObservedObject var conversationViewModel: ConversationViewModel
     @State private var showingDeleteAlert = false
     var verifiedPublicKeys: VerifiedPublicKeys
+    var config: CoverDropConfig
 
     var body: some View {
         HeaderView(type: .inbox, dismissAction: {
@@ -142,7 +143,8 @@ struct InboxView: View {
                                navigation.destination = .home
                                try? await inboxViewModel.deleteAllMessagesAndCurrentSession(
                                    verifiedPublicKeys: verifiedPublicKeys,
-                                   conversationViewModel: conversationViewModel
+                                   conversationViewModel: conversationViewModel,
+                                   config: config
                                )
                            }
                        }

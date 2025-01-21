@@ -108,7 +108,7 @@ struct HeaderView<Content: View>: View {
         switch type {
         case .login, .viewConversation, .onboarding, .inbox:
             return "Close \(type)"
-        case .home, .privacy, .about, .messageSent, .newConversation,
+        case .home, .about, .messageSent, .newConversation,
              .deskDetail, .selectRecipient, .newPassphrase, .help:
             return "Go Back"
         }

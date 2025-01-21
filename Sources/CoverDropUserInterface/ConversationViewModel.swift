@@ -14,7 +14,6 @@ struct MessageData {
 }
 
 @MainActor class ConversationViewModel: ObservableObject {
-    @ObservedObject var publicDataRepository = PublicDataRepository.shared
     @ObservedObject var secretDataRepository = SecretDataRepository.shared
 
     @Published var messageRecipient: JournalistData?
@@ -22,11 +21,15 @@ struct MessageData {
 
     @Published var message = ""
     @Published var state = State.initial
+    let config: CoverDropConfig
+    let verifiedPublicKeys: VerifiedPublicKeys
 
-    public init(verifiedPublicKeys: VerifiedPublicKeys) {
+    public init(verifiedPublicKeys: VerifiedPublicKeys, config: CoverDropConfig) {
         // We will always set messageRecipient to the supplied one
         // but set it with the defaul journalist if we can get any message reciepients from the keys
         // and the supplied recipient is nil
+        self.config = config
+        self.verifiedPublicKeys = verifiedPublicKeys
         state = .loading
 
         messageRecipient = nil
@@ -97,11 +100,6 @@ struct MessageData {
     // This handles any errors and updates the view state.
     @MainActor
     func sendMessage() async throws {
-        guard let keyHierarchy = try? await publicDataRepository.loadAndVerifyPublicKeys() else {
-            state = .error(message: "Unable to load public key")
-            return
-        }
-
         guard let messageRecipient else {
             state = .error(message: "No recipient selected")
             return
@@ -113,7 +111,7 @@ struct MessageData {
             if case let .unlockedSecretData(data) = secretDataRepository.secretData {
                 try await MessageSending.sendMessage(message,
                                                      to: messageRecipient,
-                                                     verifiedPublicKeys: keyHierarchy,
+                                                     verifiedPublicKeys: verifiedPublicKeys,
                                                      unlockedSecretDataRepository: data, dateSent: dateSent)
             }
         } catch {
