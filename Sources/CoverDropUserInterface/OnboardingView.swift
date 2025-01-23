@@ -10,9 +10,6 @@ struct OnboardingView: View {
             navigation.destination = .home
         }) {
             VStack(alignment: .leading, spacing: 0) {
-                Text("How this works")
-                    .textStyle(TitleStyle())
-                    .padding(.leading, 1) // alignment workaround for tabview scrollview inset
                 TabView {
                     ForEach(OnboardingViewModel.OnboardingSteps.allCases) { step in
                         onboardingStep(step: step)
@@ -20,8 +17,9 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page)
             }
-            .padding([.top, .leading, .trailing], Padding.large)
+            .padding([.top, .leading, .trailing, .bottom], Padding.large)
             .foregroundColor(Color.white)
+            Spacer()
 
             Button("Continue") {
                 navigation.destination = .newPassphrase
@@ -33,25 +31,31 @@ struct OnboardingView: View {
     }
 
     func onboardingStep(step: OnboardingViewModel.OnboardingSteps) -> some View {
-        VStack {
-            VStack(alignment: .leading, spacing: 0) {
+        GeometryReader { metric in
+            VStack(alignment: .center, spacing: 0) {
+                Group {
+                    step.image
+                        .frame(width: 200, height: 200)
+                        .padding([.bottom], Padding.large)
+                    // the .frame sets the height as a percentage of the parent.
+                    // Totally a magic number that works with and without the beta banner present
+                }.frame(height: metric.size.height * 0.58)
+
+                Text("How this works")
+                    .textStyle(TitleStyle())
+
                 Text(step.rawValue)
                     .textStyle(GuardianHeaderTextStyle())
                     .foregroundColor(Color.OnboardingView.textForegroundColor)
+                    .padding(.bottom, Padding.medium)
                 Text(step.description)
                     .textStyle(BodyStyle())
-                    .padding(.top, 12)
-            }
-
-            VStack(alignment: .center) {
-                step.image
-                    .frame(width: 200, height: 200)
-                    .padding([.top], Padding.xLarge * 4)
-
+                    .padding(.top, Padding.small)
+                    .padding([.leading, .trailing], Padding.medium)
                 Spacer()
-            }
-            Spacer()
-        }.foregroundColor(Color.white)
+
+            }.foregroundColor(Color.white)
+        }
     }
 }
 
@@ -66,21 +70,18 @@ enum OnboardingViewModel {
         var description: String {
             switch self {
             case .getPassphrase:
-                return """
-                    You will been shown a unique passphrase which you will use to unlock your secure inbox.
-                    Please make sure you memorise it so you can return to your secure inbox later.
-                """
+                let line1 = "You will been shown a unique passphrase which you will use to unlock your secure inbox."
+                let line2 = "Please make sure you memorise it so you can return to your secure inbox later."
+                return "\(line1) \(line2)"
             case .sendMessage:
-                return """
-                    Your message will be sent anonymously and securely to a journalist or a team.
-                    It will be encrypted and indistinguishable from normal network traffic.
-                """
+                let line1 = "Your message will be sent anonymously and securely to a journalist or a team."
+                let line2 = "It will be encrypted and indistinguishable from normal network traffic."
+                return "\(line1) \(line2)"
             case .checkResponse:
-                return """
-                    Our journalists monitor secure messages regularly.
-                    If they wish to take your story further they will respond here.
-                    To stay in touch you will need to return to your secure inbox using your passphrase.
-                """
+                let line1 = "Our journalists monitor secure messages regularly."
+                let line2 = "If they wish to take your story further they will respond here."
+                let line3 = "To stay in touch you will need to return to your secure inbox using your passphrase."
+                return "\(line1) \(line2) \(line3)"
             }
         }
 
@@ -104,8 +105,6 @@ enum OnboardingViewModel {
     }
 }
 
-struct OnboardingView_Previews: PreviewProvider {
-    static var previews: some View {
-        PreviewWrapper(OnboardingView())
-    }
+#Preview {
+    OnboardingView()
 }
