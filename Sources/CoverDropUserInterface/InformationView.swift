@@ -3,7 +3,7 @@ import SwiftUI
 
 struct InformationView: View {
     enum ViewType {
-        case error, info
+        case error, info, action
     }
 
     var viewType: ViewType
@@ -26,18 +26,23 @@ struct InformationView: View {
             imagePath = "info.circle.fill"
             textColor = Color.NewMessageView.messageInformationColor
             strokeColor = Color.NewMessageView.messageInformationStrokeColor
+
+        case .action:
+            imagePath = "info.circle.fill"
+            textColor = Color.white
+            strokeColor = Color.white
         }
     }
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .top) {
-                Text("\(Image(systemName: imagePath))")
+                Image(systemName: imagePath)
                     .foregroundColor(strokeColor)
+                    .offset(CGSize(width: 0, height: -4))
                 VStack(alignment: .leading) {
                     Text("\(title)")
                         .textStyle(ErrorBoxTitleTextStyle())
-                        .padding([.bottom], Padding.xSmall)
                         .foregroundColor(textColor)
 
                     Text(message).textStyle(BodyStyle())
@@ -45,14 +50,20 @@ struct InformationView: View {
                         .foregroundColor(textColor)
                 }
                 Spacer()
+                if viewType == .action {
+                    VStack(alignment: .center) {
+                        Image(systemName: "chevron.forward").resizable().frame(width: 7, height: 11)
+                            .padding(.top, 12)
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity)
-        .padding([.leading, .top, .bottom], Padding.medium)
+        .padding([.leading, .trailing, .top], Padding.medium)
+        .padding([.bottom], Padding.small)
         .overlay(
             RoundedRectangle(cornerRadius: CornerRadius.small)
                 .stroke(strokeColor, style: StrokeStyle(lineWidth: 1))
         )
-        .padding([.bottom], Padding.large)
     }
 }

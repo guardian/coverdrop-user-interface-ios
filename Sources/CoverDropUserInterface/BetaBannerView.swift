@@ -1,6 +1,6 @@
+import CoverDropCore
 import Foundation
 import SwiftUI
-import CoverDropCore
 
 struct BetaBannerView: View {
     var imagePath: String
@@ -9,8 +9,8 @@ struct BetaBannerView: View {
     var showBetaBannerAlert: Binding<Bool>
 
     init(showBetaBanner: Binding<Bool>, showBetaBannerAlert: Binding<Bool>) {
-        self.imagePath = "exclamationmark.triangle.fill"
-        self.textColor = Color.BetaBannerView.textForegroundColor
+        imagePath = "exclamationmark.triangle.fill"
+        textColor = Color.BetaBannerView.textForegroundColor
         self.showBetaBanner = showBetaBanner
         self.showBetaBannerAlert = showBetaBannerAlert
     }
@@ -21,7 +21,6 @@ struct BetaBannerView: View {
                 showBetaBannerAlert.wrappedValue = true
             }) {
                 HStack(alignment: .top) {
-
                     Image(systemName: imagePath)
                         .foregroundColor(textColor)
                         .offset(CGSize(width: 0, height: -3))
@@ -43,7 +42,8 @@ struct BetaBannerView: View {
                         .frame(width: 10, height: 15)
                         .padding(Padding.large)
                         .foregroundColor(textColor)
-                }.padding([.top, .bottom], Padding.large)
+                }.padding([.top], Padding.medium)
+                    .padding([.bottom], Padding.small)
                     .padding([.leading], Padding.xLarge)
             }
             .buttonStyle(.plain)
