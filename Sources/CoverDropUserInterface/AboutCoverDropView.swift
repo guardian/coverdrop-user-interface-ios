@@ -20,7 +20,7 @@ struct ChevronButtonList: View {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(buttonData.indices, id: \.self) { index in
                     let data = buttonData[index]
-                    Button(action: {navigateToHelp(contentVariant: data.target)}) {
+                    Button(action: { navigateToHelp(contentVariant: data.target) }) {
                         HStack {
                             Text(data.text)
                                 .fontWeight(.semibold)

@@ -92,9 +92,7 @@ struct HeaderView<Content: View>: View {
                 """,
                 isPresented: $showingBetaBannerAlert
             ) {
-                Button("Ok", role: .cancel) {
-
-                }
+                Button("Ok", role: .cancel) {}
                 Button("Hide warning", role: .destructive) {
                     showBetaBanner = false
                 }

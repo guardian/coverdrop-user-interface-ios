@@ -164,7 +164,10 @@ private func loadComponentsFromMarkupFile(resourceName: String) throws -> [HelpS
     }
 }
 
-private func checkForMissingAndDanglingIdentifiers(components: [HelpScreenComponent], onClickMapping: [String: HelpScreenContent]) throws {
+private func checkForMissingAndDanglingIdentifiers(
+    components: [HelpScreenComponent],
+    onClickMapping: [String: HelpScreenContent]
+) throws {
     // We first check for missing or dangling button identifiers
     var allButtonIdentifiers = [String]()
     for component in components {
@@ -183,7 +186,8 @@ private func checkForMissingAndDanglingIdentifiers(components: [HelpScreenCompon
 }
 
 /// Creates the help screen UI for the given `HelpScreenComponent` list
-private func createComponentsColumn(components: [HelpScreenComponent], onClickMapping: [String: () -> Void]) -> AnyView {
+private func createComponentsColumn(components: [HelpScreenComponent],
+                                    onClickMapping: [String: () -> Void]) -> AnyView {
     let vstack = VStack(alignment: .leading, spacing: Padding.medium) {
         ForEach(components.indices, id: \.self) { index in
             let component = components[index]
