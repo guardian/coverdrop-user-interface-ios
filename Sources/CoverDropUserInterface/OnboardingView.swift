@@ -70,18 +70,21 @@ enum OnboardingViewModel {
         var description: String {
             switch self {
             case .getPassphrase:
-                let line1 = "You will been shown a unique passphrase which you will use to unlock your secure inbox."
-                let line2 = "Please make sure you memorise it so you can return to your secure inbox later."
-                return "\(line1) \(line2)"
+                return """
+                You will been shown a unique passphrase which you will use to unlock your secure inbox. \
+                Please make sure you memorise it so you can return to your secure inbox later.
+                """
             case .sendMessage:
-                let line1 = "Your message will be sent anonymously and securely to a journalist or a team."
-                let line2 = "It will be encrypted and indistinguishable from normal network traffic."
-                return "\(line1) \(line2)"
+                return """
+                Your message will be sent anonymously and securely to a journalist or a team. \
+                It will be encrypted and indistinguishable from normal network traffic.
+                """
             case .checkResponse:
-                let line1 = "Our journalists monitor secure messages regularly."
-                let line2 = "If they wish to take your story further they will respond here."
-                let line3 = "To stay in touch you will need to return to your secure inbox using your passphrase."
-                return "\(line1) \(line2) \(line3)"
+                return """
+                Our journalists monitor secure messages regularly. \
+                If they wish to take your story further they will respond here. \
+                To stay in touch you will need to return to your secure inbox using your passphrase.
+                """
             }
         }
 
