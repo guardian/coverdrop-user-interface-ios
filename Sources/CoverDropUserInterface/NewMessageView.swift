@@ -11,11 +11,13 @@ struct NewMessageView: View {
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping
     // will allow us to fail fast in the case of developer error.
     @ObservedObject var conversationViewModel: ConversationViewModel
+    @ObservedObject var lib: CoverDropLibrary
 
-    init(viewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
+    init(lib: CoverDropLibrary, conversationViewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
         UITextView.appearance().backgroundColor = .clear
         isInboxEmpty = inboxIsEmpty
-        conversationViewModel = viewModel
+        self.conversationViewModel = conversationViewModel
+        self.lib = lib
     }
 
     var body: some View {
@@ -100,11 +102,7 @@ struct NewMessageView: View {
                        actions: {
                            Button("Yes, I want to leave") {
                                Task {
-                                   if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository
-                                       .shared.secretData {
-                                       navigation.destination = .inbox
-                                       await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
-                                   }
+                                   await conversationViewModel.clearModelDataAndLock()
                                }
                            }
                            Button("Cancel", role: .cancel) {}
@@ -166,41 +164,41 @@ struct NewMessageView: View {
     }
 }
 
-struct NewMessageView_Previews: PreviewProvider {
-    static var previews: some View {
-        PreviewWrapper(NewMessageView(viewModel: viewModel()))
-        PreviewWrapper(NewMessageView(
-            viewModel: viewModelWithALongMessage()
-        ))
-    }
-
-    private static func viewModel() -> ConversationViewModel {
-        return ConversationViewModel(
-            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
-            config: StaticConfig.devConfig
-        )
-    }
-
-    private static func viewModelWithALongMessage() -> ConversationViewModel {
-        let viewModel = viewModel()
-        let shortMessage = """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dolor
-                nulla, ornare et tristique imperdiet, dictum sit amet velit. Curabitur pharetra erat sed
-                neque interdum, non mattis tortor auctor. Curabitur eu ipsum ac neque semper eleifend.
-                Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-                Integer erat mi, ultrices nec arcu ut, sagittis sollicitudin est. In hac habitasse
-                platea dictumst. Sed in efficitur elit. Curabitur nec commodo elit. Aliquam tincidunt
-                rutrum nisl ut facilisis. Aenean ornare ut mauris eget lacinia. Mauris a felis quis orci
-                auctor varius sit amet eget est. Curabitur a urna sit amet diam sagittis aliquet eget eu
-                sapien. Curabitur a pharetra purus.
-                Nulla facilisi. Suspendisse potenti. Morbi mollis aliquet sapien sed faucibus. Donec
-                aliquam nibh nibh, ac faucibus felis aliquam at. Pellentesque egestas enim sem, eu
-                tempor urna posuere eget. Cras fermentum commodo neque ac gravida.
-        """
-        viewModel.message = shortMessage
-
-        viewModel.message.append(contentsOf: shortMessage)
-
-        return viewModel
-    }
-}
+// struct NewMessageView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        PreviewWrapper(NewMessageView(viewModel: viewModel()))
+//        PreviewWrapper(NewMessageView(
+//            viewModel: viewModelWithALongMessage()
+//        ))
+//    }
+//
+//    private static func viewModel() -> ConversationViewModel {
+//        return ConversationViewModel(
+//            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
+//            config: StaticConfig.devConfig
+//        )
+//    }
+//
+//    private static func viewModelWithALongMessage() -> ConversationViewModel {
+//        let viewModel = viewModel()
+//        let shortMessage = """
+//        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dolor
+//                nulla, ornare et tristique imperdiet, dictum sit amet velit. Curabitur pharetra erat sed
+//                neque interdum, non mattis tortor auctor. Curabitur eu ipsum ac neque semper eleifend.
+//                Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+//                Integer erat mi, ultrices nec arcu ut, sagittis sollicitudin est. In hac habitasse
+//                platea dictumst. Sed in efficitur elit. Curabitur nec commodo elit. Aliquam tincidunt
+//                rutrum nisl ut facilisis. Aenean ornare ut mauris eget lacinia. Mauris a felis quis orci
+//                auctor varius sit amet eget est. Curabitur a urna sit amet diam sagittis aliquet eget eu
+//                sapien. Curabitur a pharetra purus.
+//                Nulla facilisi. Suspendisse potenti. Morbi mollis aliquet sapien sed faucibus. Donec
+//                aliquam nibh nibh, ac faucibus felis aliquam at. Pellentesque egestas enim sem, eu
+//                tempor urna posuere eget. Cras fermentum commodo neque ac gravida.
+//        """
+//        viewModel.message = shortMessage
+//
+//        viewModel.message.append(contentsOf: shortMessage)
+//
+//        return viewModel
+//    }
+// }

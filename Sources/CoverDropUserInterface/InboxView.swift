@@ -6,15 +6,12 @@ struct InboxView: View {
     @ObservedObject var inboxViewModel: InboxViewModel
     @ObservedObject var conversationViewModel: ConversationViewModel
     @State private var showingDeleteAlert = false
-    var verifiedPublicKeys: VerifiedPublicKeys
-    var config: CoverDropConfig
 
     var body: some View {
         HeaderView(type: .inbox, dismissAction: {
             Task {
-                if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared.secretData {
-                    await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
-                }
+                await conversationViewModel.clearModelDataAndLock()
+
                 navigation.destination = .home
             }
         }) {
@@ -142,9 +139,7 @@ struct InboxView: View {
                            Task {
                                navigation.destination = .home
                                try? await inboxViewModel.deleteAllMessagesAndCurrentSession(
-                                   verifiedPublicKeys: verifiedPublicKeys,
-                                   conversationViewModel: conversationViewModel,
-                                   config: config
+                                   conversationViewModel: conversationViewModel
                                )
                            }
                        }
@@ -171,10 +166,7 @@ struct InboxView: View {
             Spacer()
             Button("Leave inbox") {
                 Task {
-                    if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared
-                        .secretData {
-                        await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
-                    }
+                    await conversationViewModel.clearModelDataAndLock()
                     navigation.destination = .home
                 }
             }

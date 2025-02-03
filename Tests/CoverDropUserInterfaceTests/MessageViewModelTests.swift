@@ -3,16 +3,16 @@
 import XCTest
 
 final class MessageViewModelTests: XCTestCase {
-    override func setUp() async throws {
-        let config = StaticConfig.devConfig
-        PublicDataRepository.setup(config)
+    // swiftlint:disable:next force_try
+    private let lib: CoverDropLibrary = try! getCoverDropLibrary()
+
+    static func getCoverDropLibrary() throws -> CoverDropLibrary {
+        let context = IntegrationTestScenarioContext(scenario: .minimal)
+        return try context.getLibraryWithVerifiedKeys()
     }
 
     func testReady() async {
-        let sut = await ConversationViewModel(
-            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
-            config: StaticConfig.devConfig
-        )
+        let sut = await ConversationViewModel(lib: lib)
 
         // the view model should be `ready` upon initialization
         let state = await sut.state
@@ -25,10 +25,7 @@ final class MessageViewModelTests: XCTestCase {
     @MainActor
     func testMessageLengthWithShortMessage() async {
         // GIVEN a `MessageViewModel`
-        let sut = ConversationViewModel(
-            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
-            config: StaticConfig.devConfig
-        )
+        let sut = ConversationViewModel(lib: lib)
 
         // WHEN a short message is added
         sut.message = "This is a short message"
@@ -40,10 +37,7 @@ final class MessageViewModelTests: XCTestCase {
     @MainActor
     func testMessageLengthWithLongMessage() async {
         // GIVEN a `MessageViewModel`
-        let sut = ConversationViewModel(
-            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
-            config: StaticConfig.devConfig
-        )
+        let sut = ConversationViewModel(lib: lib)
 
         // WHEN a long message is added
         let shortMessage = "This will be an incredibly long message."

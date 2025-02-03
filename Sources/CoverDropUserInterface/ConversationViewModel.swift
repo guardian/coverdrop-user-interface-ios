@@ -2,7 +2,7 @@ import CoverDropCore
 import Gzip
 import SwiftUI
 
-enum MessageComposeError: Error {
+public enum MessageComposeError: Error {
     case textTooLong, invalidCharacter, compressionFailed, unknownError
 }
 
@@ -14,22 +14,21 @@ struct MessageData {
 }
 
 @MainActor class ConversationViewModel: ObservableObject {
-    @ObservedObject var secretDataRepository = SecretDataRepository.shared
+    @ObservedObject var lib: CoverDropLibrary
 
     @Published var messageRecipient: JournalistData?
     @Published private(set) var recipients: MessageRecipients?
 
     @Published var message = ""
     @Published var state = State.initial
-    let config: CoverDropConfig
-    let verifiedPublicKeys: VerifiedPublicKeys
 
-    public init(verifiedPublicKeys: VerifiedPublicKeys, config: CoverDropConfig) {
+    public init(
+        lib: CoverDropLibrary
+    ) {
         // We will always set messageRecipient to the supplied one
         // but set it with the defaul journalist if we can get any message reciepients from the keys
         // and the supplied recipient is nil
-        self.config = config
-        self.verifiedPublicKeys = verifiedPublicKeys
+        self.lib = lib
         state = .loading
 
         messageRecipient = nil
@@ -39,7 +38,8 @@ struct MessageData {
         // but we still was the user to be able to view a conversation
         if messageRecipient == nil {
             if let messageRecipientsFromKeys = try? MessageRecipients(
-                verifiedPublicKeys: verifiedPublicKeys,
+                // swiftlint:disable:next force_try
+                verifiedPublicKeys: try! lib.publicDataRepository.getVerifiedKeysOrThrow(),
                 excludingDefaultRecipient: false
             ) {
                 recipients = messageRecipientsFromKeys
@@ -60,9 +60,9 @@ struct MessageData {
 
     // This returns the current conversation as a list of `Message` based on the message recipient
     var currentConversation: [Message] {
-        switch secretDataRepository.secretData {
-        case let .unlockedSecretData(unlockedData: data):
-            let filteredMailbox: [Message] = data.unlockedData.messageMailbox.filter { message in
+        switch lib.secretDataRepository.getSecretData() {
+        case let .unlockedSecretData(unlockedData: unlockedData):
+            let filteredMailbox: [Message] = unlockedData.messageMailbox.filter { message in
                 switch message {
                 case let .incomingMessage(message: messageData):
                     if case let .textMessage(message: incomingMessage) = messageData {
@@ -108,12 +108,9 @@ struct MessageData {
         let dateSent = DateFunction.currentTime()
 
         do {
-            if case let .unlockedSecretData(data) = secretDataRepository.secretData {
-                try await MessageSending.sendMessage(message,
-                                                     to: messageRecipient,
-                                                     verifiedPublicKeys: verifiedPublicKeys,
-                                                     unlockedSecretDataRepository: data, dateSent: dateSent)
-            }
+            try await lib.secretDataRepository.sendMessage(message,
+                                                           to: messageRecipient,
+                                                           dateSent: dateSent)
         } catch {
             state = .error(message: error.localizedDescription)
         }
@@ -177,10 +174,10 @@ struct MessageData {
     // This clears the value of `message`, removes the current recipient and locks the secret data.
     // These are coupled to avoid developer error in doing them seperatly.
     // This is called in the various places the user can logout or delete messages.
-    public func clearModelDataAndLock(unlockedData: UnlockedSecretDataService) async {
+    public func clearModelDataAndLock() async {
         messageRecipient = nil
         clearMessage()
-        try? await SecretDataRepository.shared.lock(unlockedData: unlockedData)
+        try? await lib.secretDataRepository.lock()
     }
 
     static let messageDateFormat: DateFormatter = {
@@ -190,9 +187,9 @@ struct MessageData {
     }()
 
     func isMostRecentMessageFromUser() -> Bool {
-        switch secretDataRepository.secretData {
-        case let .unlockedSecretData(unlockedData: data):
-            if let recentMessage: Message = data.unlockedData.messageMailbox.sorted(by: >).first {
+        switch lib.secretDataRepository.getSecretData() {
+        case let .unlockedSecretData(unlockedData: unlockedData):
+            if let recentMessage: Message = unlockedData.messageMailbox.sorted(by: >).first {
                 switch recentMessage {
                 case .outboundMessage:
                     return true

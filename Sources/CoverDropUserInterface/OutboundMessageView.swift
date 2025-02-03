@@ -72,18 +72,19 @@ struct OutboundMessageView: View {
                     .accessibilityIdentifier("Sent")
             }
         }.onAppear {
-            Task { await outboundMessage.isInQueue() }
+            Task { await outboundMessage.loadIsPendingAsync() }
         }
     }
 }
 
 struct OutboundMessageView_Previews: PreviewProvider {
     @MainActor struct Container: View {
-        let privateSendingQueueRepo: () = PreviewHelper.initSendingQueue()
         @State var nonExpiredMessage = OutboundMessageData(
-            messageRecipient: PublicKeysHelper.shared.testDefaultJournalist!,
+            recipient: PublicKeysHelper.shared.testDefaultJournalist!,
             messageText: "hey",
-            dateSent: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))), hint: HintHmac(hint: [0x0])
+            dateQueued: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))),
+            hint: HintHmac(hint: [0x0]),
+            isPending: true
         )
 
         @MainActor var body: some View {

@@ -127,10 +127,11 @@ public struct InactiveConversation: Equatable {
 
 @MainActor
 class InboxViewModel: ObservableObject {
-    var config: CoverDropConfig
     private var mailbox: Set<Message>? {
-        guard case let .unlockedSecretData(unlockedData: data) = secretDataRepository.secretData else { return nil }
-        return data.unlockedData.messageMailbox
+        guard case let .unlockedSecretData(unlockedData: data) = lib.secretDataRepository.getSecretData() else {
+            return nil
+        }
+        return data.messageMailbox
     }
 
     var activeConversation: ActiveConversation? {
@@ -141,13 +142,10 @@ class InboxViewModel: ObservableObject {
         InboxViewModel.findInactiveMessages(in: mailbox)
     }
 
-    @ObservedObject private var secretDataRepository: SecretDataRepository = .shared
+    @ObservedObject var lib: CoverDropLibrary
 
-    init(config: CoverDropConfig, secretDataRepository: SecretDataRepository? = nil) {
-        self.config = config
-        if let secretDataRepository {
-            self.secretDataRepository = secretDataRepository
-        }
+    init(lib: CoverDropLibrary) {
+        self.lib = lib
     }
 
     /// Finds the most recent conversation in a mailbox, and returns an Active Conversation. If there are no messages in
@@ -271,21 +269,18 @@ class InboxViewModel: ObservableObject {
     ///  5. removes the current recipient from memory
     ///
     public func deleteAllMessagesAndCurrentSession(
-        verifiedPublicKeys: VerifiedPublicKeys,
-        conversationViewModel: ConversationViewModel,
-        config: CoverDropConfig
+        conversationViewModel: ConversationViewModel
     ) async throws {
-        if case let .unlockedSecretData(unlockedData: unlockedSecretData) = secretDataRepository.secretData {
-            unlockedSecretData.unlockedData.messageMailbox = []
-            await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedSecretData)
-            try await EncryptedStorage
-                .createOrResetStorageWithRandomPassphrase(passphraseWordCount: config.passphraseWordCount)
+        if case let .unlockedSecretData(unlockedData: unlockedSecretData) = lib.secretDataRepository
+            .getSecretData() {
+            unlockedSecretData.messageMailbox = []
+            await conversationViewModel.clearModelDataAndLock()
+            try await EncryptedStorage.createOrResetStorageWithRandomPassphrase(
+                passphraseWordCount: lib.config.passphraseWordCount
+            )
 
-            if let coverMessageFactory = try? PublicDataRepository
-                .getCoverMessageFactory(
-                    verifiedPublicKeys: verifiedPublicKeys
-                ) {
-                try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory: coverMessageFactory)
+            if let coverMessageFactory = try? lib.publicDataRepository.getCoverMessageFactory() {
+                try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory)
             }
         }
     }

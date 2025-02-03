@@ -148,7 +148,7 @@ extension UserNewSessionView {
             passphraseState = .submitted
             do {
                 if let validPassphrase = passphrase {
-                    _ = try await EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: validPassphrase)
+                    _ = try EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: validPassphrase)
                 } else {
                     passphraseState = .error("Missing Passphrase")
                 }

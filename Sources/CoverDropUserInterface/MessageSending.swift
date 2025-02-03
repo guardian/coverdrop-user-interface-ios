@@ -3,41 +3,47 @@ import Foundation
 
 enum MessageSendingError: Error {
     case failedToEncryptMessage
+    case secretDataNotUnlocked
 }
 
 enum MessageSending {
     @MainActor
-    static func sendMessage(_ message: String,
-                            to recipient: JournalistData,
-                            verifiedPublicKeys: VerifiedPublicKeys,
-                            unlockedSecretDataRepository: UnlockedSecretDataService,
-                            dateSent: Date) async throws {
+    static func sendMessage(
+        _ message: String,
+        to recipient: JournalistData,
+        lib: CoverDropLibrary,
+        dateSent: Date
+    ) async throws {
         // add the current message to the private sending queue and
         // secret Data  Repository
 
-        let userKey = unlockedSecretDataRepository.unlockedData.userKey.publicKey
+        guard case let .unlockedSecretData(unlockedSecretData) = lib.secretDataRepository.getSecretData() else {
+            throw MessageSendingError.secretDataNotUnlocked
+        }
+
+        let userKey = unlockedSecretData.userKey.publicKey
 
         let encryptedMessage = try await UserToCoverNodeMessageData.createMessage(
             message: message,
             messageRecipient: recipient,
-            covernodeMessagePublicKey: verifiedPublicKeys,
+            publicDataRepository: lib.publicDataRepository,
             userPublicKey: userKey
         )
 
         let hint = try await PrivateSendingQueueRepository.shared.enqueue(
-            secret: unlockedSecretDataRepository.unlockedData.privateSendingQueueSecret,
+            secret: unlockedSecretData.privateSendingQueueSecret,
             message: encryptedMessage
         )
 
         let outboundMessage = OutboundMessageData(
-            messageRecipient: recipient,
+            recipient: recipient,
             messageText: message,
-            dateSent: dateSent,
+            dateQueued: dateSent,
             hint: hint
         )
 
         let newMessage: Message = .outboundMessage(message: outboundMessage)
 
-        try await unlockedSecretDataRepository.addMessage(message: newMessage)
+        try await lib.secretDataRepository.addMessage(message: newMessage)
     }
 }

@@ -9,7 +9,13 @@ struct UserLoginView: View {
     @ObservedObject var navigation = Navigation.shared
 
     var body: some View {
-        HeaderView(type: .login, dismissAction: {
+        #if DEBUG
+            if #available(iOS 17.1, *) {
+                Self._printChanges()
+            }
+        #endif
+
+        return HeaderView(type: .login, dismissAction: {
             navigation.destination = .home
         }) {
             VStack(alignment: .leading) {
@@ -86,38 +92,34 @@ struct UserLoginView: View {
     }
 }
 
-struct UserLoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        PreviewWrapper(StatefulPreviewWrapper(false) { _ in
-            UserLoginView(userLoginViewModel: UserLoginViewModel(
-                config: StaticConfig.devConfig,
-                verifiedPublicKeys: PublicKeysHelper.shared.testKeys
-            ))
-        })
-    }
-}
+// struct UserLoginView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        PreviewWrapper(StatefulPreviewWrapper(false) { _ in
+//            UserLoginView(userLoginViewModel: UserLoginViewModel(
+//                config: StaticConfig.devConfig,
+//                verifiedPublicKeys: PublicKeysHelper.shared.testKeys
+//            ))
+//        })
+//    }
+// }
 
 class UserLoginViewModel: ObservableObject {
-    var config: CoverDropConfig
-    var verifiedPublicKeys: VerifiedPublicKeys
     enum State {
         case inital, submitted, errorIncorrectWords, errorUnableToUnlock, errorSecureStorageNotInitialised
     }
 
     @Published var passphrase: [String]
     @Published var passphraseFieldsMasked: [Bool]
-
-    @ObservedObject var secretDataRepository = SecretDataRepository.shared
+    @ObservedObject var lib: CoverDropLibrary
 
     @Published var state: State = .inital
 
-    init(config: CoverDropConfig, verifiedPublicKeys: VerifiedPublicKeys) {
+    init(lib: CoverDropLibrary) {
+        self.lib = lib
         passphrase = UserLoginViewModel
-            .passphraseArray(passphraseWordCount: config.passphraseWordCount)
+            .passphraseArray(passphraseWordCount: lib.config.passphraseWordCount)
         passphraseFieldsMasked = UserLoginViewModel
-            .passphraseVisibilityArray(passphraseWordCount: config.passphraseWordCount)
-        self.config = config
-        self.verifiedPublicKeys = verifiedPublicKeys
+            .passphraseVisibilityArray(passphraseWordCount: lib.config.passphraseWordCount)
     }
 
     static func passphraseArray(passphraseWordCount: Int) -> [String] {
@@ -137,14 +139,16 @@ class UserLoginViewModel: ObservableObject {
                 return
             }
 
-            let session: ()? = try? await secretDataRepository.unlock(passphrase: validPassphrase)
+            let session: ()? = try? await lib.secretDataRepository.unlock(passphrase: validPassphrase)
 
             if session != nil {
+                // reset the passphrase to empty value
                 passphrase = UserLoginViewModel
-                    .passphraseArray(passphraseWordCount: config.passphraseWordCount)
+                    .passphraseArray(passphraseWordCount: lib.config.passphraseWordCount)
                 // try and decrypt the stored dead drops
                 try await DeadDropDecryptionService().decryptStoredDeadDrops(
-                    verifiedPublicKeys: verifiedPublicKeys
+                    publicDataRepository: lib.publicDataRepository,
+                    secretDataRepository: lib.secretDataRepository
                 )
             } else {
                 state = .errorUnableToUnlock

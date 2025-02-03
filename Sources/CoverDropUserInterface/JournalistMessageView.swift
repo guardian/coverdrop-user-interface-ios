@@ -9,8 +9,7 @@ struct JournalistMessageView: View {
     @ObservedObject var inboxViewModel: InboxViewModel
     @ObservedObject var navigation = Navigation.shared
     @StateObject var conversationViewModel: ConversationViewModel
-    var config: CoverDropConfig
-    var verifiedPublicKeys: VerifiedPublicKeys
+    @ObservedObject var lib: CoverDropLibrary
 
     // by default we want to make the user have to choose to send another message
     @State var alreadySentMessage: Bool = false
@@ -20,10 +19,8 @@ struct JournalistMessageView: View {
     init(
         journalist: JournalistData,
         conversationViewModel: ConversationViewModel,
-        verifiedPublicKeys: VerifiedPublicKeys,
-        config: CoverDropConfig
+        lib: CoverDropLibrary
     ) {
-        self.config = config
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
         UIScrollView.appearance().backgroundColor = UIColor(Color.JournalistNewMessageView.scrollviewBackgroundColor)
@@ -32,8 +29,10 @@ struct JournalistMessageView: View {
             UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
         _conversationViewModel = StateObject(wrappedValue: conversationViewModel)
-        self.verifiedPublicKeys = verifiedPublicKeys
-        inboxViewModel = InboxViewModel(config: config)
+        self.lib = lib
+        inboxViewModel = InboxViewModel(
+            lib: lib
+        )
     }
 
     var body: some View {
@@ -73,15 +72,14 @@ struct JournalistMessageView: View {
 
         }.onAppear {
             Task {
-                expired = await isCurrentKeyExpired(recipient: recipient, verifiedPublicKeys: verifiedPublicKeys)
+                expired = await isCurrentKeyExpired(recipient: recipient)
             }
         }
     }
 
-    func isCurrentKeyExpired(recipient: JournalistData, verifiedPublicKeys: VerifiedPublicKeys) async -> Bool {
-        if let currentKey = await PublicDataRepository.getLatestMessagingKey(
-            recipientId: recipient.recipientId,
-            verifiedPublicKeys: verifiedPublicKeys
+    func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
+        if let currentKey = try? await lib.publicDataRepository.getLatestMessagingKey(
+            recipientId: recipient.recipientId
         ) {
             return currentKey.isExpired(now: DateFunction.currentKeysPublishedTime())
         }
@@ -103,8 +101,8 @@ struct JournalistMessageView: View {
                     }
                     switch self.conversationViewModel.state {
                     case .initial, .loading, .ready, .sending:
-                        switch self.conversationViewModel.secretDataRepository.secretData {
-                        case let .unlockedSecretData(unlockedData: data):
+                        switch lib.secretDataRepository.getSecretData() {
+                        case let .unlockedSecretData(unlockedData: unlockedData):
                             ForEach(conversationViewModel.currentConversation.indices, id: \.self) { index in
                                 switch conversationViewModel.currentConversation[index] {
                                 // We have a seperate view for incoming and outbound messages
@@ -119,7 +117,7 @@ struct JournalistMessageView: View {
                                 case let .outboundMessage(message: outboundMessage):
                                     OutboundMessageView(outboundMessage: outboundMessage, id: index)
                                 }
-                            }.onChange(of: data.unlockedData.messageMailbox.count) { _ in
+                            }.onChange(of: unlockedData.messageMailbox.count) { _ in
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
                             }.onAppear {
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
@@ -198,9 +196,9 @@ struct JournalistMessageView: View {
     }
 
     private func scrollToLastMessage(scrollViewProxy: ScrollViewProxy) {
-        switch conversationViewModel.secretDataRepository.secretData {
-        case let .unlockedSecretData(unlockedData: data):
-            let unwrappedId = data.unlockedData.messageMailbox.count - 1
+        switch lib.secretDataRepository.getSecretData() {
+        case let .unlockedSecretData(unlockedData: unlockedData):
+            let unwrappedId = unlockedData.messageMailbox.count - 1
             withAnimation {
                 scrollViewProxy.scrollTo(unwrappedId, anchor: .bottom)
             }

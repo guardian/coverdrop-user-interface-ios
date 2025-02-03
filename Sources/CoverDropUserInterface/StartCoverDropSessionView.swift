@@ -5,16 +5,15 @@ import SwiftUI
 
 struct StartCoverDropSessionView: View {
     @ObservedObject var navigation = Navigation.shared
-    @ObservedObject private var viewModel: StartCoverDropSessionViewModel
+    // @ObservedObject private var viewModel: StartCoverDropSessionViewModel
     @ObservedObject private var publicDataRepository: PublicDataRepository
 
     /// Controls whether the alert is shown before starting a new conversation
     @State private var showingNewMessageAlert = false
 
-    init(publicDataRepository: PublicDataRepository, viewModel: StartCoverDropSessionViewModel) {
+    init(publicDataRepository: PublicDataRepository) {
         UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).adjustsFontSizeToFitWidth = true
         self.publicDataRepository = publicDataRepository
-        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -36,7 +35,6 @@ struct StartCoverDropSessionView: View {
 
                     Button(action: {
                         navigation.destination = .about
-                        viewModel.viewHidden()
                     }) {
                         Text("About Secure Messaging")
                             .fontWeight(.bold)
@@ -55,8 +53,8 @@ struct StartCoverDropSessionView: View {
                         VStack {
                             Text(
                                 """
-                                    The Secure Messaging feature is currently not available.
-                                    Please try again later. Below we show technical information that might be helpful.
+                                The Secure Messaging feature is currently not available.
+                                Please try again later. Below we show technical information that might be helpful.
                                 """
                             )
                             Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
@@ -66,12 +64,11 @@ struct StartCoverDropSessionView: View {
                         Button("Get started") {
                             showingNewMessageAlert = true
                         }
-                        .disabled(!viewModel.keysAvailable)
-                        .buttonStyle(PrimaryButtonStyle(isDisabled: !viewModel.keysAvailable))
+                        .disabled(!publicDataRepository.areKeysAvailable)
+                        .buttonStyle(PrimaryButtonStyle(isDisabled: !publicDataRepository.areKeysAvailable))
                         .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
                             Button("Yes, start conversation") {
                                 navigation.destination = .onboarding
-                                viewModel.viewHidden()
                             }
                             Button("No", role: .cancel) {}
                         }, message: {
@@ -85,7 +82,6 @@ struct StartCoverDropSessionView: View {
 
                         Button("Check your inbox") {
                             navigation.destination = .login
-                            viewModel.viewHidden()
                         }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
                     }
 
@@ -103,52 +99,54 @@ struct StartCoverDropSessionView: View {
     }
 }
 
-struct StartCoverDropSessionView_Previews: PreviewProvider {
-    @MainActor struct Container: View {
-        let setup: () = setupView()
-        var setupRepo: () = PublicDataRepository.setup(StaticConfig.devConfig)
-        let publicDataRepository: PublicDataRepository = PublicDataRepository.shared
-        let viewModel = StartCoverDropSessionViewModel(publicDataRepository: PublicDataRepository.shared)
-
-        @MainActor var body: some View {
-            let _: () = setAvailabe()
-            PreviewWrapper(StartCoverDropSessionView(publicDataRepository: publicDataRepository, viewModel: viewModel))
-            let _: () = setUnavailabe()
-            PreviewWrapper(StartCoverDropSessionView(publicDataRepository: publicDataRepository, viewModel: viewModel))
-        }
-    }
-
-    public static func setAvailabe() {
-        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
-            status: .available,
-            description: "Service is available",
-            timestamp: RFC3339DateTimeString(date: Date()),
-            isAvailable: true
-        )
-    }
-
-    public static func setUnavailabe() {
-        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
-            status: .noInformation,
-            description: "Service is unavailable",
-            timestamp: RFC3339DateTimeString(date: Date()),
-            isAvailable: false
-        )
-    }
-
-    public static func setupView() {
-        PublicDataRepository.setup(StaticConfig.devConfig)
-        PublicDataRepository.shared.areKeysAvailable = true
-        CoverDropServices.shared.isReady = true
-        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
-            status: .available,
-            description: "",
-            timestamp: RFC3339DateTimeString(date: Date()),
-            isAvailable: true
-        )
-    }
-
-    static var previews: some View {
-        Container()
-    }
-}
+// struct StartCoverDropSessionView_Previews: PreviewProvider {
+//    @MainActor struct Container: View {
+//        let setup: () = setupView()
+//        var setupRepo: () = PublicDataRepository.setup(StaticConfig.devConfig)
+//        let publicDataRepository: PublicDataRepository = PublicDataRepository.shared
+//        let viewModel = StartCoverDropSessionViewModel(publicDataRepository: PublicDataRepository.shared)
+//
+//        @MainActor var body: some View {
+//            let _: () = setAvailabe()
+//            PreviewWrapper(StartCoverDropSessionView(publicDataRepository: publicDataRepository,
+// viewModel: viewModel))
+//            let _: () = setUnavailabe()
+//            PreviewWrapper(StartCoverDropSessionView(publicDataRepository: publicDataRepository,
+// viewModel: viewModel))
+//        }
+//    }
+//
+//    public static func setAvailabe() {
+//        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
+//            status: .available,
+//            description: "Service is available",
+//            timestamp: RFC3339DateTimeString(date: Date()),
+//            isAvailable: true
+//        )
+//    }
+//
+//    public static func setUnavailabe() {
+//        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
+//            status: .noInformation,
+//            description: "Service is unavailable",
+//            timestamp: RFC3339DateTimeString(date: Date()),
+//            isAvailable: false
+//        )
+//    }
+//
+//    public static func setupView() {
+//        PublicDataRepository.setup(StaticConfig.devConfig)
+//        PublicDataRepository.shared.areKeysAvailable = true
+//        CoverDropServices.shared.isReady = true
+//        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
+//            status: .available,
+//            description: "",
+//            timestamp: RFC3339DateTimeString(date: Date()),
+//            isAvailable: true
+//        )
+//    }
+//
+//    static var previews: some View {
+//        Container()
+//    }
+// }

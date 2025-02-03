@@ -4,6 +4,7 @@ import SwiftUI
 
 struct MessageSentView: View {
     @ObservedObject var navigation = Navigation.shared
+    @ObservedObject var lib: CoverDropLibrary
     @ObservedObject var conversationViewModel: ConversationViewModel
 
     var body: some View {
@@ -11,10 +12,7 @@ struct MessageSentView: View {
             HeaderView(type: .messageSent, dismissAction: {
                 Task {
                     navigation.destination = .home
-                    if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared
-                        .secretData {
-                        await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
-                    }
+                    await conversationViewModel.clearModelDataAndLock()
                 }
             }) {
                 VStack(alignment: .center) {
@@ -52,10 +50,7 @@ struct MessageSentView: View {
                     }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
                     Button("Log out from Secure Messaging") {
                         Task {
-                            if case let .unlockedSecretData(unlockedData: unlockedData) = SecretDataRepository.shared
-                                .secretData {
-                                await conversationViewModel.clearModelDataAndLock(unlockedData: unlockedData)
-                            }
+                            await conversationViewModel.clearModelDataAndLock()
                             navigation.destination = .home
                         }
                     }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
