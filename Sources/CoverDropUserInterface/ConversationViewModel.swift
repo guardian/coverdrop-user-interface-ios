@@ -37,11 +37,11 @@ struct MessageData {
         // expired)
         // but we still was the user to be able to view a conversation
         if messageRecipient == nil {
-            if let messageRecipientsFromKeys = try? MessageRecipients(
-                // swiftlint:disable:next force_try
-                verifiedPublicKeys: try! lib.publicDataRepository.getVerifiedKeysOrThrow(),
-                excludingDefaultRecipient: false
-            ) {
+            if let verifiedPublicKeys = try? lib.publicDataRepository.getVerifiedKeysOrThrow(),
+               let messageRecipientsFromKeys = try? MessageRecipients(
+                   verifiedPublicKeys: verifiedPublicKeys,
+                   excludingDefaultRecipient: false
+               ) {
                 recipients = messageRecipientsFromKeys
                 if messageRecipientsFromKeys.defaultRecipient != nil {
                     messageRecipient = messageRecipientsFromKeys.defaultRecipient
