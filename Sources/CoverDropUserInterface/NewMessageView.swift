@@ -74,7 +74,7 @@ struct NewMessageView: View {
                             }, label: {
                                 HStack(alignment: .center) {
                                     Image(systemName: "pencil").resizable().frame(width: 12, height: 12)
-                                    Text("Change recipient").textStyle(InlineTextButtonStyle())
+                                    Text("Change recipient").textStyle(InlineButtonTextStyle())
                                 }
                             }).sheet(isPresented: $isSelectRecipientViewOpen) {
                                 SelectRecipientView(isSelectRecipientViewOpen: $isSelectRecipientViewOpen,

@@ -32,18 +32,21 @@ enum CornerRadius {
 }
 
 struct PassphraseFieldStyle: TextFieldStyle {
+    var isError: Bool = false
     // swiftlint:disable:next identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
+            .frame(height: 20)
             .padding(Padding.large)
             .font(.textSansRegular, size: FontSize.textField)
             .background(
                 RoundedRectangle(cornerRadius: CornerRadius.small).stroke(
-                    Color.PassphraseFieldStyle.strokeColor,
+                    isError ? Color.PassphraseFieldStyle.errorColor : Color.PassphraseFieldStyle.strokeColor,
                     lineWidth: 1
                 )
             )
             .background(Color.PassphraseFieldStyle.backgroundColor)
+
     }
 }
 
@@ -184,7 +187,18 @@ struct ErrorBoxTitleTextStyle: ViewModifier {
     }
 }
 
-struct InlineTextButtonStyle: ViewModifier {
+struct FormErrorTextStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.textSansBold,
+                  size: FontSize.bodyText,
+                  lineHeight: 25)
+            .foregroundColor(Color.UserNewSessionView.errorColor)
+            .padding(.bottom, Padding.small)
+    }
+}
+
+struct InlineButtonTextStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .font(.textSansBold,
@@ -375,6 +389,16 @@ struct TeriaryButtonStyle: ButtonStyle {
                 .padding([.bottom], Padding.large)
                 .font(.textSansBold, size: FontSize.buttonText)
         }
+    }
+}
+
+struct InlineButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .font(.textSansBold,
+                  size: FontSize.inlineButtonText,
+                  lineHeight: 23)
+            .padding([.trailing, .top, .bottom], Padding.small)
     }
 }
 

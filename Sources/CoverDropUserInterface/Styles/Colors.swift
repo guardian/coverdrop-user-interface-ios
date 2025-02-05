@@ -72,6 +72,7 @@ extension Color {
     enum PassphraseFieldStyle {
         static let strokeColor = GuardianColor.specialReport400
         static let backgroundColor = GuardianColor.specialReport200
+        static let errorColor = GuardianColor.error500
     }
 
     enum CustomDivider {
@@ -154,6 +155,7 @@ extension Color {
 
     enum UserNewSessionView {
         static let wordListBackgroundColor = GuardianColor.investigationsBase
+        static let errorColor = GuardianColor.error500
     }
 
     enum HeaderView {

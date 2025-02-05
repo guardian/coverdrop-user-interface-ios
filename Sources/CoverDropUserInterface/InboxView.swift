@@ -85,7 +85,7 @@ struct InboxView: View {
     @ViewBuilder
     func inactiveConversationsView(for inactiveConversations: [InactiveConversation]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Previous messages").textStyle(InlineTextButtonStyle())
+            Text("Previous messages").textStyle(InlineButtonTextStyle())
                 .foregroundColor(Color.InboxView.previousMessagesTitleColor)
             customDivider()
             ForEach(inactiveConversations, id: \.recipient) { conversation in
@@ -127,7 +127,7 @@ struct InboxView: View {
                     Image(systemName: "trash.fill")
                         .foregroundColor(Color.InboxView.deleteMessageButtonColor)
                     Text("Delete your messages")
-                        .textStyle(InlineTextButtonStyle())
+                        .textStyle(InlineButtonTextStyle())
                         .foregroundColor(Color.InboxView.deleteMessageButtonColor)
                 }
             }
@@ -161,7 +161,7 @@ struct InboxView: View {
     var footer: some View {
         HStack {
             Text("About SecureMessaging")
-                .textStyle(InlineTextButtonStyle())
+                .textStyle(InlineButtonTextStyle())
                 .foregroundColor(Color.InboxView.aboutButtonColor)
             Spacer()
             Button("Leave inbox") {

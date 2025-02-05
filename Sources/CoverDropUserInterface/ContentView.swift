@@ -82,9 +82,12 @@ struct NonLoggedInNavigationView: View {
         case .onboarding:
             OnboardingView()
         case .newPassphrase:
-            UserNewSessionView(config: lib.config)
+            UserNewSessionView(
+                passphraseWordCount: lib.config.passphraseWordCount,
+                viewModel: UserNewSessionViewModel(lib: lib)
+            )
         case .login, .newConversation:
-            UserLoginView(userLoginViewModel: UserLoginViewModel(lib: lib))
+            UserContinueSessionView(viewModel: UserContinueSessionViewModel(lib: lib))
         case .home:
             StartCoverDropSessionView(
                 publicDataRepository: lib.publishedPublicDataRepository

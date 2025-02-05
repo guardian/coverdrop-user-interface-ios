@@ -1,160 +1,342 @@
+import Combine
 import CoverDropCore
-import CryptoKit
 import Foundation
 import SVGView
 import SwiftUI
 
 enum NewSessionError: Error {
-    case failedToGeneratePassphrase
+    case wrongPassphrase
+    case missingWords
+    case misspeltWords
+    case failedToCreateStorage
+}
+
+extension NewSessionError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .wrongPassphrase:
+            return "The passphrase you entered does not match the generated one from the previous screen."
+        case .missingWords:
+            return "Please fill in all passphrase words."
+        case .misspeltWords:
+            return "The passphrase cannot be right because it contains words that are not in the word list."
+        case .failedToCreateStorage:
+            return """
+            Failed to create a message vault. Please exit Secure Messaging \
+            and try again later—or try using a different phone.
+            """
+        }
+    }
 }
 
 struct UserNewSessionView: View {
-    var config: CoverDropConfig
+    var passphraseWordCount: Int
+    @ObservedObject var viewModel: UserNewSessionViewModel
     @ObservedObject var navigation = Navigation.shared
-    @ObservedObject var viewModel: UserNewSessionView.UserNewSessionViewModel = UserNewSessionViewModel()
 
     var body: some View {
         HeaderView(type: .newPassphrase, dismissAction: {
-            navigation.destination = .onboarding
+            switch viewModel.state {
+            case .generating, .remember:
+                navigation.destination = .onboarding
+            case .confirm, .creating, .finished:
+                viewModel.goBackToRemember()
+            }
         }) {
             VStack(alignment: .leading) {
-                Text("Remember Passphrase").textStyle(TitleStyle())
-                Text(
-                    """
-                    You will always need this passphrase to access your secure inbox.
-                    So please ensure you memorise it.
-                    It must be entered in the correct order with the correct spelling.
-                    """
-                )
-                .textStyle(BodyStyle())
-
-                passphraseWordListView()
-
-                // Show the hide passphrase button when the text is revealed
-                if case .shown = viewModel.passphraseState {
-                    HStack(alignment: .top) {
-                        Spacer()
-                        Button(action: {
-                            self.viewModel.passphraseState = .hidden
-                        }, label: {
-                            Label("Hide passphrase", systemImage: "eye.slash.fill")
-                        }).buttonStyle(HideButtonStyle())
-                            .accessibilityIdentifier("Hide passphrase")
-                    }
+                switch viewModel.state {
+                    case .generating:
+                        generatingPassphraseView()
+                    case let .remember(_, passphraseWords, visible):
+                        rememberPassphraseView(
+                            viewModel: viewModel,
+                            passphraseWords: passphraseWords,
+                            visible: visible
+                        )
+                    case .confirm:
+                        confirmPassphraseView(viewModel: viewModel)
+                    case .creating:
+                        creatingStorageView()
+                    case .finished:
+                        EmptyView()
                 }
+            }
+            .padding(Padding.large)
+            .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
 
-                Spacer()
-                switch viewModel.passphraseState {
-                case .shown, .submitted:
-                    AsyncActionButton(
-                        buttonText: "I have remembered my passphrase",
-                        isInProgress: viewModel.isSubmitted
-                    ) {
-                        await viewModel.createNewStorage()
-                        viewModel.clearPassphrase()
-                        navigation.destination = .newConversation
-                    }
-                case .hidden:
-                    Button(action: {
-                        self.viewModel.passphraseState = .shown
-                    }, label: {
-                        Label("Reveal passphrase", systemImage: "eye.fill")
-                    }).buttonStyle(PrimaryButtonStyle(isDisabled: false))
-                case let .error(error):
-                    Text("Error: \(error.localizedDescription)")
-                }
-
-            }.padding(Padding.large)
-                .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-            tertiaryButton(action: {
-                               navigation.destination = .login
-                           },
-                           text: "I already have a passphrase")
+            tertiaryButton(
+                action: { navigation.destination = .login },
+                text: "I already have a passphrase"
+            ).ignoresSafeArea(.keyboard, edges: .bottom)
+        }
+        .onAppear {
+            Task { viewModel.initializeWithNewPassphrase(passphraseWordCount: passphraseWordCount) }
         }
     }
 
-    func passphraseWordListView() -> some View {
+    func generatingPassphraseView() -> some View {
         VStack {
-            if let passphraseWords = viewModel.passphraseWords {
-                ForEach(Array(passphraseWords.enumerated()), id: \.element) { id, word in
-                    switch viewModel.passphraseState {
-                    case .shown, .submitted:
-                        Text(word)
-                            .textStyle(PassphraseTextStyle())
-                            .accessibilityIdentifier("Word \(id + 1)")
-                    case .hidden:
-                        Text("●●●●●●").textStyle(PassphraseTextStyle())
-                    case let .error(error):
-                        Text("Error: \(error.localizedDescription)")
-                    }
+            Spacer()
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .tint(.white)
+                .padding(Padding.large)
+            Text("Generating passphrase...").textStyle(BodyStyle())
+            Spacer()
+        }
+    }
 
-                }.frame(maxWidth: .infinity)
+    func creatingStorageView() -> some View {
+        VStack {
+            Spacer()
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .tint(.white)
+                .padding(Padding.large)
+            Text("Creating storage...").textStyle(BodyStyle())
+            Spacer()
+        }
+    }
+
+    func rememberPassphraseView(
+        viewModel: UserNewSessionViewModel,
+        passphraseWords: [String],
+        visible: Bool
+    ) -> some View {
+        VStack(alignment: .leading) {
+            Text("Remember Passphrase").textStyle(TitleStyle())
+            Text(getRememberPassphraseInfoText())
+                .textStyle(BodyStyle())
+                .padding(.bottom, Padding.medium)
+            VStack {
+                passphraseWordListView(passphraseWords: passphraseWords, visible: visible)
+            }.padding(.bottom, Padding.medium)
+
+            hideShowButton(
+                visible: visible,
+                viewModel: viewModel,
+                textShowAll: "Show passphrase",
+                textHideAll: "Hide passphrase"
+            )
+
+            Spacer()
+
+            if visible {
+                Button("I have remembered my passphrase") {
+                    viewModel.advanceToEnter()
+                }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
             } else {
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .tint(.white)
-                    .padding(Padding.large)
+                Button("Reveal passphrase") {
+                    viewModel.showAll()
+                }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
             }
+        }
+    }
+
+    func confirmPassphraseView(viewModel: UserNewSessionViewModel) -> some View {
+        VStack(alignment: .leading) {
+            Text("Enter Passphrase").textStyle(TitleStyle())
+            Text("Enter your passphrase to unlock your secure vault and send your first message.")
+                .textStyle(BodyStyle())
+                .padding(.bottom, Padding.large)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if viewModel.error != nil {
+                Text(viewModel.error?.localizedDescription ?? "")
+                    .textStyle(FormErrorTextStyle())
+                    .padding(.bottom, Padding.large)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            passphraseForm(
+                wordCount: passphraseWordCount,
+                words: $viewModel.enteredWords,
+                wordVisible: $viewModel.wordVisible,
+                wordInvalid: viewModel.invalidWords
+            )
+
+            hideShowButton(
+                visible: viewModel.wordVisible.allSatisfy { $0 },
+                viewModel: viewModel
+            )
+
+            Spacer()
+
+            Button("Confirm passphrase") {
+                Task {
+                    await viewModel.createNewStorage()
+                }
+            }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
+        }
+    }
+
+    private func passphraseWordListView(passphraseWords: [String], visible: Bool) -> some View {
+        VStack {
+            ForEach(Array(passphraseWords.enumerated()), id: \.element) { id, word in
+                if visible {
+                    Text(word)
+                        .textStyle(PassphraseTextStyle())
+                        .accessibilityIdentifier("Word \(id + 1)")
+                } else {
+                    Text("●●●●●●").textStyle(PassphraseTextStyle())
+                }
+
+            }.frame(maxWidth: .infinity)
         }.background(Color.UserNewSessionView.wordListBackgroundColor)
             .frame(maxWidth: .infinity)
-            .onAppear {
-                Task {
-                    viewModel.initializeWithNewPassphrase(passphraseWordCount: config.passphraseWordCount)
-                }
+    }
+
+    private func hideShowButton(
+        visible: Bool,
+        viewModel: UserNewSessionViewModel,
+        textShowAll: String = "Show all",
+        textHideAll: String = "Hide all"
+    ) -> some View {
+        HStack {
+            Spacer()
+            if visible {
+                Button(textHideAll) {
+                    viewModel.hideAll()
+                }.buttonStyle(InlineButtonStyle())
+            } else {
+                Button(textShowAll) {
+                    viewModel.showAll()
+                }.buttonStyle(InlineButtonStyle())
             }
+        }
+    }
+
+    private func getRememberPassphraseInfoText() -> AttributedString {
+        let as1 = AttributedString("You will always need this passphrase to access your conversation.")
+        var as2 = AttributedString("Make sure you memorise it or write it down somewhere safe.")
+        as2.foregroundColor = Color.HelpExample.highlightColor
+        as2.font = .body.weight(.semibold)
+        let as3 = AttributedString("Your passphrase must be entered in the correct oder with the correct spelling.")
+
+        return as1 + " " + as2 + " " + as3
     }
 }
 
-extension UserNewSessionView {
-    @MainActor class UserNewSessionViewModel: ObservableObject {
-        enum State {
-            case shown, hidden, submitted
-            case error(Error)
+@MainActor class UserNewSessionViewModel: ObservableObject {
+    enum State {
+        case generating
+        case remember(passphrase: ValidPassword, passphraseWords: [String], visible: Bool)
+        case confirm(passphrase: ValidPassword)
+        case creating(passphrase: ValidPassword)
+        case finished
+    }
+
+    var lib: CoverDropLibrary
+    var validPrefixes = Set<String>()
+
+    @Published var state: State = .generating
+    @Published var error: Error?
+
+    // We keep these separate to so that they can survive navigating back-and-forth and allow easier
+    // binding from the TextFields
+    @Published var enteredWords: [String] = []
+    @Published var wordVisible: [Bool] = []
+
+    var invalidWords: [Bool] {
+        // return `true` for each non-empty word that is not a valid prefix
+        enteredWords.map { word in !word.isEmpty && !validPrefixes.contains(word) }
+    }
+
+    public init(lib: CoverDropLibrary) {
+        self.lib = lib
+    }
+
+    func initializeWithNewPassphrase(passphraseWordCount: Int) {
+        state = .generating
+        validPrefixes = PasswordGenerator.shared.generatePrefixes()
+        let passphrase = EncryptedStorage.newStoragePassphrase(passphraseWordCount: passphraseWordCount)
+        let passphraseWords = passphrase.words
+
+        state = .remember(
+            passphrase: passphrase,
+            passphraseWords: passphraseWords,
+            visible: false
+        )
+    }
+
+    func showAll() {
+        if case let .remember(passphrase, passphraseWords, _) = state {
+            state = .remember(passphrase: passphrase, passphraseWords: passphraseWords, visible: true)
+        }
+        if case .confirm = state {
+            wordVisible = Array(repeating: true, count: enteredWords.count)
+        }
+    }
+
+    func hideAll() {
+        if case let .remember(passphrase, passphraseWords, _) = state {
+            state = .remember(passphrase: passphrase, passphraseWords: passphraseWords, visible: false)
+        }
+        if case .confirm = state {
+            wordVisible = Array(repeating: false, count: enteredWords.count)
+        }
+    }
+
+    func advanceToEnter() {
+        guard case let .remember(passphrase, passphraseWords, _) = state else {
+            return
         }
 
-        @Published var passphraseState: State = .hidden
-
-        @Published private(set) var passphrase: ValidPassword? {
-            didSet {
-                passphraseWords = (passphrase?.password.split(separator: " ").map { String($0) } ?? [])
-            }
+        // If the user navigates to the enter screen for the first time, we need to initialise the enteredWords array.
+        // However, we don't want to redo this in case they briefly navigated back once to have another look at the
+        // remember screen.
+        if enteredWords.isEmpty {
+            enteredWords = Array(repeating: "", count: passphraseWords.count)
+            wordVisible = Array(repeating: true, count: passphraseWords.count)
         }
 
-        @Published private(set) var passphraseWords: [String]?
+        state = .confirm(passphrase: passphrase)
+    }
 
-        public init() {}
+    func goBackToRemember() {
+        guard case let .confirm(passphrase) = state else {
+            return
+        }
+        state = .remember(
+            passphrase: passphrase,
+            passphraseWords: passphrase.words,
+            visible: false
+        )
+    }
 
-        var isSubmitted: Bool {
-            if case .submitted = passphraseState {
-                return true
-            } else { return false }
+    func createNewStorage() async {
+        guard case let .confirm(passphrase) = state else {
+            return
         }
 
-        func initializeWithNewPassphrase(passphraseWordCount: Int) {
-            passphraseState = .hidden
-            newPassphrase(passphraseWordCount: passphraseWordCount)
+        if enteredWords.contains(where: { $0.isEmpty }) {
+            error = NewSessionError.missingWords
+            return
         }
 
-        func newPassphrase(passphraseWordCount: Int) {
-            let newPassphrase = EncryptedStorage.newStoragePassphrase(passphraseWordCount: passphraseWordCount)
-            passphrase = newPassphrase
+        let enteredPassphrase = enteredWords.joined(separator: " ")
+
+        guard let validatedPassphrase = try? PasswordGenerator.checkValid(passwordInput: enteredPassphrase) else {
+            error = NewSessionError.misspeltWords
+            return
         }
 
-        func clearPassphrase() {
-            passphrase = nil
+        if validatedPassphrase != passphrase {
+            error = NewSessionError.wrongPassphrase
+            return
+        } else {
+            error = nil
         }
 
-        func createNewStorage() async {
-            passphraseState = .submitted
-            do {
-                if let validPassphrase = passphrase {
-                    _ = try EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: validPassphrase)
-                } else {
-                    passphraseState = .error("Missing Passphrase")
-                }
-            } catch {
-                passphraseState = .error(error)
-            }
+        state = .creating(passphrase: passphrase)
+        do {
+            _ = try EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: passphrase)
+            try? await lib.secretDataRepository.unlock(passphrase: passphrase)
+
+            Navigation.shared.destination = .newConversation
+        } catch {
+            self.error = NewSessionError.failedToCreateStorage
+            return
         }
     }
 }
