@@ -108,9 +108,11 @@ struct MessageData {
         let dateSent = DateFunction.currentTime()
 
         do {
-            try await lib.secretDataRepository.sendMessage(message,
-                                                           to: messageRecipient,
-                                                           dateSent: dateSent)
+            try await lib.secretDataRepository.sendMessage(
+                message,
+                to: messageRecipient,
+                dateSent: dateSent
+            )
         } catch {
             state = .error(message: error.localizedDescription)
         }

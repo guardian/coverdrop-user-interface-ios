@@ -30,9 +30,7 @@ struct JournalistMessageView: View {
 
         _conversationViewModel = StateObject(wrappedValue: conversationViewModel)
         self.lib = lib
-        inboxViewModel = InboxViewModel(
-            lib: lib
-        )
+        inboxViewModel = InboxViewModel(lib: lib)
     }
 
     var body: some View {
