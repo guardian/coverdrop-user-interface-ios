@@ -62,7 +62,6 @@ struct IncomingMessageView: View {
 
 struct MessageView_Previews: PreviewProvider {
     @MainActor struct Container: View {
-//        let privateSendingQueueRepo: () = PreviewHelper.initSendingQueue()
         @State var nonExpiredMessage = IncomingMessageData(
             sender: PublicKeysHelper.shared.testDefaultJournalist!,
             messageText: "hey",

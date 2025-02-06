@@ -170,12 +170,6 @@ struct UserContinueSessionView: View {
 
             // reset the passphrase to empty value
             enteredWords = Array(repeating: "", count: wordCount)
-
-            try await DeadDropDecryptionService().decryptStoredDeadDrops(
-                publicDataRepository: lib.publicDataRepository,
-                secretDataRepository: lib.secretDataRepository
-            )
-
             Navigation.shared.destination = .inbox
         } catch {
             self.error = ContinueSessionError.failedToUnlock
