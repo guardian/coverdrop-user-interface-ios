@@ -11,13 +11,11 @@ struct NewMessageView: View {
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping
     // will allow us to fail fast in the case of developer error.
     @ObservedObject var conversationViewModel: ConversationViewModel
-    @ObservedObject var lib: CoverDropLibrary
 
-    init(lib: CoverDropLibrary, conversationViewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
+    init(conversationViewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
         UITextView.appearance().backgroundColor = .clear
         isInboxEmpty = inboxIsEmpty
         self.conversationViewModel = conversationViewModel
-        self.lib = lib
     }
 
     var body: some View {

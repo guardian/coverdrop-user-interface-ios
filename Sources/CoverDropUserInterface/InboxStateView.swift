@@ -36,13 +36,11 @@ struct UnlockedSecretDataStateSwitcher: View {
             if case .newConversation = navigation.destination {
                 // This scenario is when the user has logged in for the first time
                 // after creating a new session and has never sent a message
-                NewMessageView(lib: lib, conversationViewModel: conversationViewModel,
-                               inboxIsEmpty: false)
+                NewMessageView(conversationViewModel: conversationViewModel, inboxIsEmpty: false)
             } else if case .login = navigation.destination {
                 // This scenario is when the user had abandoned sending their initial message, but had created a
                 // session, and is re-logging in
                 NewMessageView(
-                    lib: lib,
                     conversationViewModel: conversationViewModel,
                     inboxIsEmpty: true
                 )

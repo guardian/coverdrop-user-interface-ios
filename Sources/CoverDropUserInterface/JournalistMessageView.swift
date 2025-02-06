@@ -76,9 +76,8 @@ struct JournalistMessageView: View {
     }
 
     func isCurrentKeyExpired(recipient: JournalistData) async -> Bool {
-        if let currentKey = try? await lib.publicDataRepository.getLatestMessagingKey(
-            recipientId: recipient.recipientId
-        ) {
+        if let verifiedKeys = try? lib.publicDataRepository.getVerifiedKeysOrThrow(),
+           let currentKey = verifiedKeys.getLatestMessagingKey(journalistId: recipient.recipientId) {
             return currentKey.isExpired(now: DateFunction.currentKeysPublishedTime())
         }
         return false
