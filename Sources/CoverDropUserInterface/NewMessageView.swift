@@ -101,6 +101,8 @@ struct NewMessageView: View {
                            Button("Yes, I want to leave") {
                                Task {
                                    await conversationViewModel.clearModelDataAndLock()
+
+                                   navigation.destination = .home
                                }
                            }
                            Button("Cancel", role: .cancel) {}
