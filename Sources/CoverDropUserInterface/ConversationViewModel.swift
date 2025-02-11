@@ -37,7 +37,7 @@ struct MessageData {
         // expired)
         // but we still was the user to be able to view a conversation
         if messageRecipient == nil {
-            if let verifiedPublicKeys = try? lib.publicDataRepository.getVerifiedKeysOrThrow(),
+            if let verifiedPublicKeys = try? lib.publicDataRepository.getVerifiedKeys(),
                let messageRecipientsFromKeys = try? MessageRecipients(
                    verifiedPublicKeys: verifiedPublicKeys,
                    excludingDefaultRecipient: false
