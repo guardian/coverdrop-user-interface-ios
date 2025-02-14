@@ -96,19 +96,22 @@ enum HelpScreenContentError: Error {
 }
 
 struct HelpView: View {
-    @ObservedObject var navigation = Navigation.shared
+    @Binding var navPath: NavigationPath
     @State var content: Result<([HelpScreenComponent], [String: HelpScreenContent]), HelpScreenContentError>
 
-    init(contentVariant: HelpScreenContent) {
+    init(contentVariant: HelpScreenContent, navPath: Binding<NavigationPath>) {
         self.init(
             fromResourceName: contentVariant.resourceName(),
-            onClickMapping: contentVariant.buttonToContentMapping()
+            onClickMapping: contentVariant.buttonToContentMapping(),
+            navPath: navPath
         )
     }
 
-    init(fromResourceName: String, onClickMapping: [String: HelpScreenContent]) {
+    init(fromResourceName: String, onClickMapping: [String: HelpScreenContent], navPath: Binding<NavigationPath>) {
+        _navPath = navPath
         do {
             let components = try loadComponentsFromMarkupFile(resourceName: fromResourceName)
+            // print("got components \(components)")
             try checkForMissingAndDanglingIdentifiers(components: components, onClickMapping: onClickMapping)
             content = .success((components, onClickMapping))
         } catch let err as HelpScreenContentError {
@@ -119,30 +122,28 @@ struct HelpView: View {
     }
 
     func navigateToHelpVariant(target: HelpScreenContent) {
-        navigation.destination = Destination.help(contentVariant: target)
+        navPath.append(Destination.help(contentVariant: target))
     }
 
     var body: some View {
-        NavigationView {
-            HeaderView(type: .about, dismissAction: {
-                // TODO: the HelpView can be called from other screens as well, we need to let it
-                // know where it should navigate to on dismissal
-                navigation.destination = .about
-            }) {
-                switch self.content {
-                case let .success((components, onClickMapping)):
-                    ScrollView {
-                        let onClickMappingToAction = onClickMapping.mapValues { target in
-                            { navigateToHelpVariant(target: target) }
-                        }
-                        createComponentsColumn(
-                            components: components,
-                            onClickMapping: onClickMappingToAction
-                        ).padding(Padding.medium)
+        HeaderView(type: .about, dismissAction: {
+            if !navPath.isEmpty {
+                navPath.removeLast()
+            }
+        }) {
+            switch self.content {
+            case let .success((components, onClickMapping)):
+                ScrollView {
+                    let onClickMappingToAction = onClickMapping.mapValues { target in
+                        { navigateToHelpVariant(target: target) }
                     }
-                case let .failure(error):
-                    Text(error.errorMessage())
+                    createComponentsColumn(
+                        components: components,
+                        onClickMapping: onClickMappingToAction
+                    ).padding(Padding.medium)
                 }
+            case let .failure(error):
+                Text(error.errorMessage())
             }
         }.foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
             .navigationBarHidden(true)

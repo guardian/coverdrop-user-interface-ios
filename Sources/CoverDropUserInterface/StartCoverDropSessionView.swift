@@ -3,91 +3,83 @@ import Foundation
 import SVGView
 import SwiftUI
 
-struct StartCoverDropSessionView: View {
-    @ObservedObject var navigation = Navigation.shared
-    // @ObservedObject private var viewModel: StartCoverDropSessionViewModel
-    @ObservedObject private var publicDataRepository: PublicDataRepository
+public struct StartCoverDropSessionView: View {
+    @ObservedObject var publicDataRepository: PublicDataRepository
+    @Binding var navPath: NavigationPath
 
     /// Controls whether the alert is shown before starting a new conversation
     @State private var showingNewMessageAlert = false
 
-    init(publicDataRepository: PublicDataRepository) {
-        UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).adjustsFontSizeToFitWidth = true
-        self.publicDataRepository = publicDataRepository
-    }
+    public var body: some View {
+        HeaderView(type: .home) {
+            VStack(alignment: .leading) {
+                titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
 
-    var body: some View {
-        NavigationView {
-            HeaderView(type: .home) {
-                VStack(alignment: .leading) {
-                    titleText.textStyle(LargeTitleStyle()).font(Font.headline.leading(.loose))
+                Text(
+                    """
+                    Our Secure Messaging service was developed by the Guardian to allow you to share \
+                    stories with us securely and privately using strong encryption. \
+                    It is designed to prevent others from even knowing you are in\
+                    communication with us.
+                    """
+                )
+                .textStyle(BodyStyle())
+                .padding(.vertical, Padding.medium)
 
-                    Text(
-                        """
-                        Our Secure Messaging service was developed by the Guardian to allow you to share \
-                        stories with us securely and privately using strong encryption. \
-                        It is designed to prevent others from even knowing you are in\
-                        communication with us.
-                        """
-                    )
-                    .textStyle(BodyStyle())
-                    .padding(.vertical, Padding.medium)
+                Button(action: {
+                    navPath.append(Destination.about)
+                }) {
+                    Text("About Secure Messaging")
+                        .fontWeight(.bold)
+                    Image(systemName: "chevron.forward")
+                        .resizable()
+                        .fontWeight(.black)
+                        .frame(width: 7, height: 11)
+                        .foregroundColor(Color.ChevronButtonList.chevronColor)
+                        .padding([.trailing], Padding.small)
+                }
 
-                    Button(action: {
-                        navigation.destination = .about
-                    }) {
-                        Text("About Secure Messaging")
-                            .fontWeight(.bold)
-                        Image(systemName: "chevron.forward")
-                            .resizable()
-                            .fontWeight(.black)
-                            .frame(width: 7, height: 11)
-                            .foregroundColor(Color.ChevronButtonList.chevronColor)
-                            .padding([.trailing], Padding.small)
+                Spacer()
+
+                if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
+                   coverDropServiceStatus.isAvailable == false {
+                    VStack {
+                        Text(
+                            """
+                            The Secure Messaging feature is currently not available.
+                            Please try again later. Below we show technical information that might be helpful.
+                            """
+                        )
+                        Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
                     }
 
-                    Spacer()
-
-                    if let coverDropServiceStatus = publicDataRepository.coverDropServiceStatus,
-                       coverDropServiceStatus.isAvailable == false {
-                        VStack {
-                            Text(
-                                """
-                                The Secure Messaging feature is currently not available.
-                                Please try again later. Below we show technical information that might be helpful.
-                                """
-                            )
-                            Text(coverDropServiceStatus.description).textStyle(MonoSpacedStyle())
-                        }
-
-                    } else {
-                        Button("Get started") {
-                            showingNewMessageAlert = true
-                        }
-                        .disabled(!publicDataRepository.areKeysAvailable)
-                        .buttonStyle(PrimaryButtonStyle(isDisabled: !publicDataRepository.areKeysAvailable))
-                        .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
-                            Button("Yes, start conversation") {
-                                navigation.destination = .onboarding
-                            }
-                            Button("No", role: .cancel) {}
-                        }, message: {
-                            Text(
-                                """
-                                Starting a new conversation will remove any prior messages from your inbox,
-                                if they existed. Do you want to continue?
-                                """
-                            )
-                        })
-
-                        Button("Check your inbox") {
-                            navigation.destination = .login
-                        }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
+                } else {
+                    Button("Get started") {
+                        showingNewMessageAlert = true
                     }
+                    .disabled(!publicDataRepository.areKeysAvailable)
+                    .buttonStyle(PrimaryButtonStyle(isDisabled: !publicDataRepository.areKeysAvailable))
+                    .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
+                        Button("Yes, start conversation") {
+                            navPath.append(Destination.onboarding)
+                        }
+                        Button("No", role: .cancel) {}
+                    }, message: {
+                        Text(
+                            """
+                            Starting a new conversation will remove any prior messages from your inbox,
+                            if they existed. Do you want to continue?
+                            """
+                        )
+                    })
 
-                }.padding(Padding.large)
-                    .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-            }
+                    Button("Check your inbox") {
+                        navPath.append(Destination.login)
+                    }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
+                }
+
+            }.padding(Padding.large)
+                .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
         }
     }
 

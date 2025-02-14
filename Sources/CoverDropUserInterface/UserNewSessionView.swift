@@ -30,48 +30,59 @@ extension NewSessionError: LocalizedError {
 }
 
 struct UserNewSessionView: View {
+    @Binding var navPath: NavigationPath
+    @State var isPasswordHelpOpen: Bool = false
     var passphraseWordCount: Int
     @ObservedObject var viewModel: UserNewSessionViewModel
-    @ObservedObject var navigation = Navigation.shared
 
     var body: some View {
         HeaderView(type: .newPassphrase, dismissAction: {
             switch viewModel.state {
             case .generating, .remember:
-                navigation.destination = .onboarding
+                navPath.isEmpty ? () : navPath.removeLast()
             case .confirm, .creating, .finished:
                 viewModel.goBackToRemember()
             }
         }) {
+            PasswordBannerView(action: {
+                isPasswordHelpOpen = true
+                navPath.append(Destination.help(contentVariant: .keepingPassphraseSafe))
+            })
             VStack(alignment: .leading) {
                 switch viewModel.state {
-                    case .generating:
-                        generatingPassphraseView()
-                    case let .remember(_, passphraseWords, visible):
-                        rememberPassphraseView(
-                            viewModel: viewModel,
-                            passphraseWords: passphraseWords,
-                            visible: visible
-                        )
-                    case .confirm:
-                        confirmPassphraseView(viewModel: viewModel)
-                    case .creating:
-                        creatingStorageView()
-                    case .finished:
-                        EmptyView()
+                case .generating:
+                    generatingPassphraseView()
+                case let .remember(_, passphraseWords, visible):
+                    rememberPassphraseView(
+                        viewModel: viewModel,
+                        passphraseWords: passphraseWords,
+                        visible: visible
+                    )
+                case .confirm:
+                    confirmPassphraseView(viewModel: viewModel)
+                case .creating:
+                    creatingStorageView()
+                case .finished:
+                    EmptyView()
                 }
             }
             .padding(Padding.large)
             .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
 
             tertiaryButton(
-                action: { navigation.destination = .login },
+                action: {
+                    navPath.isEmpty ? () : navPath.removeLast() // remove this screen
+                    navPath.isEmpty ? () : navPath.removeLast() // remove onboarding screen
+                    navPath.append(Destination.login)
+                },
                 text: "I already have a passphrase"
             ).ignoresSafeArea(.keyboard, edges: .bottom)
-        }
-        .onAppear {
-            Task { viewModel.initializeWithNewPassphrase(passphraseWordCount: passphraseWordCount) }
-        }
+        }.navigationBarHidden(true)
+            .onAppear {
+                Task {
+                    viewModel.initializeWithNewPassphrase(passphraseWordCount: passphraseWordCount)
+                }
+            }
     }
 
     func generatingPassphraseView() -> some View {
@@ -247,16 +258,17 @@ struct UserNewSessionView: View {
     }
 
     func initializeWithNewPassphrase(passphraseWordCount: Int) {
-        state = .generating
-        validPrefixes = PasswordGenerator.shared.generatePrefixes()
-        let passphrase = EncryptedStorage.newStoragePassphrase(passphraseWordCount: passphraseWordCount)
-        let passphraseWords = passphrase.words
+        if case .generating = state {
+            validPrefixes = PasswordGenerator.shared.generatePrefixes()
+            let passphrase = EncryptedStorage.newStoragePassphrase(passphraseWordCount: passphraseWordCount)
+            let passphraseWords = passphrase.words
 
-        state = .remember(
-            passphrase: passphrase,
-            passphraseWords: passphraseWords,
-            visible: false
-        )
+            state = .remember(
+                passphrase: passphrase,
+                passphraseWords: passphraseWords,
+                visible: false
+            )
+        }
     }
 
     func showAll() {
@@ -332,11 +344,19 @@ struct UserNewSessionView: View {
         do {
             _ = try EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: passphrase)
             try? await lib.secretDataRepository.unlock(passphrase: passphrase)
-
-            Navigation.shared.destination = .newConversation
         } catch {
             self.error = NewSessionError.failedToCreateStorage
             return
         }
     }
+}
+
+#Preview {
+    UserNewSessionView(
+        navPath: Binding.constant(NavigationPath()), passphraseWordCount: 3,
+        // swiftlint:disable:next force_try
+        viewModel: UserNewSessionViewModel(lib: try! IntegrationTestScenarioContext(
+            scenario: IntegrationTestScenario.minimal
+        ).getLibraryWithVerifiedKeys())
+    )
 }

@@ -29,20 +29,22 @@ struct HeaderView<Content: View>: View {
                 .ignoresSafeArea(.all)
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    Button(action: {
-                        // This will navigate a view hierarchy back to the previous screen,
-                        // or close a modal window if its open.
-                        guard let dismissAction else { presentation.wrappedValue.dismiss(); return }
-                        dismissAction()
-                    }) {
-                        Image(systemName: "arrow.backward")
-                            .resizable()
-                            .frame(width: 25, height: 25)
-                            .padding(Padding.large)
-                            .foregroundColor(Color.HeaderView.arrowColor)
+                    if type != .inbox {
+                        Button(action: {
+                            // This will navigate a view hierarchy back to the previous screen,
+                            // or close a modal window if its open.
+                            guard let dismissAction else { presentation.wrappedValue.dismiss(); return }
+                            dismissAction()
+                        }) {
+                            Image(systemName: "arrow.backward")
+                                .resizable()
+                                .frame(width: 25, height: 25)
+                                .padding(Padding.large)
+                                .foregroundColor(Color.HeaderView.arrowColor)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier(backButtonText())
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier(backButtonText())
 
                     Spacer() // This pushed the button to the left corner
 
@@ -58,7 +60,6 @@ struct HeaderView<Content: View>: View {
 
                 if showBetaBanner {
                     BetaBannerView(
-                        showBetaBanner: $showBetaBanner,
                         showBetaBannerAlert: $showingBetaBannerAlert
                     )
                 }

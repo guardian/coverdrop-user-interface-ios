@@ -2,17 +2,15 @@ import CoverDropCore
 import SwiftUI
 
 struct InboxView: View {
-    @ObservedObject var navigation = Navigation.shared
     @ObservedObject var inboxViewModel: InboxViewModel
     @ObservedObject var conversationViewModel: ConversationViewModel
     @State private var showingDeleteAlert = false
+    @Binding var navPath: NavigationPath
 
     var body: some View {
         HeaderView(type: .inbox, dismissAction: {
             Task {
                 await conversationViewModel.clearModelDataAndLock()
-
-                navigation.destination = .home
             }
         }) {
             VStack {
@@ -50,7 +48,7 @@ struct InboxView: View {
                     .foregroundColor(Color.InboxView.activeMessageRecipientColor)
                     .onTapGesture {
                         conversationViewModel.messageRecipient = activeConversation.recipient
-                        navigation.destination = .viewConversation
+                        navPath.append(Destination.viewConversation)
                     }
             }
             .padding([.top, .leading, .trailing], Padding.large)
@@ -107,7 +105,7 @@ struct InboxView: View {
                 .foregroundColor(Color.InboxView.previousMessageRecipientColor)
                 .onTapGesture {
                     conversationViewModel.messageRecipient = inactiveConversation.recipient
-                    navigation.destination = .viewConversation
+                    navPath.append(Destination.viewConversation)
                 }
             if inactiveConversation.containsExpiringMessages,
                let expiredDate = inactiveConversation.messageExpiringDate {
@@ -137,7 +135,6 @@ struct InboxView: View {
                    actions: {
                        Button("Yes, delete conversations", role: .destructive) {
                            Task {
-                               navigation.destination = .home
                                try? await inboxViewModel.deleteAllMessagesAndCurrentSession(
                                    conversationViewModel: conversationViewModel
                                )
@@ -160,14 +157,17 @@ struct InboxView: View {
 
     var footer: some View {
         HStack {
-            Text("About SecureMessaging")
-                .textStyle(InlineButtonTextStyle())
-                .foregroundColor(Color.InboxView.aboutButtonColor)
+            Button(action: {
+                navPath.append(Destination.help(contentVariant: .howSecureMessagingWorks))
+            }) {
+                Text("About SecureMessaging")
+                    .textStyle(InlineButtonTextStyle())
+                    .foregroundColor(Color.InboxView.aboutButtonColor)
+            }
             Spacer()
             Button("Leave inbox") {
                 Task {
                     await conversationViewModel.clearModelDataAndLock()
-                    navigation.destination = .home
                 }
             }
             .buttonStyle(XSmallFilledButtonStyle())

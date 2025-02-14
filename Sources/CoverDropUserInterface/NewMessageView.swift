@@ -2,7 +2,7 @@ import CoverDropCore
 import SwiftUI
 
 struct NewMessageView: View {
-    @ObservedObject var navigation = Navigation.shared
+    @Binding var navPath: NavigationPath
     @State var isMessageViewLinkActive = false
     @State var isSelectRecipientViewOpen = false
     @State private var showingDismissalAlert = false
@@ -12,7 +12,9 @@ struct NewMessageView: View {
     // will allow us to fail fast in the case of developer error.
     @ObservedObject var conversationViewModel: ConversationViewModel
 
-    init(conversationViewModel: ConversationViewModel, inboxIsEmpty: Bool = false) {
+    init(conversationViewModel: ConversationViewModel, navPath: Binding<NavigationPath>, inboxIsEmpty: Bool = false) {
+        _navPath = navPath
+
         UITextView.appearance().backgroundColor = .clear
         isInboxEmpty = inboxIsEmpty
         self.conversationViewModel = conversationViewModel
@@ -34,6 +36,9 @@ struct NewMessageView: View {
                    dismissAction: {
                        showingDismissalAlert = true
                    }) {
+            CraftMessageBannerView(action: {
+                navPath.append(Destination.help(contentVariant: .craftMessage))
+            })
             ScrollView {
                 VStack(alignment: .leading) {
                     if isInboxEmpty {
@@ -101,8 +106,6 @@ struct NewMessageView: View {
                            Button("Yes, I want to leave") {
                                Task {
                                    await conversationViewModel.clearModelDataAndLock()
-
-                                   navigation.destination = .home
                                }
                            }
                            Button("Cancel", role: .cancel) {}

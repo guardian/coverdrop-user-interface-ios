@@ -7,9 +7,9 @@ enum MessageError: Error {
 
 struct JournalistMessageView: View {
     @ObservedObject var inboxViewModel: InboxViewModel
-    @ObservedObject var navigation = Navigation.shared
     @StateObject var conversationViewModel: ConversationViewModel
     @ObservedObject var lib: CoverDropLibrary
+    @Binding var navPath: NavigationPath
 
     // by default we want to make the user have to choose to send another message
     @State var alreadySentMessage: Bool = false
@@ -19,7 +19,8 @@ struct JournalistMessageView: View {
     init(
         journalist: JournalistData,
         conversationViewModel: ConversationViewModel,
-        lib: CoverDropLibrary
+        lib: CoverDropLibrary,
+        navPath: Binding<NavigationPath>
     ) {
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
@@ -31,12 +32,13 @@ struct JournalistMessageView: View {
         _conversationViewModel = StateObject(wrappedValue: conversationViewModel)
         self.lib = lib
         inboxViewModel = InboxViewModel(lib: lib)
+        _navPath = navPath
     }
 
     var body: some View {
         HeaderView(type: .viewConversation, dismissAction: {
-            Task {
-                navigation.destination = .inbox
+            if !navPath.isEmpty {
+                navPath.removeLast()
             }
         }) {
             VStack(alignment: .leading, spacing: 0) {

@@ -16,6 +16,7 @@ private extension Color {
         static let specialReport300 = Color(red: 63 / 255, green: 70 / 255, blue: 74 / 255)
         static let specialReport400 = Color(red: 89 / 255, green: 92 / 255, blue: 95 / 255)
         static let specialReport450 = Color(red: 157 / 255, green: 160 / 255, blue: 162 / 255)
+        static let specialReport500 = Color(red: 171 / 255, green: 194 / 255, blue: 201 / 255)
         static let specialReport700 = Color(red: 228 / 255, green: 229 / 255, blue: 232 / 255)
         static let specialReport800 = Color(red: 239 / 255, green: 241 / 255, blue: 242 / 255)
         static let green500 = Color(red: 88 / 255, green: 208 / 255, blue: 139 / 255)
@@ -129,6 +130,11 @@ extension Color {
     enum BetaBannerView {
         static let textForegroundColor = Color.black
         static let backgroundColor = GuardianColor.error500
+    }
+
+    enum PasswordBannerView {
+        static let textForegroundColor = Color.black
+        static let backgroundColor = GuardianColor.specialReport500
     }
 
     enum UserLoginView {

@@ -8,11 +8,11 @@ struct ChevronButtonData {
 }
 
 struct ChevronButtonList: View {
-    @ObservedObject var navigation = Navigation.shared
+    @Binding var navPath: NavigationPath
     @State var buttonData = [ChevronButtonData]()
 
     func navigateToHelp(contentVariant: HelpScreenContent) {
-        navigation.destination = .help(contentVariant: contentVariant)
+        navPath.append(Destination.help(contentVariant: contentVariant))
     }
 
     var body: some View {
@@ -49,16 +49,18 @@ struct ChevronButtonList: View {
 }
 
 struct AboutCoverDropView: View {
-    @ObservedObject var navigation = Navigation.shared
+    @Binding var navPath: NavigationPath
 
     func navigateToHelp(contentVariant: HelpScreenContent) {
-        navigation.destination = .help(contentVariant: contentVariant)
+        navPath.append(Destination.help(contentVariant: contentVariant))
     }
 
     var body: some View {
         NavigationView {
             HeaderView(type: .about, dismissAction: {
-                navigation.destination = .home
+                if !navPath.isEmpty {
+                    navPath.removeLast()
+                }
             }) {
                 VStack(alignment: .leading) {
                     Text("About Secure Messaging")
@@ -69,7 +71,7 @@ struct AboutCoverDropView: View {
                         .textStyle(GuardianHeaderTextStyle())
                         .padding([.top], Padding.large)
                         .padding([.bottom], Padding.small)
-                    ChevronButtonList(buttonData: [
+                    ChevronButtonList(navPath: $navPath, buttonData: [
                         ChevronButtonData(
                             text: "Why we made Secure Messaging",
                             target: .whyWeMadeSecureMessaging
@@ -92,7 +94,7 @@ struct AboutCoverDropView: View {
                         .textStyle(GuardianHeaderTextStyle())
                         .padding([.top], Padding.large)
                         .padding([.bottom], Padding.small)
-                    ChevronButtonList(buttonData: [
+                    ChevronButtonList(navPath: $navPath, buttonData: [
                         ChevronButtonData(
                             text: "Craft your first message",
                             target: .craftMessage
@@ -107,7 +109,7 @@ struct AboutCoverDropView: View {
                         .textStyle(GuardianHeaderTextStyle())
                         .padding([.top], Padding.large)
                         .padding([.bottom], Padding.small)
-                    ChevronButtonList(buttonData: [
+                    ChevronButtonList(navPath: $navPath, buttonData: [
                         ChevronButtonData(
                             text: "What to expect as a reply",
                             target: .replyExpectations

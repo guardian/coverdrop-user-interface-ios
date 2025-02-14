@@ -2,12 +2,14 @@ import SVGView
 import SwiftUI
 
 struct OnboardingView: View {
-    @ObservedObject var navigation = Navigation.shared
-    @ObservedObject var viewModel = OnboardingViewModel()
+    @StateObject var viewModel = OnboardingViewModel()
+    @Binding var navPath: NavigationPath
 
     var body: some View {
         HeaderView(type: .onboarding, dismissAction: {
-            navigation.destination = .home
+            if !navPath.isEmpty {
+                navPath.removeLast()
+            }
         }) {
             VStack(alignment: .leading, spacing: 0) {
                 TabView(selection: $viewModel.currentStep) {
@@ -23,7 +25,7 @@ struct OnboardingView: View {
 
             Button(viewModel.currentStep.buttonText) {
                 if viewModel.isFinalStep() {
-                    navigation.destination = .newPassphrase
+                    navPath.append(Destination.newPassphrase)
                 } else {
                     advanceToNextTab()
                 }
@@ -31,6 +33,7 @@ struct OnboardingView: View {
             .buttonStyle(PrimaryButtonStyle(isDisabled: false))
             .padding([.bottom, .leading, .trailing], Padding.large)
         }
+        .onAppear { viewModel.reset() }
         .navigationBarHidden(true)
     }
 
@@ -71,6 +74,10 @@ struct OnboardingView: View {
 
 class OnboardingViewModel: ObservableObject {
     @Published var currentStep: OnboardingSteps = .sendMessage
+
+    func reset() {
+        currentStep = .sendMessage
+    }
 
     func advanceToNextTab() {
         switch currentStep {
@@ -147,5 +154,5 @@ enum OnboardingSteps: String, CustomStringConvertible, CaseIterable, Identifiabl
 }
 
 #Preview {
-    OnboardingView()
+    OnboardingView(navPath: Binding.constant(NavigationPath()))
 }

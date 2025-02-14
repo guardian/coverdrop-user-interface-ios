@@ -12,8 +12,10 @@ struct InformationView: View {
     var imagePath: String
     var textColor: Color
     var strokeColor: Color
+    var action: () -> Void = {}
 
-    init(viewType: ViewType, title: String, message: String) {
+    init(viewType: ViewType, title: String, message: String, action: @escaping () -> Void = {}) {
+        self.action = action
         self.viewType = viewType
         self.title = title
         self.message = message
@@ -22,6 +24,7 @@ struct InformationView: View {
             imagePath = "exclamationmark.triangle.fill"
             textColor = Color.UserLoginView.errorMessageForegroundColor
             strokeColor = Color.UserLoginView.errorMessageStrokeColor
+
         case .info:
             imagePath = "info.circle.fill"
             textColor = Color.NewMessageView.messageInformationColor
@@ -36,24 +39,26 @@ struct InformationView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(alignment: .top) {
-                Image(systemName: imagePath)
-                    .foregroundColor(strokeColor)
-                    .offset(CGSize(width: 0, height: -4))
-                VStack(alignment: .leading) {
-                    Text("\(title)")
-                        .textStyle(ErrorBoxTitleTextStyle())
-                        .foregroundColor(textColor)
+            Button(action: action) {
+                HStack(alignment: .top) {
+                    Image(systemName: imagePath)
+                        .foregroundColor(strokeColor)
+                        .offset(CGSize(width: 0, height: -4))
+                    VStack(alignment: .leading) {
+                        Text("\(title)")
+                            .textStyle(ErrorBoxTitleTextStyle())
+                            .foregroundColor(textColor)
 
-                    Text(message).textStyle(BodyStyle())
-                        .padding([.trailing], Padding.medium)
-                        .foregroundColor(textColor)
-                }
-                Spacer()
-                if viewType == .action {
-                    VStack(alignment: .center) {
-                        Image(systemName: "chevron.forward").resizable().frame(width: 7, height: 11)
-                            .padding(.top, 12)
+                        Text(message).textStyle(BodyStyle())
+                            .padding([.trailing], Padding.medium)
+                            .foregroundColor(textColor)
+                    }
+                    Spacer()
+                    if viewType == .action {
+                        VStack(alignment: .center) {
+                            Image(systemName: "chevron.forward").resizable().frame(width: 7, height: 11)
+                                .padding(.top, 12)
+                        }
                     }
                 }
             }

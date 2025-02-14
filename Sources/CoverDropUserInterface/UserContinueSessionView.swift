@@ -27,12 +27,12 @@ extension ContinueSessionError: LocalizedError {
 }
 
 struct UserContinueSessionView: View {
+    @Binding var navPath: NavigationPath
     @ObservedObject var viewModel: UserContinueSessionViewModel
-    @ObservedObject var navigation = Navigation.shared
 
     var body: some View {
         return HeaderView(type: .login, dismissAction: {
-            navigation.destination = .home
+            navPath.isEmpty ? () : navPath.removeLast()
         }) {
             VStack(alignment: .leading) {
                 switch viewModel.state {
@@ -46,7 +46,10 @@ struct UserContinueSessionView: View {
             .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
 
             tertiaryButton(
-                action: { navigation.destination = .onboarding },
+                action: {
+                    navPath.isEmpty ? () : navPath.removeLast()
+                    navPath.append(Destination.onboarding)
+                },
                 text: "I do not have a passphrase yet"
             ).ignoresSafeArea(.keyboard, edges: .bottom)
         }
@@ -170,7 +173,6 @@ struct UserContinueSessionView: View {
 
             // reset the passphrase to empty value
             enteredWords = Array(repeating: "", count: wordCount)
-            Navigation.shared.destination = .inbox
         } catch {
             self.error = ContinueSessionError.failedToUnlock
             state = .enter

@@ -2,7 +2,7 @@ import CoverDropCore
 import Foundation
 import SwiftUI
 
-enum Destination: Equatable {
+enum Destination: Equatable, Hashable {
     case inbox
     case newConversation
     case viewConversation
@@ -15,14 +15,6 @@ enum Destination: Equatable {
     case deskDetail
     case selectRecipient
     case help(contentVariant: HelpScreenContent)
-}
-
-class Navigation: ObservableObject {
-    @Published var destination: Destination = .home
-
-    public static let shared = Navigation()
-
-    private init() {}
 }
 
 struct ContentView: View {
@@ -55,6 +47,7 @@ struct ReadyView: View {
     // observe secretDataRepository itself.
     @ObservedObject var secretDataRepository: SecretDataRepository
     @ObservedObject var conversationViewModel: ConversationViewModel
+    @State var postLoginDestination: UnlockedSecretDataDestination = .newConversation
 
     var body: some View {
         if !securitySuite.getEffectiveViolationsSet().isEmpty {
@@ -63,60 +56,96 @@ struct ReadyView: View {
             InboxStateView(
                 secretDataRepository: lib.publishedSecretDataRepository,
                 conversationViewModel: conversationViewModel,
-                lib: lib
+                lib: lib,
+                postLoginDestination: postLoginDestination
             )
         } else {
-            NonLoggedInNavigationView(lib: lib)
+            NonLoggedInNavigationView(lib: lib, postLoginDestination: $postLoginDestination)
         }
     }
 }
 
 struct NonLoggedInNavigationView: View {
-    @ObservedObject var navigation = Navigation.shared
+    @State private var navPath = NavigationPath()
     @ObservedObject var lib: CoverDropLibrary
+    @Binding var postLoginDestination: UnlockedSecretDataDestination
+    @StateObject var userNewSessionViewModel: UserNewSessionViewModel
+
+    init(
+        navPath: NavigationPath = NavigationPath(),
+        lib: CoverDropLibrary,
+        postLoginDestination: Binding<UnlockedSecretDataDestination>
+    ) {
+        self.navPath = navPath
+        self.lib = lib
+        _postLoginDestination = postLoginDestination
+        _userNewSessionViewModel = StateObject(wrappedValue: UserNewSessionViewModel(lib: lib))
+    }
 
     var body: some View {
-        switch navigation.destination {
-        case .about:
-            AboutCoverDropView()
-        case .onboarding:
-            OnboardingView()
-        case .newPassphrase:
-            UserNewSessionView(
-                passphraseWordCount: lib.config.passphraseWordCount,
-                viewModel: UserNewSessionViewModel(lib: lib)
-            )
-        case .login, .newConversation:
-            UserContinueSessionView(viewModel: UserContinueSessionViewModel(lib: lib))
-        case .home:
-            StartCoverDropSessionView(
-                publicDataRepository: lib.publishedPublicDataRepository
-            )
-        case let .help(contentVariant):
-            // This switch might appear unneccessary. However, the Navigation object will not correctly
-            // invalid the HelpView if we do not split into separate code paths...
-            switch contentVariant {
-            case .craftMessage:
-                HelpView(contentVariant: .craftMessage)
-            case .faq:
-                HelpView(contentVariant: .faq)
-            case .howSecureMessagingWorks:
-                HelpView(contentVariant: .howSecureMessagingWorks)
-            case .keepingPassphraseSafe:
-                HelpView(contentVariant: .keepingPassphraseSafe)
-            case .privacyPolicy:
-                HelpView(contentVariant: .privacyPolicy)
-            case .replyExpectations:
-                HelpView(contentVariant: .replyExpectations)
-            case .sourceProtection:
-                HelpView(contentVariant: .sourceProtection)
-            case .whyWeMadeSecureMessaging:
-                HelpView(contentVariant: .whyWeMadeSecureMessaging)
+        NavigationStack(path: $navPath) {
+            Group {
+                StartCoverDropSessionView(
+                    publicDataRepository: lib.publishedPublicDataRepository, navPath: $navPath
+                )
+            }.navigationDestination(for: Destination.self) { destination in
+
+                switch destination {
+                case .about:
+                    AboutCoverDropView(navPath: $navPath)
+                case .onboarding:
+                    OnboardingView(navPath: $navPath)
+                case .newPassphrase:
+                    UserNewSessionView(
+                        navPath: $navPath,
+                        passphraseWordCount: lib.config.passphraseWordCount,
+                        viewModel: userNewSessionViewModel
+                    )
+                case .login:
+                    UserContinueSessionView(
+                        navPath: $navPath,
+                        viewModel: UserContinueSessionViewModel(lib: lib)
+                    ).onAppear {
+                        $postLoginDestination.wrappedValue = .login
+                    }
+                case .newConversation:
+                    UserContinueSessionView(
+                        navPath: $navPath,
+                        viewModel: UserContinueSessionViewModel(lib: lib)
+                    ).onAppear {
+                        $postLoginDestination.wrappedValue = .newConversation
+                    }
+                case .home:
+                    StartCoverDropSessionView(
+                        publicDataRepository: lib.publishedPublicDataRepository, navPath: $navPath
+                    )
+                case let .help(contentVariant):
+                    // This switch might appear unneccessary. However, the Navigation object will not correctly
+                    // invalid the HelpView if we do not split into separate code paths...
+                    switch contentVariant {
+                    case .craftMessage:
+                        HelpView(contentVariant: .craftMessage, navPath: $navPath)
+                    case .faq:
+                        HelpView(contentVariant: .faq, navPath: $navPath)
+                    case .howSecureMessagingWorks:
+                        HelpView(contentVariant: .howSecureMessagingWorks, navPath: $navPath)
+                    case .keepingPassphraseSafe:
+                        HelpView(contentVariant: .keepingPassphraseSafe, navPath: $navPath)
+                    case .privacyPolicy:
+                        HelpView(contentVariant: .privacyPolicy, navPath: $navPath)
+                    case .replyExpectations:
+                        HelpView(contentVariant: .replyExpectations, navPath: $navPath)
+                    case .sourceProtection:
+                        HelpView(contentVariant: .sourceProtection, navPath: $navPath)
+                    case .whyWeMadeSecureMessaging:
+                        HelpView(contentVariant: .whyWeMadeSecureMessaging, navPath: $navPath)
+                    }
+                case _:
+                    StartCoverDropSessionView(
+                        publicDataRepository: lib.publishedPublicDataRepository, navPath: $navPath
+                    )
+                }
             }
-        case _:
-            StartCoverDropSessionView(
-                publicDataRepository: lib.publishedPublicDataRepository
-            )
         }
     }
 }
