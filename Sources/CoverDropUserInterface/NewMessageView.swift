@@ -6,6 +6,7 @@ struct NewMessageView: View {
     @State var isMessageViewLinkActive = false
     @State var isSelectRecipientViewOpen = false
     @State private var showingDismissalAlert = false
+    @State private var showingForcedSelectionAlert = false
     var isInboxEmpty: Bool
 
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping
@@ -58,12 +59,25 @@ struct NewMessageView: View {
                     }
 
                     ZStack(alignment: .trailing) {
+                        let forcedSingleRecipient = conversationViewModel.recipients?.forcedPreselectedRecipient()
+
                         if let messageRecipient = conversationViewModel.messageRecipient {
                             Text("\(messageRecipient.displayName)")
                                 .textStyle(SelectRecipientTextStyle())
                                 .disableAutocorrection(true)
                                 .autocapitalization(.none)
                                 .accessibilityIdentifier("Selected Recipient is \(messageRecipient.displayName)")
+                                .onTapGesture {
+                                    if forcedSingleRecipient != nil {
+                                        showingForcedSelectionAlert = true
+                                    }
+                                }
+                                .alert(
+                                    "During this test period you can only contact a single Guardian recipient.",
+                                    isPresented: $showingForcedSelectionAlert
+                                ) {
+                                    Button("Dismiss", role: .cancel) {}
+                                }
                         } else {
                             Text("No recipient selected")
                                 .textStyle(SelectRecipientTextStyle())
@@ -71,7 +85,7 @@ struct NewMessageView: View {
                                 .autocapitalization(.none)
                                 .accessibilityIdentifier("Selected Recipient")
                         }
-                        if let recipients = conversationViewModel.recipients {
+                        if let recipients = conversationViewModel.recipients, forcedSingleRecipient == nil {
                             Button(action: {
                                 isSelectRecipientViewOpen = true
                             }, label: {
