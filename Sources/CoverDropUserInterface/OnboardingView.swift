@@ -21,7 +21,6 @@ struct OnboardingView: View {
             }
             .padding([.top, .leading, .trailing, .bottom], Padding.large)
             .foregroundColor(Color.white)
-            Spacer()
 
             Button(viewModel.currentStep.buttonText) {
                 if viewModel.isFinalStep() {
@@ -46,13 +45,16 @@ struct OnboardingView: View {
     func onboardingStep(step: OnboardingSteps) -> some View {
         GeometryReader { metric in
             VStack(alignment: .center, spacing: 0) {
+                Spacer()
                 Group {
                     step.image
                         .frame(width: 200, height: 200)
                         .padding([.bottom], Padding.large)
                     // the .frame sets the height as a percentage of the parent.
-                    // Totally a magic number that works with and without the beta banner present
-                }.frame(height: metric.size.height * 0.58)
+                    // Totally magic numbers that works with and without the beta banner present
+                    // on both iPhone 16 and iPhone SE 3rd gen
+                }.frame(height: metric.size.height * 0.5 - 100)
+                Spacer()
 
                 Text("How this works")
                     .textStyle(TitleStyle())
@@ -63,7 +65,7 @@ struct OnboardingView: View {
                     .padding(.bottom, Padding.medium)
                 Text(step.description)
                     .textStyle(BodyStyle())
-                    .padding(.top, Padding.small)
+                    .padding([.top, .bottom], Padding.small)
                     .padding([.leading, .trailing], Padding.medium)
                 Spacer()
 

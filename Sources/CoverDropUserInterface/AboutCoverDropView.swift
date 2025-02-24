@@ -62,65 +62,67 @@ struct AboutCoverDropView: View {
                     navPath.removeLast()
                 }
             }) {
-                VStack(alignment: .leading) {
-                    Text("About Secure Messaging")
-                        .textStyle(LargeTitleStyle())
-                        .font(Font.headline.leading(.loose))
+                ScrollView {
+                    VStack(alignment: .leading) {
+                        Text("About Secure Messaging")
+                            .textStyle(LargeTitleStyle())
+                            .font(Font.headline.leading(.loose))
 
-                    Text("What this is for")
-                        .textStyle(GuardianHeaderTextStyle())
-                        .padding([.top], Padding.large)
-                        .padding([.bottom], Padding.small)
-                    ChevronButtonList(navPath: $navPath, buttonData: [
-                        ChevronButtonData(
-                            text: "Why we made Secure Messaging",
-                            target: .whyWeMadeSecureMessaging
-                        ),
-                        ChevronButtonData(
-                            text: "How Secure Messaging works",
-                            target: .howSecureMessagingWorks
-                        ),
-                        ChevronButtonData(
-                            text: "FAQs",
-                            target: .faq
-                        ),
-                        ChevronButtonData(
-                            text: "Privacy policy",
-                            target: .privacyPolicy
-                        )
-                    ])
+                        Text("What this is for")
+                            .textStyle(GuardianHeaderTextStyle())
+                            .padding([.top], Padding.large)
+                            .padding([.bottom], Padding.small)
+                        ChevronButtonList(navPath: $navPath, buttonData: [
+                            ChevronButtonData(
+                                text: "Why we made Secure Messaging",
+                                target: .whyWeMadeSecureMessaging
+                            ),
+                            ChevronButtonData(
+                                text: "How Secure Messaging works",
+                                target: .howSecureMessagingWorks
+                            ),
+                            ChevronButtonData(
+                                text: "FAQs",
+                                target: .faq
+                            ),
+                            ChevronButtonData(
+                                text: "Privacy policy",
+                                target: .privacyPolicy
+                            )
+                        ])
 
-                    Text("Getting started")
-                        .textStyle(GuardianHeaderTextStyle())
-                        .padding([.top], Padding.large)
-                        .padding([.bottom], Padding.small)
-                    ChevronButtonList(navPath: $navPath, buttonData: [
-                        ChevronButtonData(
-                            text: "Craft your first message",
-                            target: .craftMessage
-                        ),
-                        ChevronButtonData(
-                            text: "Keeping passphrases safe",
-                            target: .keepingPassphraseSafe
-                        )
-                    ])
+                        Text("Getting started")
+                            .textStyle(GuardianHeaderTextStyle())
+                            .padding([.top], Padding.large)
+                            .padding([.bottom], Padding.small)
+                        ChevronButtonList(navPath: $navPath, buttonData: [
+                            ChevronButtonData(
+                                text: "Craft your first message",
+                                target: .craftMessage
+                            ),
+                            ChevronButtonData(
+                                text: "Keeping passphrases safe",
+                                target: .keepingPassphraseSafe
+                            )
+                        ])
 
-                    Text("As the conversation progresses")
-                        .textStyle(GuardianHeaderTextStyle())
-                        .padding([.top], Padding.large)
-                        .padding([.bottom], Padding.small)
-                    ChevronButtonList(navPath: $navPath, buttonData: [
-                        ChevronButtonData(
-                            text: "What to expect as a reply",
-                            target: .replyExpectations
-                        ),
-                        ChevronButtonData(
-                            text: "Source protection",
-                            target: .sourceProtection
-                        )
-                    ])
-                }.padding(Padding.large)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        Text("As the conversation progresses")
+                            .textStyle(GuardianHeaderTextStyle())
+                            .padding([.top], Padding.large)
+                            .padding([.bottom], Padding.small)
+                        ChevronButtonList(navPath: $navPath, buttonData: [
+                            ChevronButtonData(
+                                text: "What to expect as a reply",
+                                target: .replyExpectations
+                            ),
+                            ChevronButtonData(
+                                text: "Source protection",
+                                target: .sourceProtection
+                            )
+                        ])
+                    }.padding(Padding.large)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                }
                 Spacer()
             }
         }.foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
