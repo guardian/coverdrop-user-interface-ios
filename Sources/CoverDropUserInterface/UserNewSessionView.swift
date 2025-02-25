@@ -228,7 +228,7 @@ struct UserNewSessionView: View {
     }
 }
 
-@MainActor class UserNewSessionViewModel: ObservableObject {
+class UserNewSessionViewModel: ObservableObject {
     enum State {
         case generating
         case remember(passphrase: ValidPassword, passphraseWords: [String], visible: Bool)
@@ -240,7 +240,7 @@ struct UserNewSessionView: View {
     var lib: CoverDropLibrary
     var validPrefixes = Set<String>()
 
-    @Published var state: State = .generating
+    @MainActor @Published var state: State = .generating
     @Published var error: Error?
 
     // We keep these separate to so that they can survive navigating back-and-forth and allow easier
@@ -257,7 +257,7 @@ struct UserNewSessionView: View {
         self.lib = lib
     }
 
-    func initializeWithNewPassphrase(passphraseWordCount: Int) {
+    @MainActor func initializeWithNewPassphrase(passphraseWordCount: Int) {
         if case .generating = state {
             validPrefixes = PasswordGenerator.shared.generatePrefixes()
             let passphrase = EncryptedStorage.newStoragePassphrase(passphraseWordCount: passphraseWordCount)
@@ -271,7 +271,7 @@ struct UserNewSessionView: View {
         }
     }
 
-    func showAll() {
+    @MainActor func showAll() {
         if case let .remember(passphrase, passphraseWords, _) = state {
             state = .remember(passphrase: passphrase, passphraseWords: passphraseWords, visible: true)
         }
@@ -280,7 +280,7 @@ struct UserNewSessionView: View {
         }
     }
 
-    func hideAll() {
+    @MainActor func hideAll() {
         if case let .remember(passphrase, passphraseWords, _) = state {
             state = .remember(passphrase: passphrase, passphraseWords: passphraseWords, visible: false)
         }
@@ -289,7 +289,7 @@ struct UserNewSessionView: View {
         }
     }
 
-    func advanceToEnter() {
+    @MainActor func advanceToEnter() {
         guard case let .remember(passphrase, passphraseWords, _) = state else {
             return
         }
@@ -305,7 +305,7 @@ struct UserNewSessionView: View {
         state = .confirm(passphrase: passphrase)
     }
 
-    func goBackToRemember() {
+    @MainActor func goBackToRemember() {
         guard case let .confirm(passphrase) = state else {
             return
         }
@@ -317,7 +317,7 @@ struct UserNewSessionView: View {
     }
 
     func createNewStorage() async {
-        guard case let .confirm(passphrase) = state else {
+        guard case let .confirm(passphrase) = await state else {
             return
         }
 
@@ -340,7 +340,8 @@ struct UserNewSessionView: View {
             error = nil
         }
 
-        state = .creating(passphrase: passphrase)
+        await MainActor.run { state = .creating(passphrase: passphrase) }
+
         do {
             _ = try EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: passphrase)
             try? await lib.secretDataRepository.unlock(passphrase: passphrase)
