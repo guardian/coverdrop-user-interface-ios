@@ -59,7 +59,7 @@ public struct StartCoverDropSessionView: View {
                     }
                     .disabled(!publicDataRepository.areKeysAvailable)
                     .buttonStyle(PrimaryButtonStyle(isDisabled: !publicDataRepository.areKeysAvailable))
-                    .alert("Set up your secure inbox", isPresented: $showingNewMessageAlert, actions: {
+                    .alert("Set up your secure message vault", isPresented: $showingNewMessageAlert, actions: {
                         Button("Yes, start conversation") {
                             navPath.append(Destination.onboarding)
                         }
@@ -67,8 +67,9 @@ public struct StartCoverDropSessionView: View {
                     }, message: {
                         Text(
                             """
-                            Starting a new conversation will remove any prior messages from your inbox,
-                            if they existed. Do you want to continue?
+                            Starting a new conversation will remove any prior messages from your vault, \
+                            if they existed. 
+                            Do you want to continue?
                             """
                         )
                     })
