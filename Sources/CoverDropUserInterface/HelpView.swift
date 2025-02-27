@@ -11,24 +11,24 @@ enum HelpScreenContent: Error, Equatable {
     case sourceProtection
     case whyWeMadeSecureMessaging
 
-    func resourceName() -> String {
+    func getContent() -> String {
         return switch self {
         case .craftMessage:
-            "help_craft_message"
+            helpMarkdownCraftMessage
         case .faq:
-            "help_faq"
+            helpMarkdownFaq
         case .howSecureMessagingWorks:
-            "help_how_secure_messaging_works"
+            helpMarkdownHowSecureMessagingWorks
         case .keepingPassphraseSafe:
-            "help_keeping_passphrase_safe"
+            helpMarkdownKeepingPassphrasesSafe
         case .privacyPolicy:
-            "help_privacy_policy"
+            helpMarkdownPrivacyPolicy
         case .replyExpectations:
-            "help_reply_expectations"
+            helpMarkdownReplyExpectations
         case .sourceProtection:
-            "help_source_protection"
+            helpMarkdownSourceProtection
         case .whyWeMadeSecureMessaging:
-            "help_why_we_made_secure_messaging"
+            helpMarkdownWhyWeMadeSecureMessaging
         }
     }
 
@@ -101,16 +101,16 @@ struct HelpView: View {
 
     init(contentVariant: HelpScreenContent, navPath: Binding<NavigationPath>) {
         self.init(
-            fromResourceName: contentVariant.resourceName(),
+            withContent: contentVariant.getContent(),
             onClickMapping: contentVariant.buttonToContentMapping(),
             navPath: navPath
         )
     }
 
-    init(fromResourceName: String, onClickMapping: [String: HelpScreenContent], navPath: Binding<NavigationPath>) {
+    init(withContent: String, onClickMapping: [String: HelpScreenContent], navPath: Binding<NavigationPath>) {
         _navPath = navPath
         do {
-            let components = try loadComponentsFromMarkupFile(resourceName: fromResourceName)
+            let components = try loadComponentsFromMarkupString(markupString: withContent)
             // print("got components \(components)")
             try checkForMissingAndDanglingIdentifiers(components: components, onClickMapping: onClickMapping)
             content = .success((components, onClickMapping))
@@ -151,15 +151,9 @@ struct HelpView: View {
 }
 
 /// Reads and parses the given help screen markup and then returns the found list of `HelpScreenComponent`
-private func loadComponentsFromMarkupFile(resourceName: String) throws -> [HelpScreenComponent] {
-    guard let url = Bundle.module.url(forResource: resourceName, withExtension: "txt") else {
-        throw HelpScreenContentError.markupFileInvalid(resourceName: resourceName)
-    }
-    guard let markup = try? String(contentsOf: url, encoding: .utf8) else {
-        throw HelpScreenContentError.markupFileInvalid(resourceName: resourceName)
-    }
+private func loadComponentsFromMarkupString(markupString: String) throws -> [HelpScreenComponent] {
     do {
-        return try HelpScreenMarkupParser().parseHelpScreenMarkup(markup: markup)
+        return try HelpScreenMarkupParser().parseHelpScreenMarkup(markup: markupString)
     } catch let err as HelpScreenMarkupParsingError {
         throw HelpScreenContentError.badMarkup(markupParsingError: err)
     }
