@@ -72,7 +72,7 @@ public struct StartCoverDropSessionView: View {
                         Text(
                             """
                             Starting a new conversation will remove any prior messages from your vault, \
-                            if they existed. 
+                            if they existed.
                             Do you want to continue?
                             """
                         )
