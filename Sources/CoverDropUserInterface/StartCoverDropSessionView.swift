@@ -17,14 +17,18 @@ public struct StartCoverDropSessionView: View {
 
                 Text(
                     """
-                    Our Secure Messaging service was developed by the Guardian to allow you to share \
-                    stories with us securely and privately using strong encryption. \
-                    It is designed to prevent others from even knowing you are in\
-                    communication with us.
+                    The Guardian Secure Messaging service was developed to allow you to share stories with us \
+                    securely and privately using strong encryption.
                     """
                 )
                 .textStyle(BodyStyle())
-                .padding(.vertical, Padding.medium)
+                .padding(.top, Padding.medium)
+                .padding(.bottom, Padding.small)
+
+                Text("It is designed to prevent others from even know you are in communication with us.")
+                    .textStyle(BodyStyle())
+                    .padding(.top, Padding.small)
+                    .padding(.bottom, Padding.medium)
 
                 Button(action: {
                     navPath.append(Destination.about)
