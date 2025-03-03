@@ -36,7 +36,7 @@ struct HeaderView<Content: View>: View {
                             guard let dismissAction else { presentation.wrappedValue.dismiss(); return }
                             dismissAction()
                         }) {
-                            Image(systemName: "arrow.backward")
+                            Image(systemName: backButtonImageName())
                                 .resizable()
                                 .frame(width: 25, height: 25)
                                 .padding(Padding.large)
@@ -50,9 +50,9 @@ struct HeaderView<Content: View>: View {
 
                     if let image = Bundle.module.url(forResource: "logo", withExtension: "svg") {
                         SVGView(contentsOf: image)
-                            .frame(width: 200, height: 50)
+                            .frame(width: 180, height: 45)
                             .padding([.trailing], Padding.large)
-                            .padding([.top], Padding.small)
+                            .padding([.vertical], Padding.medium)
                     }
                 }
                 .background(Color.HeaderView.backgroundColor)
@@ -79,9 +79,15 @@ struct HeaderView<Content: View>: View {
                 }
             }
             .alert(
-                """
-                This is a test version of a new feature.
-
+                "This is a test version of a new feature.",
+                isPresented: $showingBetaBannerAlert
+            ) {
+                Button("Ok", role: .cancel) {}
+                Button("Hide warning", role: .destructive) {
+                    showBetaBanner = false
+                }
+            } message: {
+                Text("""
                 You can try it out but please do not yet use it to \
                 tell us anything that is very important or sensitive.
 
@@ -90,13 +96,7 @@ struct HeaderView<Content: View>: View {
                 When the feature is ready for full use we will remove the 'Beta' warnings.
 
                 You can temporarily hide the warning banner for this session.
-                """,
-                isPresented: $showingBetaBannerAlert
-            ) {
-                Button("Ok", role: .cancel) {}
-                Button("Hide warning", role: .destructive) {
-                    showBetaBanner = false
-                }
+                """)
             }
         }.onReceive(NotificationCenter.default.publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
             showingScreenshotDetectedAlert = true
@@ -110,6 +110,16 @@ struct HeaderView<Content: View>: View {
         case .home, .about, .messageSent, .newConversation,
              .deskDetail, .selectRecipient, .newPassphrase, .help:
             return "Go Back"
+        }
+    }
+
+    func backButtonImageName() -> String {
+        switch type {
+        case .login, .viewConversation, .onboarding, .inbox, .about, .messageSent, .newConversation,
+             .deskDetail, .selectRecipient, .newPassphrase, .help:
+            return "arrow.backward"
+        case .home:
+            return "xmark"
         }
     }
 }

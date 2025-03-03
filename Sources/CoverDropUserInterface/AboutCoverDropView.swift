@@ -31,7 +31,7 @@ struct ChevronButtonList: View {
                                 .fontWeight(.semibold)
                                 .frame(width: 7, height: 11)
                                 .foregroundColor(Color.ChevronButtonList.chevronColor)
-                                .padding([.trailing], Padding.small)
+                                .padding([.trailing], Padding.medium)
                         }
                     }
                     if index < buttonData.count - 1 {
@@ -41,7 +41,7 @@ struct ChevronButtonList: View {
                             .padding(.vertical, Padding.small)
                     }
                 }
-            }.padding(.horizontal, Padding.medium)
+            }.padding(.leading, Padding.medium)
                 .padding(.vertical, Padding.small)
         }.background(Color.ChevronButtonList.backgroundColor)
             .cornerRadius(CornerRadius.medium)

@@ -13,6 +13,7 @@ public struct SecurityAlert: View {
         }) {
             VStack(alignment: .leading, spacing: Padding.medium) {
                 Text("Secure Messaging is not available. We believe that this device might not be secure.")
+                    .fontWeight(.semibold)
                 getViolationMessages(violations: securitySuite.getEffectiveViolationsSet())
                 Text(
                     """
@@ -31,7 +32,7 @@ public struct SecurityAlert: View {
     }
 
     func getViolationMessages(violations: IntegrityViolations) -> some View {
-        return VStack(alignment: .leading) {
+        return VStack(alignment: .leading, spacing: 10) {
             if violations.contains(.deviceJailbroken) {
                 Text("- \(IntegrityViolations.deviceJailbroken.message)")
             }
