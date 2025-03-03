@@ -63,8 +63,9 @@ struct OnboardingView: View {
                     .textStyle(GuardianHeaderTextStyle())
                     .foregroundColor(Color.OnboardingView.textForegroundColor)
                     .padding(.bottom, Padding.medium)
+
                 Text(step.description)
-                    .textStyle(BodyStyle())
+                    .textStyle(BodyStyle(textAlignment: .center))
                     .padding([.top, .bottom], Padding.small)
                     .padding([.leading, .trailing], Padding.medium)
                 Spacer()
@@ -113,14 +114,14 @@ enum OnboardingSteps: String, CustomStringConvertible, CaseIterable, Identifiabl
             """
         case .checkResponse:
             return """
-            Our journalists monitor secure messages regularly. \
-            If they wish to take your story further they will respond here. \
-            To stay in touch you will need to return to your secure inbox using your passphrase.
+            Our journalists check for new messages regularly. \
+            If they wish to take your story further they will respond here.
             """
         case .getPassphrase:
             return """
-            You will been shown a unique passphrase which you will use to unlock your secure inbox. \
-            Please make sure you memorise it so you can return to your secure inbox later.
+            Shortly you will be given a unique passphrase. \
+            Use this to access your conversation. \
+            Please memorise it or record it somewhere secure.
             """
         }
     }

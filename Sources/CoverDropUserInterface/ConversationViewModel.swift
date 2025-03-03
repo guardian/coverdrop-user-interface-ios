@@ -149,6 +149,14 @@ struct MessageData {
             let (_, compressedSize) = try PaddedCompressedString.compressCheckingLength(from: message)
             // Check the size is greater than 0 to avoid returning `Infinity`
             if compressedSize > 0 {
+                if message.count < 30 {
+                    // So our compression algo requires 20 bytes overhead when compressing 1 byte,
+                    // So a single character outputs 4% of progress complete.
+                    // To smooth this out the percentage progress bar
+                    // any message byte length below 30 has the percentage calculated by dividing the value by 4
+                    // then we round up the first 4 characters so they are consider 1%
+                    return .success(ceil(Double(message.count) / 4))
+                }
                 let percentage = Double(compressedSize) / Double(padToSize) * 100
                 return .success(percentage)
             } else {

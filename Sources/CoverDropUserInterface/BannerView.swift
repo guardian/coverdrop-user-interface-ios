@@ -42,7 +42,7 @@ struct CraftMessageBannerView: View {
                    imagePath: "info.circle.fill",
                    backgroundColor: Color.PasswordBannerView.backgroundColor,
                    textColor: Color.PasswordBannerView.textForegroundColor,
-                   titleText: "Crafting your first message",
+                   titleText: "Craft your first message",
                    subtitleText: "Learn more")
     }
 }

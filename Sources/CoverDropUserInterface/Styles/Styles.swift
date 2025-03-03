@@ -38,7 +38,7 @@ struct PassphraseFieldStyle: TextFieldStyle {
         configuration
             .frame(height: 20)
             .padding(Padding.large)
-            .font(.textSansRegular, size: FontSize.textField)
+            .monospaced()
             .background(
                 RoundedRectangle(cornerRadius: CornerRadius.small).stroke(
                     isError ? Color.PassphraseFieldStyle.errorColor : Color.PassphraseFieldStyle.strokeColor,
@@ -46,7 +46,6 @@ struct PassphraseFieldStyle: TextFieldStyle {
                 )
             )
             .background(Color.PassphraseFieldStyle.backgroundColor)
-
     }
 }
 
@@ -87,11 +86,13 @@ struct TitleStyle: ViewModifier {
 }
 
 struct BodyStyle: ViewModifier {
+    var textAlignment: TextAlignment = .leading
     func body(content: Content) -> some View {
         content
             .font(.textSansRegular,
                   size: FontSize.bodyText,
-                  lineHeight: 23)
+                  lineHeight: 23,
+                  alignment: textAlignment)
             .padding(.bottom, Padding.small)
     }
 }
@@ -212,12 +213,14 @@ struct PassphraseTextStyle: ViewModifier {
     func body(content: Content) -> some View {
         return content
             .font(.textSansBold, size: FontSize.textField)
+            .monospaced()
             .padding(Padding.large)
-            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, minHeight: 50, alignment: .center)
             .overlay(
                 RoundedRectangle(cornerRadius: CornerRadius.small)
                     .stroke(Color.PassphraseTextStyle.strokeColor, style: StrokeStyle(lineWidth: 1, dash: [3]))
             )
+            .padding([.bottom], Padding.small)
     }
 }
 

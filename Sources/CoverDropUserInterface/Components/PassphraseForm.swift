@@ -18,7 +18,7 @@ func passphraseForm(
                     Button(action: {
                         wordVisible[id].wrappedValue = false
                     }, label: {
-                        Image(systemName: "eye.fill")
+                        Image(systemName: "eye.slash.fill")
                     }).accessibilityIdentifier("show \(id + 1)")
                         .padding([.trailing], Padding.medium)
                         .frame(height: 25)
@@ -32,7 +32,7 @@ func passphraseForm(
                     Button(action: {
                         wordVisible[id].wrappedValue = true
                     }, label: {
-                        Image(systemName: "eye.slash.fill")
+                        Image(systemName: "eye.fill")
                     }).accessibilityIdentifier("hide \(id + 1)")
                         .padding([.trailing], Padding.medium)
                         .frame(height: 25)

@@ -52,9 +52,9 @@ struct NewMessageView: View {
                     Text("What do you want to share with us?")
                         .textStyle(TitleStyle())
                     VStack(alignment: .leading, spacing: 0) {
-                        Text("Who would you like to contact?")
+                        Text("Select a journalist or team")
                             .textStyle(FormLabelTextStyle())
-                        Text("Change the recipient if you know which team or journalist you would like to contact.")
+                        Text("Your message is reviewed by journalists")
                             .textStyle(BodyStyle())
                     }
 
@@ -164,7 +164,7 @@ struct NewMessageView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text("What's your message?")
                 .textStyle(FormLabelTextStyle())
-            Text("Please include a bit about yourself.")
+            Text("What do you need to share.")
                 .textStyle(FormLabelSubtitleTextStyle())
         }
         VStack(alignment: .leading, spacing: 0) {

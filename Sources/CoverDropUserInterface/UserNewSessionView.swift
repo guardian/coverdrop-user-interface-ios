@@ -68,15 +68,16 @@ struct UserNewSessionView: View {
             }
             .padding(Padding.large)
             .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-
-            tertiaryButton(
-                action: {
-                    navPath.isEmpty ? () : navPath.removeLast() // remove this screen
-                    navPath.isEmpty ? () : navPath.removeLast() // remove onboarding screen
-                    navPath.append(Destination.login)
-                },
-                text: "I already have a passphrase"
-            ).ignoresSafeArea(.keyboard, edges: .bottom)
+            if case .remember = viewModel.state {
+                tertiaryButton(
+                    action: {
+                        navPath.isEmpty ? () : navPath.removeLast() // remove this screen
+                        navPath.isEmpty ? () : navPath.removeLast() // remove onboarding screen
+                        navPath.append(Destination.login)
+                    },
+                    text: "I already have a passphrase"
+                ).ignoresSafeArea(.keyboard, edges: .bottom)
+            }
         }.navigationBarHidden(true)
             .onAppear {
                 Task {
@@ -126,7 +127,7 @@ struct UserNewSessionView: View {
             hideShowButton(
                 visible: visible,
                 viewModel: viewModel,
-                textShowAll: "Show passphrase",
+                textShowAll: "Reveal passphrase",
                 textHideAll: "Hide passphrase"
             )
 
@@ -137,7 +138,7 @@ struct UserNewSessionView: View {
                     viewModel.advanceToEnter()
                 }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
             } else {
-                Button("Reveal passphrase") {
+                Button("\(Image(systemName: "eye.fill")) Reveal passphrase") {
                     viewModel.showAll()
                 }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
             }
@@ -146,7 +147,7 @@ struct UserNewSessionView: View {
 
     func confirmPassphraseView(viewModel: UserNewSessionViewModel) -> some View {
         VStack(alignment: .leading) {
-            Text("Enter Passphrase").textStyle(TitleStyle())
+            Text("Enter passphrase").textStyle(TitleStyle())
             Text("Enter your passphrase to unlock your secure vault and send your first message.")
                 .textStyle(BodyStyle())
                 .padding(.bottom, Padding.large)
@@ -159,17 +160,19 @@ struct UserNewSessionView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            passphraseForm(
-                wordCount: passphraseWordCount,
-                words: $viewModel.enteredWords,
-                wordVisible: $viewModel.wordVisible,
-                wordInvalid: viewModel.invalidWords
-            )
+            ScrollView {
+                passphraseForm(
+                    wordCount: passphraseWordCount,
+                    words: $viewModel.enteredWords,
+                    wordVisible: $viewModel.wordVisible,
+                    wordInvalid: viewModel.invalidWords
+                )
 
-            hideShowButton(
-                visible: viewModel.wordVisible.allSatisfy { $0 },
-                viewModel: viewModel
-            )
+                hideShowButton(
+                    visible: viewModel.wordVisible.allSatisfy { $0 },
+                    viewModel: viewModel
+                )
+            }
 
             Spacer()
 
@@ -189,7 +192,7 @@ struct UserNewSessionView: View {
                         .textStyle(PassphraseTextStyle())
                         .accessibilityIdentifier("Word \(id + 1)")
                 } else {
-                    Text("●●●●●●").textStyle(PassphraseTextStyle())
+                    Text("••••••").textStyle(PassphraseTextStyle())
                 }
 
             }.frame(maxWidth: .infinity)
@@ -200,17 +203,17 @@ struct UserNewSessionView: View {
     private func hideShowButton(
         visible: Bool,
         viewModel: UserNewSessionViewModel,
-        textShowAll: String = "Show all",
-        textHideAll: String = "Hide all"
+        textShowAll: String = "Reveal passphrase",
+        textHideAll: String = "Hide passphrase"
     ) -> some View {
         HStack {
             Spacer()
             if visible {
-                Button(textHideAll) {
+                Button("\(Image(systemName: "eye.slash.fill")) \(textHideAll)") {
                     viewModel.hideAll()
                 }.buttonStyle(InlineButtonStyle())
             } else {
-                Button(textShowAll) {
+                Button("\(Image(systemName: "eye.fill")) \(textShowAll)") {
                     viewModel.showAll()
                 }.buttonStyle(InlineButtonStyle())
             }

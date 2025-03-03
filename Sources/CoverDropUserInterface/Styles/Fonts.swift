@@ -16,13 +16,15 @@ public struct FontPad: ViewModifier {
         fontSize: CGFloat,
         lineHeight: CGFloat? = nil,
         relativeStyle: Font.TextStyle,
-        verticalTrim: VerticalTrim
+        verticalTrim: VerticalTrim,
+        alignment: TextAlignment = .leading
     ) {
         self.fontName = fontName
         self.fontSize = fontSize
         self.lineHeight = lineHeight
         self.relativeStyle = relativeStyle
         self.verticalTrim = verticalTrim
+        self.alignment = alignment
 
         font = UIFont(name: fontName, size: fontSize)
     }
@@ -33,7 +35,7 @@ public struct FontPad: ViewModifier {
     let relativeStyle: Font.TextStyle
 
     let verticalTrim: VerticalTrim
-
+    let alignment: TextAlignment
     let font: UIFont?
 
     private var topValue: CGFloat {
@@ -60,7 +62,7 @@ public struct FontPad: ViewModifier {
             // This is no longer supported on Xcode 15.
             // We are actively looking for a workaround.
             // ._lineHeightMultiple(lineMultiple)
-            .multilineTextAlignment(.leading)
+            .multilineTextAlignment(alignment)
             .padding(
                 .top,
                 topValue
@@ -196,7 +198,8 @@ public extension View {
         _ style: CoverDropFonts.GuardianFontStyle,
         size: CGFloat,
         lineHeight: CGFloat? = nil,
-        verticalTrim: VerticalTrim = .capToBaseline
+        verticalTrim: VerticalTrim = .capToBaseline,
+        alignment: TextAlignment = .leading
     ) -> some View {
         modifier(
             FontPad(
@@ -204,7 +207,8 @@ public extension View {
                 fontSize: size,
                 lineHeight: lineHeight,
                 relativeStyle: style.relativeStyle,
-                verticalTrim: verticalTrim
+                verticalTrim: verticalTrim,
+                alignment: alignment
             )
         )
     }

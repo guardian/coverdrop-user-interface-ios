@@ -83,23 +83,25 @@ struct UserContinueSessionView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            passphraseForm(
-                wordCount: viewModel.wordCount,
-                words: $viewModel.enteredWords,
-                wordVisible: $viewModel.wordVisible,
-                wordInvalid: viewModel.invalidWords
-            )
+            ScrollView {
+                passphraseForm(
+                    wordCount: viewModel.wordCount,
+                    words: $viewModel.enteredWords,
+                    wordVisible: $viewModel.wordVisible,
+                    wordInvalid: viewModel.invalidWords
+                )
 
-            HStack {
-                Spacer()
-                if viewModel.wordVisible.allSatisfy({ $0 }) {
-                    Button("Hide all") {
-                        viewModel.hideAll()
-                    }.buttonStyle(InlineButtonStyle())
-                } else {
-                    Button("Show all") {
-                        viewModel.showAll()
-                    }.buttonStyle(InlineButtonStyle())
+                HStack {
+                    Spacer()
+                    if viewModel.wordVisible.allSatisfy({ $0 }) {
+                        Button("Hide all") {
+                            viewModel.hideAll()
+                        }.buttonStyle(InlineButtonStyle())
+                    } else {
+                        Button("Show all") {
+                            viewModel.showAll()
+                        }.buttonStyle(InlineButtonStyle())
+                    }
                 }
             }
 
