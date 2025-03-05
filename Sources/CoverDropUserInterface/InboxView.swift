@@ -28,6 +28,7 @@ struct InboxView: View {
                 footer
             }
             .navigationBarHidden(true)
+            .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
         }
     }
 
@@ -39,34 +40,46 @@ struct InboxView: View {
     @ViewBuilder
     func activeConversationView(for activeConversation: ActiveConversation) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 0) {
-                messagingTitle()
-                    .textStyle(GuardianHeadlineSmallTextStyle())
-                    .foregroundColor(Color.InboxView.activeMessageSubHeaderColor)
-                Text(activeConversation.recipient.displayName)
-                    .textStyle(TitleStyle())
-                    .foregroundColor(Color.InboxView.activeMessageRecipientColor)
-                    .onTapGesture {
-                        conversationViewModel.messageRecipient = activeConversation.recipient
-                        navPath.append(Destination.viewConversation)
+            Button(action: {
+                conversationViewModel.messageRecipient = activeConversation.recipient
+                navPath.append(Destination.viewConversation)
+            }) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 0) {
+                        messagingTitle()
+                            .textStyle(GuardianHeadlineSmallTextStyle())
+                            .foregroundColor(Color.InboxView.activeMessageSubHeaderColor)
+                        Text(activeConversation.recipient.displayName)
+                            .textStyle(TitleStyle())
+                            .foregroundColor(Color.InboxView.activeMessageRecipientColor)
+
+                            .padding([.top], Padding.medium)
                     }
+                    .padding([.top, .leading, .trailing], Padding.large)
+                    .padding(.bottom, Padding.small)
+                    Spacer()
+                    Image(systemName: "chevron.forward")
+                        .resizable()
+                        .fontWeight(.semibold)
+                        .frame(width: 7, height: 11)
+                        .foregroundColor(Color.ChevronButtonList.chevronColor)
+                        .padding([.trailing], Padding.medium)
+                }
             }
-            .padding([.top, .leading, .trailing], Padding.large)
-            .padding(.bottom, Padding.small)
             customDivider()
-            HStack(alignment: .top, spacing: 2) {
+            HStack(alignment: .top) {
                 Image(systemName: "bubble.left")
                     .foregroundColor(Color.InboxView.lastMessageBubbleColor)
-                    .padding([.top], Padding.small)
 
                 Text("Last message")
-                    .textStyle(MessageDetailTextStyle()).padding([.top], Padding.small)
+                    .textStyle(MessageDetailTextStyle())
                 Spacer()
                 Text(activeConversation.formattedLastMessageUpdated)
                     .textStyle(MessageMetadata())
+                    .padding([.top], Padding.small)
             }
             .padding([.leading, .trailing], Padding.large)
-            .padding([.top, .bottom], Padding.medium)
+            .padding([.top], Padding.small)
             if inboxViewModel.activeConversation?.containsExpiringMessages != nil,
                let expiredDate = inboxViewModel.activeConversation?.messageExpiringDate {
                 customDivider()
@@ -130,10 +143,10 @@ struct InboxView: View {
                 }
             }
             .accessibilityLabel("Delete your messages")
-            .alert("Delete all conversations?",
+            .alert("Delete your conversations?",
                    isPresented: $showingDeleteAlert,
                    actions: {
-                       Button("Yes, delete conversations", role: .destructive) {
+                       Button("Delete", role: .destructive) {
                            Task {
                                try? await inboxViewModel.deleteAllMessagesAndCurrentSession(
                                    conversationViewModel: conversationViewModel
@@ -144,8 +157,8 @@ struct InboxView: View {
                    }, message: {
                        Text(
                            """
-                           Deleting all conversations will remove all messages from your device.
-                           This cannot be undone. Would you like to proceed?
+                           Deleting your messages means the journalist might never see them.
+                           Please consider keeping this conversation.
                            """
                        )
                    })
@@ -182,5 +195,34 @@ struct InboxView: View {
             .foregroundColor(Color.NewMessageView.messageInformationStrokeColor)
             .padding([.top, .trailing, .bottom], Padding.medium)
             .padding([.leading], 0)
+    }
+}
+
+#Preview {
+    @Previewable @State var loaded: Bool = false
+    @Previewable @State var conversationViewModel: ConversationViewModel?
+    @Previewable @State var inboxViewModel: InboxViewModel?
+    Group {
+        if loaded {
+            InboxView(
+                inboxViewModel: inboxViewModel!,
+                conversationViewModel: conversationViewModel!,
+                navPath: .constant(NavigationPath())
+            )
+        } else {
+            Group {
+                LoadingView()
+            }
+        }
+    }.onAppear {
+        Task {
+            let context = IntegrationTestScenarioContext(scenario: .minimal, config: StaticConfig.devConfig)
+            let lib = try context.getLibraryWithVerifiedKeys()
+            let data = try await CoverDropServiceHelper.addTestMessagesToLib(lib: lib)
+            lib.secretDataRepository.setUnlockedDataForTesting(unlockedData: data)
+            inboxViewModel = InboxViewModel(lib: lib)
+            conversationViewModel = ConversationViewModel(lib: lib)
+            loaded = true
+        }
     }
 }

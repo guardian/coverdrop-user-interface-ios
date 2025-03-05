@@ -22,6 +22,7 @@ private extension Color {
         static let green500 = Color(red: 88 / 255, green: 208 / 255, blue: 139 / 255)
         static let error500 = Color(red: 255 / 255, green: 144 / 255, blue: 129 / 255)
         static let brand800 = Color(red: 193 / 255, green: 216 / 255, blue: 252 / 255)
+        static let orange = Color(red: 255 / 255, green: 127 / 255, blue: 15 / 255)
     }
 }
 
@@ -150,7 +151,7 @@ extension Color {
     enum NewMessageView {
         static let foregroundColor = GuardianColor.neutral100
         static let messageInformationColor = GuardianColor.neutral100
-        static let messageInformationStrokeColor = GuardianColor.brand800
+        static let messageInformationStrokeColor = GuardianColor.orange
         static let messageToLongErrorColor = GuardianColor.error500
     }
 

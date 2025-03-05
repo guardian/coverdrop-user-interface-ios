@@ -244,7 +244,7 @@ class UserNewSessionViewModel: ObservableObject {
     var validPrefixes = Set<String>()
 
     @MainActor @Published var state: State = .generating
-    @Published var error: Error?
+    @MainActor @Published var error: Error?
 
     // We keep these separate to so that they can survive navigating back-and-forth and allow easier
     // binding from the TextFields
@@ -325,22 +325,30 @@ class UserNewSessionViewModel: ObservableObject {
         }
 
         if enteredWords.contains(where: { $0.isEmpty }) {
-            error = NewSessionError.missingWords
+            await MainActor.run {
+                error = NewSessionError.missingWords
+            }
             return
         }
 
         let enteredPassphrase = enteredWords.joined(separator: " ")
 
         guard let validatedPassphrase = try? PasswordGenerator.checkValid(passwordInput: enteredPassphrase) else {
-            error = NewSessionError.misspeltWords
+            await MainActor.run {
+                error = NewSessionError.misspeltWords
+            }
             return
         }
 
         if validatedPassphrase != passphrase {
-            error = NewSessionError.wrongPassphrase
+            await MainActor.run {
+                error = NewSessionError.wrongPassphrase
+            }
             return
         } else {
-            error = nil
+            await MainActor.run {
+                error = nil
+            }
         }
 
         await MainActor.run { state = .creating(passphrase: passphrase) }
@@ -349,7 +357,9 @@ class UserNewSessionViewModel: ObservableObject {
             _ = try EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: passphrase)
             try? await lib.secretDataRepository.unlock(passphrase: passphrase)
         } catch {
-            self.error = NewSessionError.failedToCreateStorage
+            await MainActor.run {
+                self.error = NewSessionError.failedToCreateStorage
+            }
             return
         }
     }

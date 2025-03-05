@@ -116,10 +116,20 @@ struct JournalistMessageView: View {
                                 case let .outboundMessage(message: outboundMessage):
                                     OutboundMessageView(outboundMessage: outboundMessage, id: index)
                                 }
-                            }.onChange(of: unlockedData.messageMailbox.count) { _ in
+                            }.onChange(of: unlockedData.messageMailbox.count) {
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
                             }.onAppear {
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
+                            }
+                            if conversationViewModel.isMostRecentMessageFromUser() {
+                                Text(
+                                    """
+                                    Your message has been sent. \
+                                    We recommend that you exit Secure Messaging and \
+                                    wait for a response before you send another message.
+                                    """
+                                )
+                                .textStyle(UserNotificationTextStyle())
                             }
                         case _:
                             EmptyView()
@@ -138,13 +148,6 @@ struct JournalistMessageView: View {
 
     func chooseToSentAnotherMessage() -> some View {
         return VStack {
-            Text(
-                """
-                Your message has been sent. \
-                We recommend that you exit Secure Messaging and wait for a response before you send another message.
-                """
-            )
-            .textStyle(UserNotificationTextStyle())
             Button("Send a new message") {
                 self.alreadySentMessage = true
             }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
@@ -186,6 +189,7 @@ struct JournalistMessageView: View {
                 Task {
                     try? await conversationViewModel.sendMessage()
                     conversationViewModel.clearMessage()
+                    self.alreadySentMessage = false
                 }
             }.disabled(conversationViewModel.sendButtonDisabled)
                 .buttonStyle(PrimaryButtonStyle(isDisabled: conversationViewModel.sendButtonDisabled))
@@ -203,6 +207,44 @@ struct JournalistMessageView: View {
             }
         case _:
             return
+        }
+    }
+}
+
+#Preview {
+    @Previewable @State var loaded: Bool = false
+    @Previewable @State var lib: CoverDropLibrary?
+    @Previewable @State var conversationViewModel: ConversationViewModel?
+    @Previewable @State var inboxViewModel: InboxViewModel?
+    @Previewable @State var journalist: JournalistData?
+    Group {
+        if loaded {
+            JournalistMessageView(
+                journalist: journalist!,
+                conversationViewModel: conversationViewModel!,
+                lib: lib!,
+                navPath: .constant(NavigationPath())
+            )
+
+        } else {
+            Group {
+                LoadingView()
+            }
+        }
+    }.onAppear {
+        Task {
+            let context = IntegrationTestScenarioContext(scenario: .minimal, config: StaticConfig.devConfig)
+            let library = try context.getLibraryWithVerifiedKeys()
+            let data = try await CoverDropServiceHelper.addTestMessagesToLib(lib: library)
+            library.secretDataRepository.setUnlockedDataForTesting(unlockedData: data)
+            inboxViewModel = InboxViewModel(lib: library)
+            conversationViewModel = ConversationViewModel(lib: library)
+            lib = library
+            if let testDefaultJournalist = PublicKeysHelper.shared.testDefaultJournalist {
+                journalist = testDefaultJournalist
+                conversationViewModel?.messageRecipient = journalist
+                loaded = true
+            }
         }
     }
 }

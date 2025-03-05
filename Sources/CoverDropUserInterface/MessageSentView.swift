@@ -25,9 +25,7 @@ struct MessageSentView: View {
             customDivider().padding([.trailing, .leading, .top], Padding.large)
 
             VStack(alignment: .leading) {
-                Text("What to expect next?").textStyle(GuardianHeadlineSmallTextStyle())
-                Text("Your message is now in our queue and will be received by our team soon.")
-                    .textStyle(BodyStyle())
+                Text("What to happens next?").textStyle(GuardianHeadlineSmallTextStyle())
                 Text("""
                 Your message is being disguised. It will be received by a Guardian journalist within a few hours.
                 """)

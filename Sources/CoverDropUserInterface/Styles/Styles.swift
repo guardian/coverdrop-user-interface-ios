@@ -150,7 +150,7 @@ struct MessageTextErrorMessage: LabelStyle {
 struct UserNotificationTextStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .font(.textSansBold,
+            .font(.textSansMedium,
                   size: FontSize.bodyText,
                   lineHeight: 23)
             .padding(.bottom, Padding.xSmall)
@@ -459,15 +459,15 @@ struct XSmallFilledButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         HStack {
             configuration.label
-                .padding([.leading, .trailing], Padding.medium)
-                .padding([.top, .bottom], Padding.xSmall)
+                .padding([.leading, .trailing], Padding.large)
+                .padding([.top, .bottom], Padding.small)
                 .background(
                     Capsule()
                         .foregroundColor(Color.XSmallFilledButtonStyle.buttonColor)
                 )
         }
         .foregroundColor(Color.XSmallFilledButtonStyle.textColor)
-        .padding(10) // this ensures a larger, invisible tap area
+        .padding(20) // this ensures a larger, invisible tap area
         .font(.textSansBold, size: FontSize.xSmallButtonText)
     }
 }
