@@ -141,6 +141,7 @@ struct UserNewSessionView: View {
                 Button("\(Image(systemName: "eye.fill")) Reveal passphrase") {
                     viewModel.showAll()
                 }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
+                    .accessibilityLabel("Reveal passphrase to continue")
             }
         }
     }
@@ -212,10 +213,12 @@ struct UserNewSessionView: View {
                 Button("\(Image(systemName: "eye.slash.fill")) \(textHideAll)") {
                     viewModel.hideAll()
                 }.buttonStyle(InlineButtonStyle())
+                    .accessibilityLabel("\(textHideAll) fields")
             } else {
                 Button("\(Image(systemName: "eye.fill")) \(textShowAll)") {
                     viewModel.showAll()
                 }.buttonStyle(InlineButtonStyle())
+                    .accessibilityLabel("\(textShowAll) fields")
             }
         }
     }
