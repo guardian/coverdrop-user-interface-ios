@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/guardian/coverdrop-core-ios", exact: "1.0.0-alpha"),
-        .package(url: "https://github.com/exyte/SVGView.git", from: "1.0.4")
+        .package(url: "https://github.com/exyte/SVGView.git", from: "1.0.4"),
         .package(url: "https://github.com/guardian/fonts.git", branch: "main")
     ],
     targets: [
