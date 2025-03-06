@@ -96,5 +96,5 @@ struct BannerView: View {
     Group {
         BetaBannerView(showBetaBannerAlert: .constant(false))
         PasswordBannerView(action: {})
-    }
+    }.previewFonts()
 }

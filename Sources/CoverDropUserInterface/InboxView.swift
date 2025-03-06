@@ -224,5 +224,5 @@ struct InboxView: View {
             conversationViewModel = ConversationViewModel(lib: lib)
             loaded = true
         }
-    }
+    }.previewFonts()
 }

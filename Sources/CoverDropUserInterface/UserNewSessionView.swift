@@ -375,5 +375,5 @@ class UserNewSessionViewModel: ObservableObject {
         viewModel: UserNewSessionViewModel(lib: try! IntegrationTestScenarioContext(
             scenario: IntegrationTestScenario.minimal
         ).getLibraryWithVerifiedKeys())
-    )
+    ).previewFonts()
 }

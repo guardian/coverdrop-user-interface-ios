@@ -246,5 +246,5 @@ struct JournalistMessageView: View {
                 loaded = true
             }
         }
-    }
+    }.previewFonts()
 }

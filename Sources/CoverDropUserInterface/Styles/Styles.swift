@@ -1,4 +1,5 @@
 import Foundation
+import GuardianFonts
 import SwiftUI
 
 enum Padding {
@@ -89,10 +90,17 @@ struct BodyStyle: ViewModifier {
     var textAlignment: TextAlignment = .leading
     func body(content: Content) -> some View {
         content
-            .font(.textSansRegular,
-                  size: FontSize.bodyText,
-                  lineHeight: 23,
-                  alignment: textAlignment)
+            //    The text alignment parameter was an addition we made in the local font library that is not
+            //    available in the remote one, I've opened a PR to add it.
+            //            .font(.textSansRegular,
+            //                  size: FontSize.bodyText,
+            //                  lineHeight: 23,
+            //                  alignment: textAlignment)
+            .font(Font.custom(
+                GuardianFontStyle.textSansRegular.fontName,
+                size: FontSize.bodyText,
+                relativeTo: GuardianFontStyle.textSansRegular.relativeStyle
+            )).multilineTextAlignment(textAlignment)
             .padding(.bottom, Padding.small)
     }
 }
@@ -515,7 +523,7 @@ enum SegmentedControlAppearance {
     static func setup() {
         UISegmentedControl.appearance()
             .selectedSegmentTintColor = UIColor(Color.SegmentedControlAppearance.selectedSegmentTintColor)
-        guard let font = UIFont(name: CoverDropFonts.GuardianFontStyle.textSansBold.fontName,
+        guard let font = UIFont(name: GuardianFontStyle.textSansBold.fontName,
                                 size: FontSize.segmentedControlText) else { return }
         let textAttributes = [
             NSAttributedString.Key.foregroundColor: UIColor(Color.SegmentedControlAppearance.textForegroundColor),

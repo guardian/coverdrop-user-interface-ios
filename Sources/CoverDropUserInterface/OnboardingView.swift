@@ -157,5 +157,5 @@ enum OnboardingSteps: String, CustomStringConvertible, CaseIterable, Identifiabl
 }
 
 #Preview {
-    OnboardingView(navPath: Binding.constant(NavigationPath()))
+    OnboardingView(navPath: Binding.constant(NavigationPath())).previewFonts()
 }
