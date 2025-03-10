@@ -51,7 +51,9 @@ enum HelpScreenContent: Error, Equatable {
         case .keepingPassphraseSafe:
             [:]
         case .privacyPolicy:
-            [:]
+            [
+                "button_help_keeping_passphrase_safe": HelpScreenContent.keepingPassphraseSafe
+            ]
         case .replyExpectations: [:]
         case .sourceProtection:
             [:]

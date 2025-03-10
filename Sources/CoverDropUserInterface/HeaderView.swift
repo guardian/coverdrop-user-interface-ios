@@ -1,3 +1,4 @@
+import CoverDropCore
 import Foundation
 import SVGView
 import SwiftUI
@@ -7,17 +8,19 @@ struct HeaderView<Content: View>: View {
     let type: Destination
     @State private var showingScreenshotDetectedAlert = false
     @State private var showingBetaBannerAlert = false
-    @AppStorage("showBetaBanner") var showBetaBanner: Bool = true
 
     /// An optional closure to allow a view to implement its own dismissal logic. If `nil`, the parent view will be
     /// dismissed when the back button is pressed.
     let dismissAction: (() -> Void)?
 
     @Environment(\.presentationMode) var presentation: Binding<PresentationMode>
+    @Environment(CoverDropUserInterfaceConfiguration.self) var uiConfig
 
-    init(type: Destination,
-         dismissAction: (() -> Void)? = nil,
-         @ViewBuilder _ content: () -> Content) {
+    init(
+        type: Destination,
+        dismissAction: (() -> Void)? = nil,
+        @ViewBuilder _ content: () -> Content
+    ) {
         self.content = content()
         self.type = type
         self.dismissAction = dismissAction
@@ -58,7 +61,7 @@ struct HeaderView<Content: View>: View {
                 .background(Color.HeaderView.backgroundColor)
                 .padding(0)
 
-                if showBetaBanner {
+                if uiConfig.showBetaBanner {
                     BetaBannerView(
                         showBetaBannerAlert: $showingBetaBannerAlert
                     )
@@ -84,7 +87,7 @@ struct HeaderView<Content: View>: View {
             ) {
                 Button("Ok", role: .cancel) {}
                 Button("Hide warning", role: .destructive) {
-                    showBetaBanner = false
+                    uiConfig.showBetaBanner = false
                 }
             } message: {
                 Text("""

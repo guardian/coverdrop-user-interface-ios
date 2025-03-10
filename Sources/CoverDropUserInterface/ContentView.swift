@@ -19,6 +19,7 @@ enum Destination: Equatable, Hashable {
 
 struct ContentView: View {
     var config: CoverDropConfig
+    var uiConfig: CoverDropUserInterfaceConfiguration
     @ObservedObject var coverDropService: CoverDropService = .shared
 
     var body: some View {
@@ -35,7 +36,7 @@ struct ContentView: View {
             case let .failedToInitialize(reason: reason):
                 InitErrorView(error: "error: \(reason)")
             }
-        }
+        }.environment(uiConfig)
     }
 }
 
@@ -60,7 +61,10 @@ struct ReadyView: View {
                 postLoginDestination: postLoginDestination
             )
         } else {
-            NonLoggedInNavigationView(lib: lib, postLoginDestination: $postLoginDestination)
+            NonLoggedInNavigationView(
+                lib: lib,
+                postLoginDestination: $postLoginDestination
+            )
         }
     }
 }
@@ -92,7 +96,10 @@ struct NonLoggedInNavigationView: View {
 
                 switch destination {
                 case .about:
-                    AboutCoverDropView(navPath: $navPath)
+                    AboutCoverDropView(
+                        navPath: $navPath,
+                        viewModel: AboutCoverDropViewModel(lib: lib)
+                    )
                 case .onboarding:
                     OnboardingView(navPath: $navPath)
                 case .newPassphrase:

@@ -5,14 +5,14 @@
 // swiftlint:disable line_length
 
 let helpMarkdownCraftMessage = """
-# Craft your first message
+# Compose your first message
 
 BLOCKQUOTE
 We receive hundreds of tips a day. The messages that stand out are clear, detailed and fact-focused.
 Paul Lewis
 Head of investigations
 
-Messages are most credible when they are packed with facts, refer to evidence for those facts, and provide some context for how you know this stuff.
+Messages are most credible when they are packed with facts, refer to evidence for those facts, and provide some context for how you know this.
 
 DIVIDER
 
@@ -68,7 +68,7 @@ I know about a criminal abuse of power but ~I can't tell you how I know it~.
 
 ### Time pressure
 
-Reply times can vary. It can take up to two weeks. If it can’t wait, consider faster but less secure methods such as email or telephone.
+Reply times can vary. It could take several days. If it can’t wait, consider faster but less secure methods such as email or telephone.
 
 EXAMPLE
 Make sure you reply to me on here by the ~end of today~.
@@ -90,7 +90,7 @@ let helpMarkdownFaq = """
 
 We built the Guardian Secure Messaging service to allow readers to contact our journalists directly about news stories that we are covering or should be covering. If you know about something that should be reported, tell us using Secure Messaging and we will handle your tip confidentially and responsibly.
 
-Unlike other apps that require technical skills to ensure security, Secure Messaging is designed for anyone to use with ease. All you need is to remember your passphrase – no technical expertise required. Whether you're a PA, nurse, data scientist, police officer, supermarket worker, public servant, intern, or CEO, this app is for you. It’s made for people who are witnessing injustice and need the Guardian’s help to bring it to light.
+Unlike other apps that require technical skills to ensure security, Secure Messaging is designed for anyone to use with ease. All you need is to remember your passphrase. Whether you're a PA, nurse, data scientist, police officer, supermarket worker, public servant, intern, or CEO, this app is for you. It’s made for people who are witnessing injustice and want the Guardian’s help to bring it to light.
 
 DIVIDER
 
@@ -102,6 +102,8 @@ DIVIDER
 
 ### How does Secure Messaging work?
 
+We have a dedicated help page on how Secure Messaging works. It explains how the system is designed to protect your identity and keep your messages secret.
+
 BUTTON
 How Secure Messaging works
 Read more
@@ -111,9 +113,9 @@ DIVIDER
 
 ### Is it really anonymous? I’m signed in to the Guardian app.
 
-It is anonymous even if you are signed in. The Secure Messaging app only knows the content of your message. It will not know anything else about you. Not your email, name or history of articles.
+You don’t have to be signed in to the Guardian app to use Secure Messaging, but Secure Messaging is anonymous even if you are signed in. The Secure Messaging part of the app only knows the content of your messages. It has no access to information that the overall Guardian app may have – not your email, name, location, reading history, etc.
 
-Users of the Guardian app can use the Secure Messaging service whether or not they are signed in to the app. And when they do so, the Secure Messaging component of the app has no access to information about the user. Similarly, when someone sends a Secure Message to our journalists, no information about the user, their device, or their location is contained within the data that gets sent to our Secure Messaging servers. Not even the Guardian can tell which app sent us a real message. We know nothing about Secure Messaging sources other than what they tell us.
+As a consequence no identifying information accompanies the messages received by our journalists. We can’t even tell which devices sent us real messages. We know nothing more than what the senders tell us.
 
 BUTTON
 Privacy policy
@@ -134,17 +136,18 @@ DIVIDER
 
 The pending message you see is part of a sophisticated system to keep your actions hidden. Your real message is delayed because it will be sent when your phone would normally send a decoy “cover” message. This means the time you use the app cannot be linked to when a message is sent. This disguise technique is one of the many ways we keep you and your messages secret.
 
-To make the sending of real messages from a person indistinguishable from the “cover” messages that the Guardian apps automatically generate, we have to send both types at similar times. If we didn’t do that it would in theory be possible to determine patterns in the app’s activity that correspond to the sending of real messages. Potentially that could help identify a source.
+To ensure real messages are indistinguishable from the “cover” messages sent by the Guardian app, both messages must be sent at similar times. Otherwise, activity patterns could reveal when real messages are sent, potentially identifying a source.
 
-We can’t send messages constantly, because we need to keep the overall Secure Messaging network traffic tiny in order for it not to impact customers’ network load. So instead we usually send messages (both real and “cover”) when people close or “background” their apps. There can be other delays – e.g. messages can get queued up when the system is busy. This too is to avoid potentially suspicious peaks and troughs.
 
 DIVIDER
 
 ### Who gets to see my messages?
 
-Secure Messages cannot be read by anyone except the Guardian journalists that we have designated to receive source messages. If you select a specific journalist as a recipient, your message is routed directly to them. If you select a team, your message will go to the editor or editors in charge of that team.
+If you select a specific journalist as a recipient, your message is routed directly to them. If you select a team, your message will go to the editor or editors in charge of that team. Secure Messages are end-to-end encrypted and can’t be deciphered by anyone else.
 
-Under rare circumstances a substitute journalist will act on behalf of the designated recipient – for example if a reporter is currently unavailable to respond to an ongoing conversation they may entrust a colleague to do so for them. And if someone tries to abuse the system we may sometimes have to moderate messages sent to our colleagues. The people performing such moderation would be Guardian journalists who are already entrusted with dealing with highly confidential material.
+Under some circumstances a substitute journalist will act on behalf of the designated recipient – for example if a reporter is briefly unavailable to respond to an ongoing conversation.
+
+Similarly, if someone using our apps should try to abuse the system, the recipient journalist may ask a colleague to take over. In both cases the addressee would temporarily transfer the means to decrypt their correspondence to a trusted colleague who is experienced in dealing with highly confidential material.
 
 DIVIDER
 
@@ -161,7 +164,7 @@ DIVIDER
 
 ### Why can't I talk to more than one person at a time?
 
-For the principle of “cover” to work without creating a burden on people’s data use, messages must be quite infrequent. So we only allow one conversation at a time. This restriction also helps us avoid spam or other abuses.
+Messages must be infrequent to keep “cover” effective without increasing data use. That’s why only one conversation is allowed at a time. This also helps prevent spam and abuse.
 
 DIVIDER
 
@@ -177,7 +180,7 @@ DIVIDER
 
 You can report problems with Secure Messaging by going back into the main app, selecting Settings and then Help. However, please note that unlike your communication using Secure Messaging, bug reports are not anonymous: they’re sent from your own email address and can include details about the phone you’re using and your Guardian subscription (if you have one). Your bug report shouldn't discuss the content of your Secure Message.
 
-Bear in mind that, because bug reports are sent by email, if someone managed to break in to your emails, they could see that you’ve been trying to use Secure Messaging.
+Keep in mind that bug reports are sent via email. If someone gains access to your emails, they could see that you’ve attempted to use Secure Messaging. This means your use of the system is not secret.
 
 DIVIDER
 
@@ -189,7 +192,7 @@ DIVIDER
 
 ### I forgot my passphrase. What should I do?
 
-We don’t have any way to let you reset the passphrase for your current message vault, or to get a passphrase reminder. These would weaken the system’s security. You’ll have to create a new secure message vault and start a brand new conversation.
+We cannot reset your passphrase or provide reminders, as this would weaken security. If you lose it, please create a new secure message vault and start a new conversation.
 """
 
 let helpMarkdownHowSecureMessagingWorks = """
@@ -209,19 +212,19 @@ In order to receive content, news apps exchange data with the app providers’ s
 
 ### Real messages look no different
 
-To tip off the Guardian about a news story, a Guardian app user can create a Secure Messaging conversation in the app. When they hit “send”, some of the “cover” data will be replaced with the text of the Secure Message. These real messages are encrypted and stored in exactly the same way as the “cover” messages; they are the same size, and they get transmitted at the same times. This makes them indistinguishable from the cover messages that every app user generates.
+To tip off the Guardian about a news story, you can create a Secure Messaging conversation in the Guardian mobile app. When you hit “send”, some of the “cover” data will be replaced with the text of your Secure Message. These real messages are encrypted and stored in exactly the same way as the “cover” messages. They are the same size, and they get transmitted at the same times. This makes them indistinguishable from the cover messages generated by everyone using the Guardian app.
 
-However, after the Guardian receives both cover and real messages, our Secure Messaging system can identify the real ones and deliver those to our journalists.
+However, once the Guardian receives both cover and real messages, our Secure Messaging system removes an outer layer of encryption to identify which are the real messages and which journalist or team they are for. The real messages are then delivered to our journalists, who decrypt the inner layer of encryption to read the content.
 
 ### Our replies are also under cover
 
-Replies from those journalists are similarly hidden in “cover” traffic from the Guardian to our mobile apps. But genuine replies can only be identified and decrypted in the app used by the person who started the conversation.
+Replies from journalists are similarly hidden in “cover” traffic from the Guardian to our mobile apps. But genuine replies can only be identified and decrypted in the app used by the person who started the conversation.
 
 Consequently, confidential communication with the Guardian looks exactly the same as completely normal use of the Guardian mobile app to view our content.
 
 ### Sources can say they're just readers
 
-If someone were to be accused of being a source, their Guardian app would not look different from any other Guardian app. Millions of people have the Guardian app installed simply to view our content, so having the app doesn’t prove anything.
+If someone were to be accused of being a source, their Guardian app would not look different from any other Guardian app. Millions of people have the Guardian app installed simply to read our content, so having the app doesn’t prove anything.
 
 DIVIDER
 
@@ -238,7 +241,7 @@ let helpMarkdownKeepingPassphrasesSafe = """
 
 Your Secure Messaging passphrase is a set of words known only by you. It grants you access to your conversation with the Guardian on this mobile device. You will need to enter your passphrase to see replies from us and to send follow-up messages.
 
-Our software creates your passphrase, but it does not remember it. If you forget it, we can't get you - or anyone else - back in to your conversation.
+Our software creates your passphrase, but we do not store it. If you forget it, we can't get you back in to your conversation.
 
 PASSPHRASE_BOXES apple waterfall diamond
 
@@ -250,7 +253,7 @@ SPACE
 
 ### Can I screenshot my passphrase?
 
-This is not secure. But if you don't need your messages to be confidential, maybe that's OK.
+This is not secure. If confidentiality isn’t a concern, it might work for you.
 
 SPACE
 
@@ -268,7 +271,7 @@ Only you have your passphrase; no one else. Our systems cannot remind you. This 
 
 If you lose your passphrase you will need to start a new conversation. For security reasons, when you start a new conversation, your old conversation will be deleted from this device.
 
-If you start a new conversation with the same journalist as before, they will not know you're the same person.
+If you start a new conversation with the same journalist as before, they will not know you're the same person. But you may be able to remind the journalist by referring to details shared in the prior conversation.
 
 DIVIDER
 
@@ -290,16 +293,26 @@ The Secure Messaging software in the Guardian app is currently in a testing phas
 
 This feature is designed to be used anonymously. As a consequence, messages sent to our journalists using Secure Messaging contain no accompanying data about who sent that message, from where, and from what kind of device. We can't even tell exactly when you wrote a message.
 
-If you are signed in to the Guardian app, that information is not known by the Secure Messaging feature. Similarly, the rest of the Guardian app on your mobile device does not know if you are sending messages to the Guardian using Secure Messaging. So this tool does not allow us to discover anything about you that you don't choose to tell us.
+If you are signed in to the Guardian app, that information is not known by the Secure Messaging feature. Similarly, the rest of the Guardian app on your mobile device does not know if you are sending messages to the Guardian using Secure Messaging. The Secure Messaging App cannot discover anything about you that you don't choose to tell us.
 
-We will update this page with more details as we move towards launching this feature more widely.
+Your correspondence with our journalists is held in an encrypted vault on your phone. This vault is secured by a passphrase known only to you. Messages disappear automatically after 14 days.
+
+BUTTON
+Passphrase security
+Read more
+button_help_keeping_passphrase_safe
+
+At the point at which you send any information to us, the Guardian’s Editorial Code applies. theguardian.com/editorial-code
+
+Last updated March 2025
 """
 
 let helpMarkdownReplyExpectations = """
 # What to expect as a reply
 
-For many reasons, we can't promise that we will reply to messages. But if we do, here’s what to typically expect:
+We may not reply to all messages. If we do reply, you can expect the following:
 
+- Once we enter into correspondence with you, that conversation and any reporting that may come of it falls under the Guardian’s Editorial Code. See theguardian.com/editorial-code
 - If you messaged a team rather than an individual, a reporter or editor will identify themself in the reply.
 - They may ask you for more details about your tip.
 - They may ask for more details about how you came by this information. Be assured that disclosing information to a Guardian journalist that could identify you does not mean they will reveal that information to anyone else. We are committed to protecting our sources.
@@ -336,7 +349,7 @@ Our Secure Messaging system was created to help protect sources’ anonymity:
 - The data transmitted to and from the Guardian looks the same for Secure Messaging users as it does for all other Guardian app users.
 - The information the Guardian receives from Secure Messaging sources comes with no accompanying information about who sent it or from where.
 
-So we know nothing more about a Secure Messaging source than what they choose to tell us.
+So we know nothing more about a Secure Messaging source than what a source chooses to tell us.
 
 DIVIDER
 
@@ -346,11 +359,11 @@ This doesn’t necessarily mean that all sources remain anonymous to the reporte
 let helpMarkdownWhyWeMadeSecureMessaging = """
 # Why we made Secure Messaging
 
-The Guardian’s Secure Messaging tool allows users of our app to tip off our journalists about newsworthy stories.
+The Guardian’s Secure Messaging tool allows readers like you to tip off our journalists about newsworthy stories.
 
-It’s a unique new system based on proposals by the University of Cambridge’s Department of Computer Science and Technology.
+It’s a unique new system based on research by the University of Cambridge’s Department of Computer Science and Technology.
 
-The Cambridge researchers sought to address problems faced by people who wish to tell news organisations about misdeeds. Such sources are acting in the public interest, but that doesn't necessarily mean they welcome publicity, censure or even retaliation. They need a safe communication method that doesn't reveal what is said, or who is saying it.
+The Cambridge researchers set out to solve challenges faced by those who want to share information about wrongdoing with news organisations. These sources act in the public interest, but that doesn’t mean they seek attention, in fact, they may fear scrutiny or even retaliation. They need a safe communication method that doesn't reveal what is said, or who is saying it.
 
 DIVIDER
 

@@ -1,3 +1,4 @@
+import CoverDropCore
 import Foundation
 import SVGView
 import SwiftUI
@@ -50,6 +51,8 @@ struct ChevronButtonList: View {
 
 struct AboutCoverDropView: View {
     @Binding var navPath: NavigationPath
+    @Environment(CoverDropUserInterfaceConfiguration.self) var uiConfig
+    @ObservedObject var viewModel: AboutCoverDropViewModel
 
     func navigateToHelp(contentVariant: HelpScreenContent) {
         navPath.append(Destination.help(contentVariant: contentVariant))
@@ -97,7 +100,7 @@ struct AboutCoverDropView: View {
                             .padding([.bottom], Padding.small)
                         ChevronButtonList(navPath: $navPath, buttonData: [
                             ChevronButtonData(
-                                text: "Craft your first message",
+                                text: "Compose your first message",
                                 target: .craftMessage
                             ),
                             ChevronButtonData(
@@ -120,6 +123,21 @@ struct AboutCoverDropView: View {
                                 target: .sourceProtection
                             )
                         ])
+
+                        if uiConfig.showAboutScreenDebugInformation {
+                            Text("Technical information")
+                                .textStyle(GuardianHeaderTextStyle())
+                                .padding([.top], Padding.large)
+                                .padding([.bottom], Padding.small)
+                            Text("The details below help our engineers to develop and test this feature.")
+                                .padding([.bottom], Padding.small)
+                            DebugContextView(state: viewModel.state)
+                                .onAppear {
+                                    Task {
+                                        await viewModel.loadDebugContextInformation()
+                                    }
+                                }
+                        }
                     }.padding(Padding.large)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
@@ -127,5 +145,53 @@ struct AboutCoverDropView: View {
             }
         }.foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
             .navigationBarHidden(true)
+    }
+}
+
+struct DebugContextView: View {
+    var state: AboutCoverDropViewModel.State
+
+    var body: some View {
+        switch state {
+        case .loading:
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .tint(.white)
+        case let .ready(debugContext):
+            Text(debugContext.description)
+                .font(.system(size: 14, design: .monospaced))
+        case .error:
+            Text("Error while loading debug information.")
+        }
+    }
+}
+
+class AboutCoverDropViewModel: ObservableObject {
+    enum State {
+        case loading
+        case ready(debugContext: DebugContext)
+        case error
+    }
+
+    var lib: CoverDropLibrary
+
+    @MainActor @Published var state: State = .loading
+
+    public init(lib: CoverDropLibrary) {
+        self.lib = lib
+    }
+
+    func loadDebugContextInformation() async {
+        do {
+            let debugContext = try await lib.publicDataRepository.getDebugContext()
+            await MainActor.run {
+                state = .ready(debugContext: debugContext)
+            }
+        } catch {
+            Debug.println("Failed loading debug context: \(error)")
+            await MainActor.run {
+                state = .error
+            }
+        }
     }
 }
