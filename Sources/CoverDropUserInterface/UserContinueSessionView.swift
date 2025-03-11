@@ -44,15 +44,15 @@ struct UserContinueSessionView: View {
             }
             .padding(Padding.large)
             .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
-
+            Spacer()
             tertiaryButton(
                 action: {
                     navPath.isEmpty ? () : navPath.removeLast()
                     navPath.append(Destination.onboarding)
                 },
                 text: "I do not have a passphrase yet"
-            ).ignoresSafeArea(.keyboard, edges: .bottom)
-        }
+            ).ignoresSafeArea(.all, edges: .all)
+        }.navigationBarHidden(true)
     }
 
     func unlockingStorageView() -> some View {
@@ -83,25 +83,23 @@ struct UserContinueSessionView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            ScrollView {
-                passphraseForm(
-                    wordCount: viewModel.wordCount,
-                    words: $viewModel.enteredWords,
-                    wordVisible: $viewModel.wordVisible,
-                    wordInvalid: viewModel.invalidWords
-                )
+            passphraseForm(
+                wordCount: viewModel.wordCount,
+                words: $viewModel.enteredWords,
+                wordVisible: $viewModel.wordVisible,
+                wordInvalid: viewModel.invalidWords
+            )
 
-                HStack {
-                    Spacer()
-                    if viewModel.wordVisible.allSatisfy({ $0 }) {
-                        Button("Hide all") {
-                            viewModel.hideAll()
-                        }.buttonStyle(InlineButtonStyle())
-                    } else {
-                        Button("Show all") {
-                            viewModel.showAll()
-                        }.buttonStyle(InlineButtonStyle())
-                    }
+            HStack {
+                Spacer()
+                if viewModel.wordVisible.allSatisfy({ $0 }) {
+                    Button("Hide all") {
+                        viewModel.hideAll()
+                    }.buttonStyle(InlineButtonStyle())
+                } else {
+                    Button("Show all") {
+                        viewModel.showAll()
+                    }.buttonStyle(InlineButtonStyle())
                 }
             }
 
