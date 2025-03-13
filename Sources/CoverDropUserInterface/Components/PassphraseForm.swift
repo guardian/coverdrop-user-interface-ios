@@ -6,7 +6,7 @@ func passphraseForm(
     wordVisible: Binding<[Bool]>,
     wordInvalid: [Bool]
 ) -> some View {
-    VStack(spacing: Padding.medium) {
+    VStack(spacing: Padding.small) {
         ForEach(0 ... wordCount - 1, id: \.self) { id in
             if wordVisible[id].wrappedValue {
                 ZStack(alignment: .trailing) {
@@ -39,5 +39,5 @@ func passphraseForm(
                 }
             }
         }
-    }.padding(.bottom, Padding.large)
+    }.padding(.bottom, Padding.small)
 }

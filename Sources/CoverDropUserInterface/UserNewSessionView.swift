@@ -31,6 +31,7 @@ extension NewSessionError: LocalizedError {
 
 struct UserNewSessionView: View {
     @Binding var navPath: NavigationPath
+    @State var keyboardVisible: Bool = false
     @State var isPasswordHelpOpen: Bool = false
     var passphraseWordCount: Int
     @ObservedObject var viewModel: UserNewSessionViewModel
@@ -43,11 +44,13 @@ struct UserNewSessionView: View {
             case .confirm, .creating, .finished:
                 viewModel.goBackToRemember()
             }
-        }) {
-            PasswordBannerView(action: {
-                isPasswordHelpOpen = true
-                navPath.append(Destination.help(contentVariant: .keepingPassphraseSafe))
-            })
+        }, keyboardVisible: $keyboardVisible) {
+            if !keyboardVisible {
+                PasswordBannerView(action: {
+                    isPasswordHelpOpen = true
+                    navPath.append(Destination.help(contentVariant: .keepingPassphraseSafe))
+                }).transition(.move(edge: .top))
+            }
             VStack(alignment: .leading) {
                 switch viewModel.state {
                 case .generating:
@@ -59,7 +62,7 @@ struct UserNewSessionView: View {
                         visible: visible
                     )
                 case .confirm:
-                    confirmPassphraseView(viewModel: viewModel)
+                    confirmPassphraseView(viewModel: viewModel, keyboardVisibile: $keyboardVisible)
                 case .creating:
                     creatingStorageView()
                 case .finished:
@@ -83,6 +86,8 @@ struct UserNewSessionView: View {
                 Task {
                     viewModel.initializeWithNewPassphrase(passphraseWordCount: passphraseWordCount)
                 }
+            }.onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
+                withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
             }
     }
 
@@ -119,10 +124,11 @@ struct UserNewSessionView: View {
             Text("Remember Passphrase").textStyle(TitleStyle())
             Text(getRememberPassphraseInfoText())
                 .textStyle(BodyStyle())
-                .padding(.bottom, Padding.medium)
+                .padding(.bottom, Padding.small)
+                .fixedSize(horizontal: false, vertical: true)
             VStack {
                 passphraseWordListView(passphraseWords: passphraseWords, visible: visible)
-            }.padding(.bottom, Padding.medium)
+            }.padding(.bottom, Padding.small)
 
             hideShowButton(
                 visible: visible,
@@ -146,34 +152,32 @@ struct UserNewSessionView: View {
         }
     }
 
-    func confirmPassphraseView(viewModel: UserNewSessionViewModel) -> some View {
+    func confirmPassphraseView(viewModel: UserNewSessionViewModel, keyboardVisibile: Binding<Bool>) -> some View {
         VStack(alignment: .leading) {
-            Text("Enter passphrase").textStyle(TitleStyle())
+            Text("Enter passphrase")
+                .textStyle(TitleStyle(bottomPadding: keyboardVisibile.wrappedValue ? Padding.xSmall : Padding.medium))
             Text("Enter your passphrase to unlock your secure vault and send your first message.")
-                .textStyle(BodyStyle())
-                .padding(.bottom, Padding.large)
+                .textStyle(BodyStyle(bottomPadding: keyboardVisibile.wrappedValue ? Padding.xSmall : Padding.large))
                 .fixedSize(horizontal: false, vertical: true)
 
             if viewModel.error != nil {
                 Text(viewModel.error?.localizedDescription ?? "")
                     .textStyle(FormErrorTextStyle())
-                    .padding(.bottom, Padding.large)
+                    .padding(.bottom, keyboardVisibile.wrappedValue ? Padding.xSmall : Padding.large)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            ScrollView {
-                passphraseForm(
-                    wordCount: passphraseWordCount,
-                    words: $viewModel.enteredWords,
-                    wordVisible: $viewModel.wordVisible,
-                    wordInvalid: viewModel.invalidWords
-                )
+            passphraseForm(
+                wordCount: passphraseWordCount,
+                words: $viewModel.enteredWords,
+                wordVisible: $viewModel.wordVisible,
+                wordInvalid: viewModel.invalidWords
+            )
 
-                hideShowButton(
-                    visible: viewModel.wordVisible.allSatisfy { $0 },
-                    viewModel: viewModel
-                )
-            }
+            hideShowButton(
+                visible: viewModel.wordVisible.allSatisfy { $0 },
+                viewModel: viewModel
+            )
 
             Spacer()
 
@@ -186,7 +190,7 @@ struct UserNewSessionView: View {
     }
 
     private func passphraseWordListView(passphraseWords: [String], visible: Bool) -> some View {
-        VStack {
+        VStack(spacing: Padding.small) {
             ForEach(Array(passphraseWords.enumerated()), id: \.element) { id, word in
                 if visible {
                     Text(word)

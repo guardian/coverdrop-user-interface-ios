@@ -8,6 +8,7 @@ struct HeaderView<Content: View>: View {
     let type: Destination
     @State private var showingScreenshotDetectedAlert = false
     @State private var showingBetaBannerAlert = false
+    @Binding private var keyboardVisible: Bool
 
     /// An optional closure to allow a view to implement its own dismissal logic. If `nil`, the parent view will be
     /// dismissed when the back button is pressed.
@@ -19,11 +20,13 @@ struct HeaderView<Content: View>: View {
     init(
         type: Destination,
         dismissAction: (() -> Void)? = nil,
+        keyboardVisible: Binding<Bool> = .constant(false),
         @ViewBuilder _ content: () -> Content
     ) {
         self.content = content()
         self.type = type
         self.dismissAction = dismissAction
+        _keyboardVisible = keyboardVisible
     }
 
     var body: some View {
@@ -31,55 +34,60 @@ struct HeaderView<Content: View>: View {
             Color.HeaderView.fillColor
                 .ignoresSafeArea(.all)
             VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    if type != .inbox {
-                        Button(action: {
-                            // This will navigate a view hierarchy back to the previous screen,
-                            // or close a modal window if its open.
-                            guard let dismissAction else { presentation.wrappedValue.dismiss(); return }
-                            dismissAction()
-                        }) {
-                            Image(systemName: backButtonImageName())
-                                .resizable()
-                                .frame(width: 25, height: 25)
-                                .padding(Padding.large)
-                                .foregroundColor(Color.HeaderView.arrowColor)
+                if !keyboardVisible {
+                    HStack(spacing: 0) {
+                        if type != .inbox {
+                            Button(action: {
+                                // This will navigate a view hierarchy back to the previous screen,
+                                // or close a modal window if its open.
+                                guard let dismissAction else { presentation.wrappedValue.dismiss(); return }
+                                dismissAction()
+                            }) {
+                                Image(systemName: backButtonImageName())
+                                    .resizable()
+                                    .frame(width: 25, height: 25)
+                                    .padding(Padding.large)
+                                    .foregroundColor(Color.HeaderView.arrowColor)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier(backButtonText())
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityIdentifier(backButtonText())
+
+                        Spacer() // This pushed the button to the left corner
+
+                        if let image = Bundle.module.url(forResource: "logo", withExtension: "svg") {
+                            SVGView(contentsOf: image)
+                                .frame(width: 180, height: 45)
+                                .padding([.trailing], Padding.large)
+                                .padding([.vertical], Padding.medium)
+                        }
+                    }
+                    .background(Color.HeaderView.backgroundColor)
+                    .padding(0)
+                    .transition(.move(edge: .top))
+
+                    if uiConfig.showBetaBanner && type != .newPassphrase {
+                        BetaBannerView(
+                            showBetaBannerAlert: $showingBetaBannerAlert
+                        )
+                        .transition(.move(edge: .top))
                     }
 
-                    Spacer() // This pushed the button to the left corner
-
-                    if let image = Bundle.module.url(forResource: "logo", withExtension: "svg") {
-                        SVGView(contentsOf: image)
-                            .frame(width: 180, height: 45)
-                            .padding([.trailing], Padding.large)
-                            .padding([.vertical], Padding.medium)
-                    }
+                    customDivider()
                 }
-                .background(Color.HeaderView.backgroundColor)
-                .padding(0)
-
-                if uiConfig.showBetaBanner {
-                    BetaBannerView(
-                        showBetaBannerAlert: $showingBetaBannerAlert
-                    )
-                }
-
-                customDivider()
 
                 content
-            }.alert(
-                """
-                You took a screenshot.
-                These screenshots can appear in your photo library, so this may be a security risk.
-                """,
-                isPresented: $showingScreenshotDetectedAlert
-            ) {
-                Button("OK", role: .cancel) {
-                    showingScreenshotDetectedAlert = false
-                }
+            }
+        }
+        .alert(
+            """
+            You took a screenshot.
+            These screenshots can appear in your photo library, so this may be a security risk.
+            """,
+            isPresented: $showingScreenshotDetectedAlert
+        ) {
+            Button("OK", role: .cancel) {
+                showingScreenshotDetectedAlert = false
             }
             .alert(
                 "Secure Messaging: public test",
@@ -99,8 +107,10 @@ struct HeaderView<Content: View>: View {
                 If you don't need to stay anonymous we'd welcome feedback at userhelp@theguardian.com.
                 """)
             }
-        }.onReceive(NotificationCenter.default.publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
-            showingScreenshotDetectedAlert = true
+            .onReceive(NotificationCenter.default
+                .publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
+                    showingScreenshotDetectedAlert = true
+            }
         }
     }
 

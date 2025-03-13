@@ -78,16 +78,18 @@ struct LargeTitleStyle: ViewModifier {
 }
 
 struct TitleStyle: ViewModifier {
+    var bottomPadding: CGFloat = Padding.medium
     func body(content: Content) -> some View {
         content
             .font(.headlineBold, size: FontSize.title, lineHeight: 39)
-            .padding(.bottom, Padding.medium)
+            .padding(.bottom, bottomPadding)
             .fixedSize(horizontal: false, vertical: false)
     }
 }
 
 struct BodyStyle: ViewModifier {
     var textAlignment: TextAlignment = .leading
+    var bottomPadding: CGFloat = Padding.small
     func body(content: Content) -> some View {
         content
             //    The text alignment parameter was an addition we made in the local font library that is not
@@ -101,7 +103,7 @@ struct BodyStyle: ViewModifier {
                 size: FontSize.bodyText,
                 relativeTo: GuardianFontStyle.textSansRegular.relativeStyle
             )).multilineTextAlignment(textAlignment)
-            .padding(.bottom, Padding.small)
+            .padding(.bottom, bottomPadding)
     }
 }
 
@@ -228,7 +230,6 @@ struct PassphraseTextStyle: ViewModifier {
                 RoundedRectangle(cornerRadius: CornerRadius.small)
                     .stroke(Color.PassphraseTextStyle.strokeColor, style: StrokeStyle(lineWidth: 1, dash: [3]))
             )
-            .padding([.bottom], Padding.small)
     }
 }
 
