@@ -82,7 +82,7 @@ struct HeaderView<Content: View>: View {
                 }
             }
             .alert(
-                "This is a test version of a new feature.",
+                "Secure Messaging: public test",
                 isPresented: $showingBetaBannerAlert
             ) {
                 Button("Ok", role: .cancel) {}
@@ -91,14 +91,12 @@ struct HeaderView<Content: View>: View {
                 }
             } message: {
                 Text("""
-                You can try it out but please do not yet use it to \
-                tell us anything that is very important or sensitive.
+                Feel free to try out this new way to contact Guardian reporters. \
+                However, during this test period we can't guarantee that all messages \
+                will be read. You may want to consider the alternatives described in \
+                theguardian.com/tips.
 
-                We cannot guarantee your message will be read.
-
-                When the feature is ready for full use we will remove the 'Beta' warnings.
-
-                You can temporarily hide the warning banner for this session.
+                If you don't need to stay anonymous we'd welcome feedback at userhelp@theguardian.com.
                 """)
             }
         }.onReceive(NotificationCenter.default.publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in

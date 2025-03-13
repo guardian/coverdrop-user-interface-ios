@@ -10,14 +10,14 @@ struct BetaBannerView: View {
     }
 
     var body: some View {
-        BannerView(action: {
-                       showBetaBannerAlert.wrappedValue = true
-                   },
-                   imagePath: "exclamationmark.triangle.fill",
-                   backgroundColor: Color.BetaBannerView.backgroundColor,
-                   textColor: Color.BetaBannerView.textForegroundColor,
-                   titleText: "This is test software",
-                   subtitleText: "Do not send sensitive information.")
+        BannerView(
+            action: { showBetaBannerAlert.wrappedValue = true },
+            imagePath: "exclamationmark.triangle.fill",
+            backgroundColor: Color.BetaBannerView.backgroundColor,
+            textColor: Color.BetaBannerView.textForegroundColor,
+            titleText: "We're testing a new feature",
+            subtitleText: "Messages may not all be read"
+        )
     }
 }
 
@@ -69,7 +69,7 @@ struct BannerView: View {
                             .foregroundColor(textColor)
 
                         Text(subtitleText).textStyle(BodyStyle())
-                            .padding([.trailing], Padding.medium)
+                            .padding([.trailing], Padding.small)
                             .foregroundColor(textColor)
                     }
 
