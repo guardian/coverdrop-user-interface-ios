@@ -40,6 +40,12 @@ struct IncomingMessageView: View {
                                 .padding([.leading], Padding.medium)
                                 .accessibilityIdentifier("Expiring in")
                         }
+                        if case .expired = messageData.status {
+                            Text("\(Image(systemName: "exclamationmark.triangle.fill")) Expired")
+                                .textStyle(ExpiringMessageMetadata())
+                                .padding([.leading], Padding.medium)
+                                .accessibilityIdentifier("Expired")
+                        }
                         Spacer()
                         Text("\(messageData.dateSent, formatter: ConversationViewModel.messageDateFormat)")
                             .textStyle(MessageMetadata())
@@ -64,12 +70,25 @@ struct MessageView_Previews: PreviewProvider {
     @MainActor struct Container: View {
         @State var nonExpiredMessage = IncomingMessageData(
             sender: PublicKeysHelper.shared.testDefaultJournalist!,
-            messageText: "hey",
-            dateReceived: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2)))
+            messageText: "hey non expired",
+            dateReceived: Date(timeIntervalSinceNow: -TimeInterval(60 * 60 * 24 * 2))
+        )
+        @State var expiringMessageWithWarning = IncomingMessageData(
+            sender: PublicKeysHelper.shared.testDefaultJournalist!,
+            messageText: "hey expiring with warning",
+            dateReceived: Date(timeIntervalSinceNow: -TimeInterval(60 * 60 * 24 * 13))
+        )
+
+        @State var expiredMessage = IncomingMessageData(
+            sender: PublicKeysHelper.shared.testDefaultJournalist!,
+            messageText: "hey expired",
+            dateReceived: Date(timeIntervalSinceNow: -TimeInterval(60 * 60 * 24 * 15))
         )
 
         @MainActor var body: some View {
             IncomingMessageView(message: nonExpiredMessage, id: 1)
+            IncomingMessageView(message: expiringMessageWithWarning, id: 2)
+            IncomingMessageView(message: expiredMessage, id: 3)
         }
     }
 

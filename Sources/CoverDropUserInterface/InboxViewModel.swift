@@ -16,6 +16,8 @@ public struct ActiveConversation: Equatable {
                     switch incomingMessageData.expiredStatus {
                     case .expiring:
                         return true
+                    case .expired:
+                        return true
                     case .pendingOrSent:
                         return false
                     }
@@ -26,6 +28,8 @@ public struct ActiveConversation: Equatable {
             case let .outboundMessage(message: messageData):
                 switch messageData.expiredStatus {
                 case .expiring:
+                    return true
+                case .expired:
                     return true
                 case .pendingOrSent:
                     return false
@@ -43,6 +47,8 @@ public struct ActiveConversation: Equatable {
                     switch incomingMessageData.expiredStatus {
                     case let .expiring(time: expiringTime):
                         return expiringTime
+                    case .expired:
+                        return nil
                     case .pendingOrSent:
                         return nil
                     }
@@ -53,6 +59,8 @@ public struct ActiveConversation: Equatable {
                 switch messageData.expiredStatus {
                 case let .expiring(time: expiringTime):
                     return expiringTime
+                case .expired:
+                    return nil
                 case .pendingOrSent:
                     return nil
                 }
@@ -79,6 +87,8 @@ public struct InactiveConversation: Equatable {
                     switch incomingMessageData.expiredStatus {
                     case .expiring:
                         return true
+                    case .expired:
+                        return true
                     case .pendingOrSent:
                         return false
                     }
@@ -89,6 +99,8 @@ public struct InactiveConversation: Equatable {
             case let .outboundMessage(message: messageData):
                 switch messageData.expiredStatus {
                 case .expiring:
+                    return true
+                case .expired:
                     return true
                 case .pendingOrSent:
                     return false
@@ -106,6 +118,8 @@ public struct InactiveConversation: Equatable {
                     switch incomingMessageData.expiredStatus {
                     case let .expiring(time: expiringTime):
                         return expiringTime
+                    case .expired:
+                        return nil
                     case .pendingOrSent:
                         return nil
                     }
@@ -116,6 +130,8 @@ public struct InactiveConversation: Equatable {
                 switch messageData.expiredStatus {
                 case let .expiring(time: expiringTime):
                     return expiringTime
+                case .expired:
+                    return nil
                 case .pendingOrSent:
                     return nil
                 }

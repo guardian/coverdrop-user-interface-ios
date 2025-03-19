@@ -247,4 +247,5 @@ struct JournalistMessageView: View {
             }
         }
     }.previewFonts()
+        .environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
 }

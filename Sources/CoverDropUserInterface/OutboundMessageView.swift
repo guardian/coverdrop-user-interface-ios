@@ -82,7 +82,7 @@ struct OutboundMessageView_Previews: PreviewProvider {
         @State var nonExpiredMessage = OutboundMessageData(
             recipient: PublicKeysHelper.shared.testDefaultJournalist!,
             messageText: "hey",
-            dateQueued: Date(timeIntervalSinceNow: TimeInterval(1 - (60 * 60 * 24 * 2))),
+            dateQueued: Date(timeIntervalSinceNow: -TimeInterval(60 * 60 * 24 * 2)),
             hint: HintHmac(hint: [0x0]),
             isPending: true
         )
