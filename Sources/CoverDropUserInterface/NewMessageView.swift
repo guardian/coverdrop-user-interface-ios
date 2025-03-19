@@ -1,3 +1,4 @@
+import Combine
 import CoverDropCore
 import SwiftUI
 
@@ -7,11 +8,18 @@ struct NewMessageView: View {
     @State var isSelectRecipientViewOpen = false
     @State private var showingDismissalAlert = false
     @State private var showingForcedSelectionAlert = false
+    @FocusState private var focusedField: Field?
     var isInboxEmpty: Bool
+    @State var keyboardVisible: Bool = false
+    @State var path = NavigationPath() // This is nuts, this is a workaround to get toolbar buttons working in iOS17
 
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping
     // will allow us to fail fast in the case of developer error.
     @ObservedObject var conversationViewModel: ConversationViewModel
+
+    private enum Field: Int, CaseIterable {
+        case message
+    }
 
     init(conversationViewModel: ConversationViewModel, navPath: Binding<NavigationPath>, inboxIsEmpty: Bool = false) {
         _navPath = navPath
@@ -33,14 +41,20 @@ struct NewMessageView: View {
     }
 
     private func newMessage() -> some View {
-        HeaderView(type: .home,
-                   dismissAction: {
-                       showingDismissalAlert = true
-                   }) {
-            CraftMessageBannerView(action: {
-                navPath.append(Destination.help(contentVariant: .craftMessage))
-            })
-            ScrollView {
+        HeaderView(
+            type: .home,
+            dismissAction: { showingDismissalAlert = true },
+            keyboardVisible: $keyboardVisible
+        ) {
+            // This NavigationStack is here as a workaround to get toolbar buttons to appear in iOS17
+            // https://stackoverflow.com/questions/77238131/placing-the-toolbar-above-keyboard-does-not-work-in-ios-17
+            NavigationStack(path: $path) {
+                if !keyboardVisible {
+                    CraftMessageBannerView(action: {
+                        navPath.append(Destination.help(contentVariant: .craftMessage))
+                    })
+                }
+
                 VStack(alignment: .leading) {
                     if isInboxEmpty {
                         InformationView(
@@ -49,69 +63,30 @@ struct NewMessageView: View {
                             message: "Enter your message to start a conversation."
                         )
                     }
-                    Text("What do you want to share with us?")
-                        .textStyle(TitleStyle())
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text("Select a journalist or team")
-                            .textStyle(FormLabelTextStyle())
-                        Text("Your message is reviewed by journalists")
-                            .textStyle(BodyStyle())
+                    let titleText = "What do you want to share with us?"
+                    if keyboardVisible {
+                        Text(titleText)
+                            .textStyle(GuardianHeadlineSmallTextStyle())
+                    } else {
+                        Text(titleText)
+                            .textStyle(TitleStyle())
                     }
-
-                    ZStack(alignment: .trailing) {
-                        let forcedSingleRecipient = conversationViewModel.recipients?.forcedPreselectedRecipient()
-
-                        if let messageRecipient = conversationViewModel.messageRecipient {
-                            Text("\(messageRecipient.displayName)")
-                                .textStyle(SelectRecipientTextStyle())
-                                .disableAutocorrection(true)
-                                .autocapitalization(.none)
-                                .accessibilityIdentifier("Selected Recipient is \(messageRecipient.displayName)")
-                                .onTapGesture {
-                                    if forcedSingleRecipient != nil {
-                                        showingForcedSelectionAlert = true
-                                    }
-                                }
-                                .alert(
-                                    "During this test period you can only contact a single Guardian recipient.",
-                                    isPresented: $showingForcedSelectionAlert
-                                ) {
-                                    Button("Dismiss", role: .cancel) {}
-                                }
-                        } else {
-                            Text("No recipient selected")
-                                .textStyle(SelectRecipientTextStyle())
-                                .disableAutocorrection(true)
-                                .autocapitalization(.none)
-                                .accessibilityIdentifier("Selected Recipient")
-                        }
-                        if let recipients = conversationViewModel.recipients, forcedSingleRecipient == nil {
-                            Button(action: {
-                                isSelectRecipientViewOpen = true
-                            }, label: {
-                                HStack(alignment: .center) {
-                                    Image(systemName: "pencil").resizable().frame(width: 12, height: 12)
-                                    Text("Change recipient").textStyle(InlineButtonTextStyle())
-                                }
-                            }).sheet(isPresented: $isSelectRecipientViewOpen) {
-                                SelectRecipientView(isSelectRecipientViewOpen: $isSelectRecipientViewOpen,
-                                                    selectedRecipient: $conversationViewModel.messageRecipient,
-                                                    recipients: recipients)
-                            }
-                            .accessibilityIdentifier("Select a Recipient")
-                            .padding([.trailing], Padding.medium)
-                        }
-                    }
-                    .padding([.bottom], Padding.xLarge)
-                    Spacer()
+                    chooseRecipient()
                     messageCompose()
                     Spacer()
                     messageSend()
                 }
                 .padding(Padding.large)
                 .foregroundColor(Color.NewMessageView.foregroundColor)
+                .onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
+                    withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
+                }
                 .onAppear {
                     UITextView.appearance().backgroundColor = .clear
+
+                }.onTapGesture {
+                    // This closes the keyboard when tapping outside of the message text field
+                    focusedField = nil
                 }.navigationBarHidden(true)
                 .navigationBarTitle(Text(""))
                 .alert("Leaving your inbox",
@@ -123,7 +98,8 @@ struct NewMessageView: View {
                                }
                            }
                            Button("Cancel", role: .cancel) {}
-                       }, message: {
+                       },
+                       message: {
                            Text(
                                """
                                 You will be leaving your secure inbox and your message will not be sent.\n
@@ -133,6 +109,64 @@ struct NewMessageView: View {
                        })
             }
         }
+    }
+
+    @ViewBuilder
+    func chooseRecipient() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Select a journalist or team")
+                .textStyle(FormLabelTextStyle())
+            if !keyboardVisible {
+                Text("Your message is reviewed by journalists")
+                    .textStyle(BodyStyle())
+            }
+        }
+
+        ZStack(alignment: .trailing) {
+            let forcedSingleRecipient = conversationViewModel.recipients?.forcedPreselectedRecipient()
+
+            if let messageRecipient = conversationViewModel.messageRecipient {
+                Text("\(messageRecipient.displayName)")
+                    .textStyle(SelectRecipientTextStyle())
+                    .disableAutocorrection(true)
+                    .autocapitalization(.none)
+                    .accessibilityIdentifier("Selected Recipient is \(messageRecipient.displayName)")
+                    .onTapGesture {
+                        if forcedSingleRecipient != nil {
+                            showingForcedSelectionAlert = true
+                        }
+                    }
+                    .alert(
+                        "During this test period you can only contact a single Guardian recipient.",
+                        isPresented: $showingForcedSelectionAlert
+                    ) {
+                        Button("Dismiss", role: .cancel) {}
+                    }
+            } else {
+                Text("No recipient selected")
+                    .textStyle(SelectRecipientTextStyle())
+                    .disableAutocorrection(true)
+                    .autocapitalization(.none)
+                    .accessibilityIdentifier("Selected Recipient")
+            }
+            if let recipients = conversationViewModel.recipients, forcedSingleRecipient == nil {
+                Button(action: {
+                    isSelectRecipientViewOpen = true
+                }, label: {
+                    HStack(alignment: .center) {
+                        Image(systemName: "pencil").resizable().frame(width: 12, height: 12)
+                        Text("Change recipient").textStyle(InlineButtonTextStyle())
+                    }
+                }).sheet(isPresented: $isSelectRecipientViewOpen) {
+                    SelectRecipientView(isSelectRecipientViewOpen: $isSelectRecipientViewOpen,
+                                        selectedRecipient: $conversationViewModel.messageRecipient,
+                                        recipients: recipients)
+                }
+                .accessibilityIdentifier("Select a Recipient")
+                .padding([.trailing], Padding.medium)
+            }
+        }
+        .padding([.bottom], Padding.medium)
     }
 
     @ViewBuilder
@@ -174,48 +208,32 @@ struct NewMessageView: View {
             TextEditor(text: $conversationViewModel.message)
                 .style(ComposeMessageTextStyle())
                 .accessibilityIdentifier("Compose your message")
-                .frame(height: 240)
+                .frame(minHeight: 80, maxHeight: .greatestFiniteMagnitude)
+                .focused($focusedField, equals: .message)
         }
-
-        Spacer()
     }
 }
 
-// struct NewMessageView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        PreviewWrapper(NewMessageView(viewModel: viewModel()))
-//        PreviewWrapper(NewMessageView(
-//            viewModel: viewModelWithALongMessage()
-//        ))
-//    }
-//
-//    private static func viewModel() -> ConversationViewModel {
-//        return ConversationViewModel(
-//            verifiedPublicKeys: PublicKeysHelper.shared.testKeys,
-//            config: StaticConfig.devConfig
-//        )
-//    }
-//
-//    private static func viewModelWithALongMessage() -> ConversationViewModel {
-//        let viewModel = viewModel()
-//        let shortMessage = """
-//        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dolor
-//                nulla, ornare et tristique imperdiet, dictum sit amet velit. Curabitur pharetra erat sed
-//                neque interdum, non mattis tortor auctor. Curabitur eu ipsum ac neque semper eleifend.
-//                Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-//                Integer erat mi, ultrices nec arcu ut, sagittis sollicitudin est. In hac habitasse
-//                platea dictumst. Sed in efficitur elit. Curabitur nec commodo elit. Aliquam tincidunt
-//                rutrum nisl ut facilisis. Aenean ornare ut mauris eget lacinia. Mauris a felis quis orci
-//                auctor varius sit amet eget est. Curabitur a urna sit amet diam sagittis aliquet eget eu
-//                sapien. Curabitur a pharetra purus.
-//                Nulla facilisi. Suspendisse potenti. Morbi mollis aliquet sapien sed faucibus. Donec
-//                aliquam nibh nibh, ac faucibus felis aliquam at. Pellentesque egestas enim sem, eu
-//                tempor urna posuere eget. Cras fermentum commodo neque ac gravida.
-//        """
-//        viewModel.message = shortMessage
-//
-//        viewModel.message.append(contentsOf: shortMessage)
-//
-//        return viewModel
-//    }
-// }
+#Preview {
+    @Previewable @State var loaded: Bool = false
+    @Previewable @State var conversationViewModel: ConversationViewModel?
+
+    Group {
+        if loaded {
+            NewMessageView(conversationViewModel: conversationViewModel!, navPath: .constant(NavigationPath()))
+        } else {
+            Group {
+                LoadingView()
+            }
+        }
+    }.onAppear {
+        Task {
+            let context = IntegrationTestScenarioContext(scenario: .minimal, config: StaticConfig.devConfig)
+            let lib = try context.getLibraryWithVerifiedKeys()
+            conversationViewModel = ConversationViewModel(lib: lib)
+            loaded = true
+        }
+    }
+    .previewFonts()
+    .environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
+}

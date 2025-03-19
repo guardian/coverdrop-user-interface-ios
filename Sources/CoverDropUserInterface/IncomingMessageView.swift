@@ -87,8 +87,20 @@ struct MessageView_Previews: PreviewProvider {
 
         @MainActor var body: some View {
             IncomingMessageView(message: nonExpiredMessage, id: 1)
+                .environment(CoverDropUserInterfaceConfiguration(
+                    showAboutScreenDebugInformation: true,
+                    showBetaBanner: true
+                ))
             IncomingMessageView(message: expiringMessageWithWarning, id: 2)
+                .environment(CoverDropUserInterfaceConfiguration(
+                    showAboutScreenDebugInformation: true,
+                    showBetaBanner: true
+                ))
             IncomingMessageView(message: expiredMessage, id: 3)
+                .environment(CoverDropUserInterfaceConfiguration(
+                    showAboutScreenDebugInformation: true,
+                    showBetaBanner: true
+                ))
         }
     }
 

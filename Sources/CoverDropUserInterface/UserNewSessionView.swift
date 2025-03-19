@@ -380,4 +380,5 @@ class UserNewSessionViewModel: ObservableObject {
             scenario: IntegrationTestScenario.minimal
         ).getLibraryWithVerifiedKeys())
     ).previewFonts()
+        .environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
 }

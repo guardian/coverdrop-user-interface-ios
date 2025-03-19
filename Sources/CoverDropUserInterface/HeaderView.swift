@@ -89,28 +89,28 @@ struct HeaderView<Content: View>: View {
             Button("OK", role: .cancel) {
                 showingScreenshotDetectedAlert = false
             }
-            .alert(
-                "Secure Messaging: public test",
-                isPresented: $showingBetaBannerAlert
-            ) {
-                Button("Ok", role: .cancel) {}
-                Button("Hide warning", role: .destructive) {
-                    uiConfig.showBetaBanner = false
-                }
-            } message: {
-                Text("""
-                Feel free to try out this new way to contact Guardian reporters. \
-                However, during this test period we can't guarantee that all messages \
-                will be read. You may want to consider the alternatives described in \
-                theguardian.com/tips.
+        }
+        .alert(
+            "Secure Messaging: public test",
+            isPresented: $showingBetaBannerAlert
+        ) {
+            Button("Ok", role: .cancel) {}
+            Button("Hide warning", role: .destructive) {
+                uiConfig.showBetaBanner = false
+            }
+        } message: {
+            Text("""
+            Feel free to try out this new way to contact Guardian reporters. \
+            However, during this test period we can't guarantee that all messages \
+            will be read. You may want to consider the alternatives described in \
+            theguardian.com/tips.
 
-                If you don't need to stay anonymous we'd welcome feedback at userhelp@theguardian.com.
-                """)
-            }
-            .onReceive(NotificationCenter.default
-                .publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
-                    showingScreenshotDetectedAlert = true
-            }
+            If you don't need to stay anonymous we'd welcome feedback at userhelp@theguardian.com.
+            """)
+        }
+        .onReceive(NotificationCenter.default
+            .publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
+                showingScreenshotDetectedAlert = true
         }
     }
 
@@ -139,6 +139,6 @@ struct HeaderView_Previews: PreviewProvider {
     static var previews: some View {
         PreviewWrapper(HeaderView(type: .login) {
             EmptyView()
-        })
+        }).environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
     }
 }

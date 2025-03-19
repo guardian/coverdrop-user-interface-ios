@@ -97,4 +97,5 @@ struct BannerView: View {
         BetaBannerView(showBetaBannerAlert: .constant(false))
         PasswordBannerView(action: {})
     }.previewFonts()
+        .environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
 }
