@@ -37,6 +37,15 @@ struct ContentView: View {
                 InitErrorView(error: "error: \(reason)")
             }
         }.environment(uiConfig)
+            .onAppear {
+                // This runs the task outside of the views context, so it will not cancel if the user
+                // navigates away from this screen
+                Task.detached(priority: .high) {
+                    if case .notInitialized = coverDropService.state {
+                        try? CoverDropService.shared.didLaunch(config: config)
+                    }
+                }
+            }
     }
 }
 
