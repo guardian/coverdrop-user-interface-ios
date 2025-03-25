@@ -43,7 +43,7 @@ struct NewMessageView: View {
     private func newMessage() -> some View {
         HeaderView(
             type: .home,
-            dismissAction: { showingDismissalAlert = true },
+            dismissAction: { DispatchQueue.main.async { showingDismissalAlert = true } },
             keyboardVisible: $keyboardVisible
         ) {
             // This NavigationStack is here as a workaround to get toolbar buttons to appear in iOS17
@@ -133,7 +133,9 @@ struct NewMessageView: View {
                     .accessibilityIdentifier("Selected Recipient is \(messageRecipient.displayName)")
                     .onTapGesture {
                         if forcedSingleRecipient != nil {
-                            showingForcedSelectionAlert = true
+                            DispatchQueue.main.async {
+                                showingForcedSelectionAlert = true
+                            }
                         }
                     }
                     .alert(

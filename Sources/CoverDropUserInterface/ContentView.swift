@@ -21,6 +21,7 @@ struct ContentView: View {
     var config: CoverDropConfig
     var uiConfig: CoverDropUserInterfaceConfiguration
     @ObservedObject var coverDropService: CoverDropService = .shared
+    @State private var showingScreenshotDetectedAlert = false
 
     var body: some View {
         Group {
@@ -45,6 +46,27 @@ struct ContentView: View {
                         try? CoverDropService.shared.didLaunch(config: config)
                     }
                 }
+            }
+            .alert(
+                """
+                You took a screenshot.
+                These screenshots can appear in your photo library and can be uploaded to the cloud, \
+                so this may be a security risk.
+                """,
+                isPresented: $showingScreenshotDetectedAlert
+            ) {
+                Button("OK", role: .cancel) {
+                    DispatchQueue.main.async {
+                        showingScreenshotDetectedAlert = false
+                    }
+                }
+            }
+
+            .onReceive(NotificationCenter.default
+                .publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
+                    DispatchQueue.main.async {
+                        showingScreenshotDetectedAlert = true
+                    }
             }
     }
 }

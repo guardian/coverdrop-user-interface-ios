@@ -71,6 +71,26 @@ struct HeaderView<Content: View>: View {
                             showBetaBannerAlert: $showingBetaBannerAlert
                         )
                         .transition(.move(edge: .top))
+                        .alert(
+                            "Secure Messaging: public test",
+                            isPresented: $showingBetaBannerAlert
+                        ) {
+                            Button("Ok", role: .cancel) {}
+                            Button("Hide warning", role: .destructive) {
+                                DispatchQueue.main.async {
+                                    uiConfig.showBetaBanner = false
+                                }
+                            }
+                        } message: {
+                            Text("""
+                            Feel free to try out this new way to contact Guardian reporters. \
+                            However, during this test period we can't guarantee that all messages \
+                            will be read. You may want to consider the alternatives described in \
+                            theguardian.com/tips.
+
+                            If you don't need to stay anonymous we'd welcome feedback at userhelp@theguardian.com.
+                            """)
+                        }
                     }
 
                     customDivider()
@@ -78,39 +98,6 @@ struct HeaderView<Content: View>: View {
 
                 content
             }
-        }
-        .alert(
-            """
-            You took a screenshot.
-            These screenshots can appear in your photo library, so this may be a security risk.
-            """,
-            isPresented: $showingScreenshotDetectedAlert
-        ) {
-            Button("OK", role: .cancel) {
-                showingScreenshotDetectedAlert = false
-            }
-        }
-        .alert(
-            "Secure Messaging: public test",
-            isPresented: $showingBetaBannerAlert
-        ) {
-            Button("Ok", role: .cancel) {}
-            Button("Hide warning", role: .destructive) {
-                uiConfig.showBetaBanner = false
-            }
-        } message: {
-            Text("""
-            Feel free to try out this new way to contact Guardian reporters. \
-            However, during this test period we can't guarantee that all messages \
-            will be read. You may want to consider the alternatives described in \
-            theguardian.com/tips.
-
-            If you don't need to stay anonymous we'd welcome feedback at userhelp@theguardian.com.
-            """)
-        }
-        .onReceive(NotificationCenter.default
-            .publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
-                showingScreenshotDetectedAlert = true
         }
     }
 

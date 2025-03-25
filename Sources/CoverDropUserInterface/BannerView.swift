@@ -11,7 +11,7 @@ struct BetaBannerView: View {
 
     var body: some View {
         BannerView(
-            action: { showBetaBannerAlert.wrappedValue = true },
+            action: { DispatchQueue.main.async { showBetaBannerAlert.wrappedValue = true } },
             imagePath: "exclamationmark.triangle.fill",
             backgroundColor: Color.BetaBannerView.backgroundColor,
             textColor: Color.BetaBannerView.textForegroundColor,

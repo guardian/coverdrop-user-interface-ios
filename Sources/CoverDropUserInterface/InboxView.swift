@@ -132,7 +132,9 @@ struct InboxView: View {
     var deleteYourMessages: some View {
         HStack {
             Button {
-                showingDeleteAlert = true
+                DispatchQueue.main.async {
+                    showingDeleteAlert = true
+                }
             } label: {
                 HStack {
                     Image(systemName: "trash.fill")

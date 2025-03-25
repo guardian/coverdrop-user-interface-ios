@@ -59,12 +59,17 @@ public struct StartCoverDropSessionView: View {
 
                 } else {
                     Button("Get started") {
-                        showingNewMessageAlert = true
+                        DispatchQueue.main.async {
+                            showingNewMessageAlert = true
+                        }
                     }
                     .disabled(!publicDataRepository.areKeysAvailable)
                     .buttonStyle(PrimaryButtonStyle(isDisabled: !publicDataRepository.areKeysAvailable))
                     .alert("Set up your secure message vault", isPresented: $showingNewMessageAlert, actions: {
                         Button("Yes, start conversation") {
+                            DispatchQueue.main.async {
+                                showingNewMessageAlert = false
+                            }
                             navPath.append(Destination.onboarding)
                         }
                         Button("No", role: .cancel) {}
