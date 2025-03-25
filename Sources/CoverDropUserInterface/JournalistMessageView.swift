@@ -22,13 +22,7 @@ struct JournalistMessageView: View {
         lib: CoverDropLibrary,
         navPath: Binding<NavigationPath>
     ) {
-        let navigationBarAppearance = UINavigationBarAppearance()
-        navigationBarAppearance.backgroundColor = UIColor(Color.JournalistNewMessageView.navigationBarBackgroundColor)
-        UIScrollView.appearance().backgroundColor = UIColor(Color.JournalistNewMessageView.scrollviewBackgroundColor)
         self.journalist = journalist
-        UITextView.appearance().textContainerInset =
-            UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-
         _conversationViewModel = StateObject(wrappedValue: conversationViewModel)
         self.lib = lib
         inboxViewModel = InboxViewModel(lib: lib)
