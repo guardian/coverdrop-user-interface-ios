@@ -66,7 +66,7 @@ struct HeaderView<Content: View>: View {
                     .padding(0)
                     .transition(.move(edge: .top))
 
-                    if uiConfig.showBetaBanner && type != .newPassphrase {
+                    if uiConfig.showBetaBanner && type != .newPassphrase && type != .messageSent {
                         BetaBannerView(
                             showBetaBannerAlert: $showingBetaBannerAlert
                         )
