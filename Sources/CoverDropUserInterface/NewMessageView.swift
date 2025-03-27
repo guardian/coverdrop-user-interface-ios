@@ -9,7 +9,6 @@ struct NewMessageView: View {
     @State private var showingDismissalAlert = false
     @State private var showingForcedSelectionAlert = false
     @FocusState private var focusedField: Field?
-    var isInboxEmpty: Bool
     @State var keyboardVisible: Bool = false
     @State var path = NavigationPath() // This is nuts, this is a workaround to get toolbar buttons working in iOS17
 
@@ -21,11 +20,8 @@ struct NewMessageView: View {
         case message
     }
 
-    init(conversationViewModel: ConversationViewModel, navPath: Binding<NavigationPath>, inboxIsEmpty: Bool = false) {
+    init(conversationViewModel: ConversationViewModel, navPath: Binding<NavigationPath>) {
         _navPath = navPath
-
-        UITextView.appearance().backgroundColor = .clear
-        isInboxEmpty = inboxIsEmpty
         self.conversationViewModel = conversationViewModel
     }
 
@@ -56,13 +52,6 @@ struct NewMessageView: View {
                 }
 
                 VStack(alignment: .leading) {
-                    if isInboxEmpty {
-                        InformationView(
-                            viewType: .info,
-                            title: "Looks like you haven’t sent your message yet",
-                            message: "Enter your message to start a conversation."
-                        )
-                    }
                     let titleText = "What do you want to share with us?"
                     if keyboardVisible {
                         Text(titleText)
@@ -80,10 +69,6 @@ struct NewMessageView: View {
                 .foregroundColor(Color.NewMessageView.foregroundColor)
                 .onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
                     withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
-                }
-                .onAppear {
-                    UITextView.appearance().backgroundColor = .clear
-
                 }.onTapGesture {
                     // This closes the keyboard when tapping outside of the message text field
                     focusedField = nil

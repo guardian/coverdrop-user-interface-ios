@@ -43,24 +43,10 @@ struct UnlockedSecretDataStateSwitcher: View {
         NavigationStack(path: $loggedInNavPath) {
             Group {
                 if unlockedSecretData.messageMailbox.isEmpty {
-                    if case .newConversation = postLoginDestination {
-                        // This scenario is when the user has logged in for the first time
-                        // after creating a new session and has never sent a message
-                        NewMessageView(
-                            conversationViewModel: conversationViewModel,
-                            navPath: $loggedInNavPath,
-                            inboxIsEmpty: false
-                        )
-                    } else if case .login = postLoginDestination {
-                        // This scenario is when the user had abandoned sending their initial message, but had
-                        // created a
-                        // session, and is re-logging in
-                        NewMessageView(
-                            conversationViewModel: conversationViewModel,
-                            navPath: $loggedInNavPath,
-                            inboxIsEmpty: true
-                        )
-                    }
+                    NewMessageView(
+                        conversationViewModel: conversationViewModel,
+                        navPath: $loggedInNavPath
+                    )
                 } else {
                     if case .newConversation = postLoginDestination {
                         // This scenario is when the user has just sent their first message for this session (after
