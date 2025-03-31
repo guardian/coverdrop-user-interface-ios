@@ -29,10 +29,10 @@ struct InitErrorView: View {
 
 #Preview {
     InitErrorView(error: """
-                  Error Domain=NSCocoaErrorDomain Code=257 "The file \
-                  "privateSendingQueue" couldn't be opened because you don't have permission to view it.\ 
-                  Application%20Support/ privateSendingQueue, NSUnderlyingError=0x3013f9200
-                  {Error Domain=NSPOSIXErrorDomai}
-                  """)
-        .environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
+    Error Domain=NSCocoaErrorDomain Code=257 "The file \
+    "privateSendingQueue" couldn't be opened because you don't have permission to view it.\
+    Application%20Support/ privateSendingQueue, NSUnderlyingError=0x3013f9200
+    {Error Domain=NSPOSIXErrorDomai}
+    """)
+    .environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
 }

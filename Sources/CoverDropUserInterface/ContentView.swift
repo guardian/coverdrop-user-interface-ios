@@ -43,7 +43,7 @@ struct ContentView: View {
                 // navigates away from this screen
                 Task.detached(priority: .high) {
                     if case .notInitialized = coverDropService.state {
-                        try? CoverDropService.shared.didLaunch(config: config)
+                        try? CoverDropService.shared.ensureInitialized(config: config)
                     }
                 }
             }
