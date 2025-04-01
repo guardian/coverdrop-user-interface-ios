@@ -6,9 +6,14 @@ enum MessageError: Error {
 }
 
 struct JournalistMessageView: View {
-    @ObservedObject var inboxViewModel: InboxViewModel
-    @StateObject var conversationViewModel: ConversationViewModel
     @ObservedObject var lib: CoverDropLibrary
+    @ObservedObject var inboxViewModel: InboxViewModel
+    @ObservedObject var conversationViewModel: ConversationViewModel
+
+    /// This is required for the view to re-render when items are popped from the PSQ, which can
+    /// cause messages go from `pending` to `sent`.
+    @ObservedObject var privateSendingQueue = PrivateSendingQueueRepository.shared
+
     @Binding var navPath: NavigationPath
 
     // by default we want to make the user have to choose to send another message
@@ -23,7 +28,7 @@ struct JournalistMessageView: View {
         navPath: Binding<NavigationPath>
     ) {
         self.journalist = journalist
-        _conversationViewModel = StateObject(wrappedValue: conversationViewModel)
+        self.conversationViewModel = conversationViewModel
         self.lib = lib
         inboxViewModel = InboxViewModel(lib: lib)
         _navPath = navPath
@@ -96,19 +101,9 @@ struct JournalistMessageView: View {
                     case .initial, .loading, .ready, .sending:
                         switch lib.secretDataRepository.getSecretData() {
                         case let .unlockedSecretData(unlockedData: unlockedData):
-                            ForEach(conversationViewModel.currentConversation.indices, id: \.self) { index in
-                                switch conversationViewModel.currentConversation[index] {
-                                // We have a seperate view for incoming and outbound messages
-                                // because outbound messages have message statuses which cannot be observed
-                                // when inside an enum
-                                case let .incomingMessage(message: incomingMessage):
-                                    if case let .textMessage(message: incomingTextMessage) = incomingMessage {
-                                        IncomingMessageView(message: incomingTextMessage, id: index)
-                                    } else {
-                                        EmptyView()
-                                    }
-                                case let .outboundMessage(message: outboundMessage):
-                                    OutboundMessageView(outboundMessage: outboundMessage, id: index)
+                            ForEach(conversationViewModel.currentConversationForUi.indices, id: \.self) { index in
+                                if let message = conversationViewModel.currentConversationForUi[index] {
+                                    MessageView(message: message, id: index)
                                 }
                             }.onChange(of: unlockedData.messageMailbox.count) {
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
@@ -211,6 +206,7 @@ struct JournalistMessageView: View {
     @Previewable @State var conversationViewModel: ConversationViewModel?
     @Previewable @State var inboxViewModel: InboxViewModel?
     @Previewable @State var journalist: JournalistData?
+
     Group {
         if loaded {
             JournalistMessageView(

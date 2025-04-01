@@ -80,10 +80,9 @@ struct InboxView: View {
             }
             .padding([.leading, .trailing], Padding.large)
             .padding([.top], Padding.small)
-            if inboxViewModel.activeConversation?.containsExpiringMessages != nil,
-               let expiredDate = inboxViewModel.activeConversation?.messageExpiringDate {
+            if let expiryString = inboxViewModel.activeConversation?.messages.maybeExpiryDate() {
                 customDivider()
-                expiredInformationText(expiredDate: expiredDate)
+                expiredInformationText(expiryDate: expiryString)
                     .padding([.leading], Padding.medium)
             }
         }
@@ -120,9 +119,8 @@ struct InboxView: View {
                     conversationViewModel.messageRecipient = inactiveConversation.recipient
                     navPath.append(Destination.viewConversation)
                 }
-            if inactiveConversation.containsExpiringMessages,
-               let expiredDate = inactiveConversation.messageExpiringDate {
-                expiredInformationText(expiredDate: expiredDate)
+            if let expiryDate = inactiveConversation.messages.maybeExpiryDate() {
+                expiredInformationText(expiryDate: expiryDate)
             }
         }
         .padding([.top, .bottom], 10)
@@ -192,11 +190,12 @@ struct InboxView: View {
         .padding(.bottom, Padding.medium)
     }
 
-    func expiredInformationText(expiredDate: String) -> some View {
-        return Text("\(Image(systemName: "info.circle.fill")) Expiring in \(expiredDate)")
+    func expiredInformationText(expiryDate: String) -> some View {
+        return Text("\(Image(systemName: "info.circle.fill")) Expiring in \(expiryDate)")
+            .textStyle(ExpiringMessageMetadata())
             .foregroundColor(Color.NewMessageView.messageInformationStrokeColor)
-            .padding([.top, .trailing, .bottom], Padding.medium)
-            .padding([.leading], 0)
+            .padding([.top], 9)
+            .padding([.leading, .bottom], Padding.small)
     }
 }
 

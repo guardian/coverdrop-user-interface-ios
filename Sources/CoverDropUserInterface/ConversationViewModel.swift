@@ -6,15 +6,9 @@ public enum MessageComposeError: Error {
     case textTooLong, invalidCharacter, compressionFailed, unknownError
 }
 
-struct MessageData {
-    var isCurrentUser: Bool
-    var messageText: String
-    var dateSent: Date
-    var status: MessageStatus
-}
-
 @MainActor class ConversationViewModel: ObservableObject {
     @ObservedObject var lib: CoverDropLibrary
+    @ObservedObject var privateSendingQueue = PrivateSendingQueueRepository.shared
 
     @Published var messageRecipient: JournalistData?
     @Published private(set) var recipients: MessageRecipients?
@@ -58,7 +52,7 @@ struct MessageData {
         case error(message: String)
     }
 
-    // This returns the current conversation as a list of `Message` based on the message recipient
+    /// This returns the current conversation as a list of `Message` based on the message recipient
     var currentConversation: [Message] {
         switch lib.secretDataRepository.getSecretData() {
         case let .unlockedSecretData(unlockedData: unlockedData):
@@ -82,11 +76,19 @@ struct MessageData {
         }
     }
 
-    // This checks to see if the current conversation in active or inactive
-    // We currenly only allow the user to reply to the active conversation, which restricts
-    // the user to having one conversation at the time.
-    // We check to see if the most recent message from the current conversation is in the active conversation
+    /// This returns the current conversation as a list of `UiMessage` based on the message
+    /// recipient (as per `currentCoversation`) and sets pending flags according to the
+    /// private sending queue.
+    var currentConversationForUi: [UiMessage?] {
+        return currentConversation.map {
+            try? $0.toUiMessage(hintsInFlight: privateSendingQueue.hintsInFlight)
+        }
+    }
 
+    /// This checks to see if the current conversation in active or inactive
+    /// We currenly only allow the user to reply to the active conversation, which restricts
+    /// the user to having one conversation at the time.
+    /// We check to see if the most recent message from the current conversation is in the active conversation
     func isCurrentConversationActive(maybeActiveConversation: ActiveConversation?) -> Bool {
         if let activeConversation = maybeActiveConversation,
            let lastConversationMessage = currentConversation.last {
@@ -212,15 +214,5 @@ struct MessageData {
         case _:
             return false
         }
-    }
-
-    static func getIncomingMessageData(message: IncomingMessageData) -> MessageData {
-        return MessageData(isCurrentUser: false, messageText: message.messageText,
-                           dateSent: message.dateReceived, status: message.expiredStatus)
-    }
-
-    static func getOutboundMessageData(message: OutboundMessageData) -> MessageData {
-        return MessageData(isCurrentUser: true, messageText: message.messageText,
-                           dateSent: message.dateQueued, status: message.expiredStatus)
     }
 }

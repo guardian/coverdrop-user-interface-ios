@@ -7,68 +7,6 @@ public struct ActiveConversation: Equatable {
 
     var messages: Set<Message> = []
 
-    var containsExpiringMessages: Bool {
-        return messages.contains(where: { message in
-            switch message {
-            case let .incomingMessage(message: messageData):
-                switch messageData {
-                case let .textMessage(message: incomingMessageData):
-                    switch incomingMessageData.expiredStatus {
-                    case .expiring:
-                        return true
-                    case .expired:
-                        return true
-                    case .pendingOrSent:
-                        return false
-                    }
-
-                case .handoverMessage:
-                    return false
-                }
-            case let .outboundMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case .expiring:
-                    return true
-                case .expired:
-                    return true
-                case .pendingOrSent:
-                    return false
-                }
-            }
-        })
-    }
-
-    var messageExpiringDate: String? {
-        if let lastMessage = messages.sorted(by: >).last {
-            switch lastMessage {
-            case let .incomingMessage(message: messageData):
-                switch messageData {
-                case let .textMessage(message: incomingMessageData):
-                    switch incomingMessageData.expiredStatus {
-                    case let .expiring(time: expiringTime):
-                        return expiringTime
-                    case .expired:
-                        return nil
-                    case .pendingOrSent:
-                        return nil
-                    }
-                case .handoverMessage:
-                    return nil
-                }
-            case let .outboundMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case let .expiring(time: expiringTime):
-                    return expiringTime
-                case .expired:
-                    return nil
-                case .pendingOrSent:
-                    return nil
-                }
-            }
-        }
-        return nil
-    }
-
     var formattedLastMessageUpdated: String {
         lastMessageUpdated.formatted(date: .abbreviated, time: .shortened)
     }
@@ -77,68 +15,6 @@ public struct ActiveConversation: Equatable {
 public struct InactiveConversation: Equatable {
     let recipient: JournalistData
     var messages: Set<Message> = []
-
-    var containsExpiringMessages: Bool {
-        return messages.contains(where: { message in
-            switch message {
-            case let .incomingMessage(message: messageData):
-                switch messageData {
-                case let .textMessage(message: incomingMessageData):
-                    switch incomingMessageData.expiredStatus {
-                    case .expiring:
-                        return true
-                    case .expired:
-                        return true
-                    case .pendingOrSent:
-                        return false
-                    }
-
-                case .handoverMessage:
-                    return false
-                }
-            case let .outboundMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case .expiring:
-                    return true
-                case .expired:
-                    return true
-                case .pendingOrSent:
-                    return false
-                }
-            }
-        })
-    }
-
-    var messageExpiringDate: String? {
-        if let lastMessage = messages.sorted(by: >).last {
-            switch lastMessage {
-            case let .incomingMessage(message: messageData):
-                switch messageData {
-                case let .textMessage(message: incomingMessageData):
-                    switch incomingMessageData.expiredStatus {
-                    case let .expiring(time: expiringTime):
-                        return expiringTime
-                    case .expired:
-                        return nil
-                    case .pendingOrSent:
-                        return nil
-                    }
-                case .handoverMessage:
-                    return nil
-                }
-            case let .outboundMessage(message: messageData):
-                switch messageData.expiredStatus {
-                case let .expiring(time: expiringTime):
-                    return expiringTime
-                case .expired:
-                    return nil
-                case .pendingOrSent:
-                    return nil
-                }
-            }
-        }
-        return nil
-    }
 }
 
 @MainActor
@@ -205,9 +81,11 @@ class InboxViewModel: ObservableObject {
                     recipient: incomingMessage.sender,
                     mailbox: mailbox
                 )
-                return ActiveConversation(recipient: incomingMessage.sender,
-                                          lastMessageUpdated: incomingMessage.dateReceived,
-                                          messages: allMessagesInConversation)
+                return ActiveConversation(
+                    recipient: incomingMessage.sender,
+                    lastMessageUpdated: incomingMessage.dateReceived,
+                    messages: allMessagesInConversation
+                )
             } else {
                 return nil
             }
