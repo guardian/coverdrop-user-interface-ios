@@ -29,12 +29,17 @@ extension NewSessionError: LocalizedError {
     }
 }
 
+public enum PasswordField: Int, CaseIterable {
+    case password1, password2, password3
+}
+
 struct UserNewSessionView: View {
     @Binding var navPath: NavigationPath
     @State var keyboardVisible: Bool = false
     @State var isPasswordHelpOpen: Bool = false
     var passphraseWordCount: Int
     @ObservedObject var viewModel: UserNewSessionViewModel
+    @FocusState private var focusedField: PasswordField?
 
     var body: some View {
         HeaderView(type: .newPassphrase, dismissAction: {
@@ -88,6 +93,9 @@ struct UserNewSessionView: View {
                 }
             }.onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
                 withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
+            }
+            .onTapGesture {
+                focusedField = nil
             }
     }
 
@@ -171,7 +179,8 @@ struct UserNewSessionView: View {
                 wordCount: passphraseWordCount,
                 words: $viewModel.enteredWords,
                 wordVisible: $viewModel.wordVisible,
-                wordInvalid: viewModel.invalidWords
+                wordInvalid: viewModel.invalidWords,
+                passwordFieldFocus: $focusedField
             )
 
             hideShowButton(

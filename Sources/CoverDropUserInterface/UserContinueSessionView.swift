@@ -1,5 +1,6 @@
 import CoverDropCore
 import CryptoKit
+import Combine
 import Foundation
 import SVGView
 import SwiftUI
@@ -29,15 +30,17 @@ extension ContinueSessionError: LocalizedError {
 struct UserContinueSessionView: View {
     @Binding var navPath: NavigationPath
     @ObservedObject var viewModel: UserContinueSessionViewModel
+    @FocusState private var focusedField: PasswordField?
+    @State var keyboardVisible: Bool = false
 
     var body: some View {
         return HeaderView(type: .login, dismissAction: {
             navPath.isEmpty ? () : navPath.removeLast()
-        }) {
+        }, keyboardVisible: $keyboardVisible) {
             VStack(alignment: .leading) {
                 switch viewModel.state {
                 case .enter:
-                    enteringPassphraseView()
+                    enteringPassphraseView(keyboardVisible: $keyboardVisible)
                 case .unlocking:
                     unlockingStorageView()
                 }
@@ -45,14 +48,24 @@ struct UserContinueSessionView: View {
             .padding(Padding.large)
             .foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
             Spacer()
-            tertiaryButton(
-                action: {
-                    navPath.isEmpty ? () : navPath.removeLast()
-                    navPath.append(Destination.onboarding)
-                },
-                text: "I do not have a passphrase yet"
-            ).ignoresSafeArea(.all, edges: .all)
+
+            if !keyboardVisible {
+                tertiaryButton(
+                    action: {
+                        navPath.isEmpty ? () : navPath.removeLast()
+                        navPath.append(Destination.onboarding)
+                    },
+                    text: "I do not have a passphrase yet"
+                )
+            }
+
         }.navigationBarHidden(true)
+            .onTapGesture {
+                focusedField = nil
+            }
+            .onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
+                withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
+            }
     }
 
     func unlockingStorageView() -> some View {
@@ -68,18 +81,19 @@ struct UserContinueSessionView: View {
         }
     }
 
-    func enteringPassphraseView() -> some View {
+    func enteringPassphraseView(keyboardVisible: Binding<Bool>) -> some View {
         VStack(alignment: .leading) {
-            Text("Enter passphrase").textStyle(TitleStyle())
-            Text("If you previously set up a secure message vault, please enter your passphrase to unlock it.")
+            Text("Enter passphrase")
+                .textStyle(TitleStyle(bottomPadding: keyboardVisible.wrappedValue ? Padding.xSmall : Padding.medium))
+            Text("If you previously set up a secure message vault, please enter your passphrase.")
                 .textStyle(BodyStyle())
-                .padding(.bottom, Padding.medium)
+                .padding(.bottom, keyboardVisible.wrappedValue ? Padding.xSmall : Padding.medium)
                 .fixedSize(horizontal: false, vertical: true)
 
             if viewModel.error != nil {
                 Text(viewModel.error?.localizedDescription ?? "")
                     .textStyle(FormErrorTextStyle())
-                    .padding(.bottom, Padding.medium)
+                    .padding(.bottom, keyboardVisible.wrappedValue ? Padding.xSmall : Padding.medium)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -87,7 +101,8 @@ struct UserContinueSessionView: View {
                 wordCount: viewModel.wordCount,
                 words: $viewModel.enteredWords,
                 wordVisible: $viewModel.wordVisible,
-                wordInvalid: viewModel.invalidWords
+                wordInvalid: viewModel.invalidWords,
+                passwordFieldFocus: $focusedField
             )
 
             HStack {
@@ -102,8 +117,9 @@ struct UserContinueSessionView: View {
                     }.buttonStyle(InlineButtonStyle())
                 }
             }
-
-            Spacer()
+            if !keyboardVisible.wrappedValue {
+                Spacer()
+            }
 
             Button("Confirm passphrase") {
                 Task {
