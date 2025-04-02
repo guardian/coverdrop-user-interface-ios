@@ -42,8 +42,8 @@ struct ContentView: View {
                 // This runs the task outside of the views context, so it will not cancel if the user
                 // navigates away from this screen
                 Task.detached(priority: .high) {
-                    if case .notInitialized = coverDropService.state {
-                        try? CoverDropService.shared.ensureInitialized(config: config)
+                    if case .notInitialized = await coverDropService.state {
+                        try? await CoverDropService.shared.ensureInitialized(config: config)
                     }
                 }
             }

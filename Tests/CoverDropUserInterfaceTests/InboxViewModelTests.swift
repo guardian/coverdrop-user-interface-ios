@@ -14,7 +14,7 @@ final class InboxViewModelTests: XCTestCase {
             month: 05,
             day: 01,
             hour: 12 + hour
-        ).date) { return date } else { return Date() }
+        ).date) { return date } else { return DateFunction.currentTime() }
     }
 
     private static let recipients = try! MessageRecipients(

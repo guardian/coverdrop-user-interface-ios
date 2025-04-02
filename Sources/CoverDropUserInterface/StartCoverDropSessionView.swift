@@ -122,7 +122,7 @@ public struct StartCoverDropSessionView: View {
 //        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
 //            status: .available,
 //            description: "Service is available",
-//            timestamp: RFC3339DateTimeString(date: Date()),
+//            timestamp: RFC3339DateTimeString(date: DateFunction.currentTime()),
 //            isAvailable: true
 //        )
 //    }
@@ -131,7 +131,7 @@ public struct StartCoverDropSessionView: View {
 //        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
 //            status: .noInformation,
 //            description: "Service is unavailable",
-//            timestamp: RFC3339DateTimeString(date: Date()),
+//            timestamp: RFC3339DateTimeString(date: DateFunction.currentTime()),
 //            isAvailable: false
 //        )
 //    }
@@ -143,7 +143,7 @@ public struct StartCoverDropSessionView: View {
 //        PublicDataRepository.shared.coverDropServiceStatus = StatusData(
 //            status: .available,
 //            description: "",
-//            timestamp: RFC3339DateTimeString(date: Date()),
+//            timestamp: RFC3339DateTimeString(date: DateFunction.currentTime()),
 //            isAvailable: true
 //        )
 //    }
