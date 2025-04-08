@@ -83,7 +83,7 @@ public struct StartCoverDropSessionView: View {
                         )
                     })
 
-                    Button("Check your inbox") {
+                    Button("Check your message vault") {
                         navPath.append(Destination.login)
                     }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
                 }

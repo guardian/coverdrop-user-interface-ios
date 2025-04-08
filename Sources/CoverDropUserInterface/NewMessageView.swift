@@ -74,7 +74,7 @@ struct NewMessageView: View {
                     focusedField = nil
                 }.navigationBarHidden(true)
                 .navigationBarTitle(Text(""))
-                .alert("Leaving your inbox",
+                .alert("Leaving your message vault",
                        isPresented: $showingDismissalAlert,
                        actions: {
                            Button("Yes, I want to leave") {
@@ -87,7 +87,7 @@ struct NewMessageView: View {
                        message: {
                            Text(
                                """
-                                You will be leaving your secure inbox and your message will not be sent.\n
+                                You will be leaving your message vault and your message will not be sent.\n
                                 Do you want to continue?
                                """
                            )

@@ -178,7 +178,7 @@ struct InboxView: View {
                     .foregroundColor(Color.InboxView.aboutButtonColor)
             }
             Spacer()
-            Button("Leave inbox") {
+            Button("Leave vault") {
                 Task {
                     await conversationViewModel.clearModelDataAndLock()
                 }
