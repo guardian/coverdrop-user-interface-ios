@@ -25,7 +25,7 @@ public struct StartCoverDropSessionView: View {
                 .padding(.top, Padding.medium)
                 .padding(.bottom, Padding.small)
 
-                Text("It is designed to prevent others from even know you are in communication with us.")
+                Text("It is designed to prevent others from even knowing you are in communication with us.")
                     .textStyle(BodyStyle())
                     .padding(.top, Padding.small)
                     .padding(.bottom, Padding.medium)
