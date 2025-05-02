@@ -37,20 +37,21 @@ struct HeaderView<Content: View>: View {
                 if !keyboardVisible {
                     HStack(spacing: 0) {
                         if type != .inbox {
+                            let (backButtonImageName, backButtonText) = backButtonInfo()
                             Button(action: {
                                 // This will navigate a view hierarchy back to the previous screen,
                                 // or close a modal window if its open.
                                 guard let dismissAction else { presentation.wrappedValue.dismiss(); return }
                                 dismissAction()
                             }) {
-                                Image(systemName: backButtonImageName())
+                                Image(systemName: backButtonImageName)
                                     .resizable()
                                     .frame(width: 25, height: 25)
                                     .padding(Padding.large)
                                     .foregroundColor(Color.HeaderView.arrowColor)
                             }
                             .buttonStyle(.plain)
-                            .accessibilityIdentifier(backButtonText())
+                            .accessibilityIdentifier(backButtonText)
                         }
 
                         Spacer() // This pushed the button to the left corner
@@ -77,9 +78,7 @@ struct HeaderView<Content: View>: View {
                         ) {
                             Button("Ok", role: .cancel) {}
                             Button("Hide warning", role: .destructive) {
-                                DispatchQueue.main.async {
-                                    uiConfig.showBetaBanner = false
-                                }
+                                uiConfig.showBetaBanner = false
                             }
                         } message: {
                             Text("""
@@ -101,23 +100,16 @@ struct HeaderView<Content: View>: View {
         }
     }
 
-    func backButtonText() -> String {
+    /// This maps the page type to the correct descriptive text and back button icon
+    func backButtonInfo() -> (text: String, imageName: String) {
         switch type {
-        case .login, .viewConversation, .onboarding, .inbox:
-            return "Close \(type)"
-        case .home, .about, .messageSent, .newConversation,
+        case .login, .viewConversation, .onboarding, .about,
              .deskDetail, .selectRecipient, .newPassphrase, .help:
-            return "Go Back"
-        }
-    }
-
-    func backButtonImageName() -> String {
-        switch type {
-        case .login, .viewConversation, .onboarding, .inbox, .about, .messageSent, .newConversation,
-             .deskDetail, .selectRecipient, .newPassphrase, .help:
-            return "arrow.backward"
+            return ("arrow.backward", "Go Back")
         case .home:
-            return "xmark"
+            return ("xmark", "Close Secure Messaging")
+        case .inbox, .messageSent, .newConversation:
+            return ("xmark", "Log out of vault")
         }
     }
 }

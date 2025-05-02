@@ -160,7 +160,6 @@ class InboxViewModel: ObservableObject {
     ///  3. overwrites the encrypted storage on disk with a new session with random passphrase
     ///  4. empties the private sending queue, so any pending messages are also removed, this is to allow users
     ///     to change their mind after sending a message.
-    ///  5. removes the current recipient from memory
     ///
     public func deleteAllMessagesAndCurrentSession(
         conversationViewModel: ConversationViewModel

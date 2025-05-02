@@ -5,14 +5,11 @@ struct InboxView: View {
     @ObservedObject var inboxViewModel: InboxViewModel
     @ObservedObject var conversationViewModel: ConversationViewModel
     @State private var showingDeleteAlert = false
+    @State private var showingDismissalAlert = false
     @Binding var navPath: NavigationPath
 
     var body: some View {
-        HeaderView(type: .inbox, dismissAction: {
-            Task {
-                await conversationViewModel.clearModelDataAndLock()
-            }
-        }) {
+        HeaderView(type: .inbox) {
             VStack {
                 if let activeConversation = inboxViewModel.activeConversation {
                     activeConversationView(for: activeConversation)
@@ -130,23 +127,21 @@ struct InboxView: View {
     var deleteYourMessages: some View {
         HStack {
             Button {
-                DispatchQueue.main.async {
-                    showingDeleteAlert = true
-                }
+                showingDeleteAlert = true
             } label: {
                 HStack {
                     Image(systemName: "trash.fill")
                         .foregroundColor(Color.InboxView.deleteMessageButtonColor)
-                    Text("Delete your messages")
+                    Text("Delete message vault")
                         .textStyle(InlineButtonTextStyle())
                         .foregroundColor(Color.InboxView.deleteMessageButtonColor)
                 }
             }
-            .accessibilityLabel("Delete your messages")
-            .alert("Delete your conversations?",
+            .accessibilityLabel("Delete message vault")
+            .alert("Delete your message vault?",
                    isPresented: $showingDeleteAlert,
                    actions: {
-                       Button("Delete", role: .destructive) {
+                       Button("Delete everything", role: .destructive) {
                            Task {
                                try? await inboxViewModel.deleteAllMessagesAndCurrentSession(
                                    conversationViewModel: conversationViewModel
@@ -157,8 +152,9 @@ struct InboxView: View {
                    }, message: {
                        Text(
                            """
-                           Deleting your messages means the journalist might never see them.
-                           Please consider keeping this conversation.
+                           This will delete your vault and you will not be able to unlock it anymore.\
+                           You won't be able to read any existing messages or future responses.\
+                           Already sent messages might still be read by the journalist.
                            """
                        )
                    })
@@ -179,15 +175,25 @@ struct InboxView: View {
             }
             Spacer()
             Button("Leave vault") {
-                Task {
-                    await conversationViewModel.clearModelDataAndLock()
-                }
+                showingDismissalAlert = true
             }
             .buttonStyle(XSmallFilledButtonStyle())
         }
         .padding(.leading, Padding.large)
         .padding(.trailing, Padding.small)
         .padding(.bottom, Padding.medium)
+        .alert("Leaving your message vault",
+               isPresented: $showingDismissalAlert,
+               actions: {
+                   LogoutDialogView(conversationViewModel: conversationViewModel)
+               },
+               message: {
+                   Text(
+                       """
+                       This will log you out of your secure vault. Are you sure?
+                       """
+                   )
+               })
     }
 
     func expiredInformationText(expiryDate: String) -> some View {

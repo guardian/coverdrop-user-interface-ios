@@ -6,15 +6,11 @@ struct MessageSentView: View {
     @ObservedObject var lib: CoverDropLibrary
     @ObservedObject var conversationViewModel: ConversationViewModel
     @Binding var navPath: NavigationPath
+    @State private var showingDismissalAlert = false
 
     var body: some View {
         HeaderView(type: .messageSent, dismissAction: {
-            Task {
-                await conversationViewModel.clearModelDataAndLock()
-            }
-            if !navPath.isEmpty {
-                navPath.removeLast()
-            }
+            showingDismissalAlert = true
         }) {
             VStack(alignment: .center) {
                 Text("Your message will be received by a journalist soon.").textStyle(GuardianHeaderTextStyle())
@@ -54,13 +50,22 @@ struct MessageSentView: View {
                     navPath.append(Destination.inbox)
                 }.buttonStyle(PrimaryButtonStyle(isDisabled: false))
                 Button("Log out from Secure Messaging") {
-                    Task {
-                        await conversationViewModel.clearModelDataAndLock()
-                        navPath.isEmpty ? () : navPath.removeLast()
-                    }
+                    showingDismissalAlert = true
                 }.buttonStyle(SecondaryButtonStyle(isDisabled: false))
             }.padding(Padding.large)
         }.foregroundColor(Color.MessageSentView.foregroundColor)
+            .alert("Leaving your message vault",
+                   isPresented: $showingDismissalAlert,
+                   actions: {
+                       LogoutDialogView(conversationViewModel: conversationViewModel)
+                   },
+                   message: {
+                       Text(
+                           """
+                           This will log you out of your secure vault. Are you sure?
+                           """
+                       )
+                   })
     }
 }
 

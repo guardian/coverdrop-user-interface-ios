@@ -4,13 +4,11 @@ import SwiftUI
 
 struct NewMessageView: View {
     @Binding var navPath: NavigationPath
-    @State var isMessageViewLinkActive = false
     @State var isSelectRecipientViewOpen = false
     @State private var showingDismissalAlert = false
     @State private var showingForcedSelectionAlert = false
     @FocusState private var focusedField: Field?
     @State var keyboardVisible: Bool = false
-    @State var path = NavigationPath() // This is nuts, this is a workaround to get toolbar buttons working in iOS17
 
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping
     // will allow us to fail fast in the case of developer error.
@@ -38,61 +36,52 @@ struct NewMessageView: View {
 
     private func newMessage() -> some View {
         HeaderView(
-            type: .home,
-            dismissAction: { DispatchQueue.main.async { showingDismissalAlert = true } },
+            type: .newConversation,
+            dismissAction: { showingDismissalAlert = true },
             keyboardVisible: $keyboardVisible
         ) {
-            // This NavigationStack is here as a workaround to get toolbar buttons to appear in iOS17
-            // https://stackoverflow.com/questions/77238131/placing-the-toolbar-above-keyboard-does-not-work-in-ios-17
-            NavigationStack(path: $path) {
-                if !keyboardVisible {
-                    CraftMessageBannerView(action: {
-                        navPath.append(Destination.help(contentVariant: .craftMessage))
-                    })
-                }
-
-                VStack(alignment: .leading) {
-                    let titleText = "What do you want to share with us?"
-                    if keyboardVisible {
-                        Text(titleText)
-                            .textStyle(GuardianHeadlineSmallTextStyle())
-                    } else {
-                        Text(titleText)
-                            .textStyle(TitleStyle())
-                    }
-                    chooseRecipient()
-                    messageCompose()
-                    Spacer()
-                    messageSend()
-                }
-                .padding(Padding.large)
-                .foregroundColor(Color.NewMessageView.foregroundColor)
-                .onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
-                    withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
-                }.onTapGesture {
-                    // This closes the keyboard when tapping outside of the message text field
-                    focusedField = nil
-                }.navigationBarHidden(true)
-                .navigationBarTitle(Text(""))
-                .alert("Leaving your message vault",
-                       isPresented: $showingDismissalAlert,
-                       actions: {
-                           Button("Yes, I want to leave") {
-                               Task {
-                                   await conversationViewModel.clearModelDataAndLock()
-                               }
-                           }
-                           Button("Cancel", role: .cancel) {}
-                       },
-                       message: {
-                           Text(
-                               """
-                                You will be leaving your message vault and your message will not be sent.\n
-                                Do you want to continue?
-                               """
-                           )
-                       })
+            if !keyboardVisible {
+                CraftMessageBannerView(action: {
+                    navPath.append(Destination.help(contentVariant: .craftMessage))
+                })
             }
+
+            VStack(alignment: .leading) {
+                let titleText = "What do you want to share with us?"
+                if keyboardVisible {
+                    Text(titleText)
+                        .textStyle(GuardianHeadlineSmallTextStyle())
+                } else {
+                    Text(titleText)
+                        .textStyle(TitleStyle())
+                }
+                chooseRecipient()
+                messageCompose()
+                Spacer()
+                messageSend()
+            }
+            .padding(Padding.large)
+            .foregroundColor(Color.NewMessageView.foregroundColor)
+            .onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
+                withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
+            }.onTapGesture {
+                // This closes the keyboard when tapping outside of the message text field
+                focusedField = nil
+            }.navigationBarHidden(true)
+            .navigationBarTitle(Text(""))
+            .alert("Leaving your message vault",
+                   isPresented: $showingDismissalAlert,
+                   actions: {
+                       LogoutDialogView(conversationViewModel: conversationViewModel)
+                   },
+                   message: {
+                       Text(
+                           """
+                           This will log you out of your secure vault. Your unfinished message will not be sent. \
+                           Are you sure?
+                           """
+                       )
+                   })
         }
     }
 
@@ -169,7 +158,6 @@ struct NewMessageView: View {
                     do {
                         try await conversationViewModel.sendMessage()
                         conversationViewModel.clearMessage()
-                        isMessageViewLinkActive = true
                     } catch {
                         // We drop errors sliently to avoid giving away any user interaction in logs
                     }

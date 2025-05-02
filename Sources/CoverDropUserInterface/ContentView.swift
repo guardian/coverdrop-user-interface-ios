@@ -56,9 +56,7 @@ struct ContentView: View {
                 isPresented: $showingScreenshotDetectedAlert
             ) {
                 Button("OK", role: .cancel) {
-                    DispatchQueue.main.async {
-                        showingScreenshotDetectedAlert = false
-                    }
+                    showingScreenshotDetectedAlert = false
                 }
             }
 

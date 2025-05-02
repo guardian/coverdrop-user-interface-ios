@@ -1,3 +1,4 @@
+import CoverDropCore
 import SVGView
 import SwiftUI
 
@@ -158,4 +159,5 @@ enum OnboardingSteps: String, CustomStringConvertible, CaseIterable, Identifiabl
 
 #Preview {
     OnboardingView(navPath: Binding.constant(NavigationPath())).previewFonts()
+        .environment(CoverDropUserInterfaceConfiguration(showAboutScreenDebugInformation: true, showBetaBanner: true))
 }
