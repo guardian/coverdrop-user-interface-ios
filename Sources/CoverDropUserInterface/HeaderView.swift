@@ -1,6 +1,5 @@
 import CoverDropCore
 import Foundation
-import SVGView
 import SwiftUI
 
 struct HeaderView<Content: View>: View {
@@ -55,13 +54,12 @@ struct HeaderView<Content: View>: View {
                         }
 
                         Spacer() // This pushed the button to the left corner
-
-                        if let image = Bundle.module.url(forResource: "logo", withExtension: "svg") {
-                            SVGView(contentsOf: image)
-                                .frame(width: 180, height: 45)
-                                .padding([.trailing], Padding.large)
-                                .padding([.vertical], Padding.medium)
-                        }
+                        Image(.logo)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 40, alignment: .topLeading)
+                            .padding([.trailing], Padding.large)
+                            .padding([.vertical], Padding.medium)
                     }
                     .background(Color.HeaderView.backgroundColor)
                     .padding(0)

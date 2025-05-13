@@ -1,6 +1,5 @@
 import CoverDropCore
 import Foundation
-import SVGView
 import SwiftUI
 
 struct ChevronButtonData {

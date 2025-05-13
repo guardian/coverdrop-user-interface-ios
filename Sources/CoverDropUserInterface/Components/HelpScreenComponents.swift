@@ -1,4 +1,3 @@
-import SVGView
 import SwiftUI
 
 struct HelpHeadline: View {
@@ -128,11 +127,10 @@ struct HelpButton: View {
     var body: some View {
         Button(action: action) {
             HStack(alignment: .top, spacing: Padding.small) {
-                if let svg = Bundle.module.url(forResource: "iconRoundInfo", withExtension: "svg") {
-                    SVGView(contentsOf: svg).frame(width: 18, height: 18).padding(.top, 1)
-                } else {
-                    EmptyView()
-                }
+                Image(.iconRoundInfo)
+                    .frame(width: 18, height: 18)
+                    .padding(.top, 1)
+
                 VStack(alignment: .leading) {
                     Text(firstLine)
                         .fontWeight(.semibold)

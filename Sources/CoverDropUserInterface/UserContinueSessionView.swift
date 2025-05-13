@@ -1,8 +1,7 @@
+import Combine
 import CoverDropCore
 import CryptoKit
-import Combine
 import Foundation
-import SVGView
 import SwiftUI
 
 enum ContinueSessionError: Error {

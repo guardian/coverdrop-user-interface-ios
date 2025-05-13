@@ -1,7 +1,6 @@
 import Combine
 import CoverDropCore
 import Foundation
-import SVGView
 import SwiftUI
 
 enum NewSessionError: Error {

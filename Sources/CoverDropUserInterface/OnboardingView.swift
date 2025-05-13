@@ -1,5 +1,4 @@
 import CoverDropCore
-import SVGView
 import SwiftUI
 
 struct OnboardingView: View {
@@ -49,6 +48,7 @@ struct OnboardingView: View {
                 Spacer()
                 Group {
                     step.image
+                        .aspectRatio(contentMode: .fit)
                         .frame(width: 200, height: 200)
                         .padding([.bottom], Padding.large)
                     // the .frame sets the height as a percentage of the parent.
@@ -127,21 +127,14 @@ enum OnboardingSteps: String, CustomStringConvertible, CaseIterable, Identifiabl
         }
     }
 
-    var image: SVGView? {
-        var imageUrl: String
-
+    var image: Image {
         switch self {
         case .sendMessage:
-            imageUrl = "sendAMessageIcon"
+            return Image(.sendAMessageIcon)
         case .checkResponse:
-            imageUrl = "checkBackForResponseIcon"
+            return Image(.checkBackForResponseIcon)
         case .getPassphrase:
-            imageUrl = "memorisePassphraseIcon"
-        }
-        if let svg = Bundle.module.url(forResource: imageUrl, withExtension: "svg") {
-            return SVGView(contentsOf: svg)
-        } else {
-            return nil
+            return Image(.memorisePassphraseIcon)
         }
     }
 

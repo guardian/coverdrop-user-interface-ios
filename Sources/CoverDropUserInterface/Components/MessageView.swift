@@ -1,7 +1,6 @@
 import CoverDropCore
 import CryptoKit
 import Foundation
-import SVGView
 import SwiftUI
 
 @MainActor

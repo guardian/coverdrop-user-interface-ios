@@ -1,5 +1,4 @@
 import CoverDropCore
-import SVGView
 import SwiftUI
 
 struct MessageSentView: View {
