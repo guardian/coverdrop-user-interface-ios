@@ -153,28 +153,8 @@ class InboxViewModel: ObservableObject {
         } ?? Set()
     }
 
-    ///
-    /// This deletes all messages and current session by:
-    ///  1. removing all messages from the inbox,
-    ///  2. locking the current session to remove it from memory
-    ///  3. overwrites the encrypted storage on disk with a new session with random passphrase
-    ///  4. empties the private sending queue, so any pending messages are also removed, this is to allow users
-    ///     to change their mind after sending a message.
-    ///
-    public func deleteAllMessagesAndCurrentSession(
-        conversationViewModel: ConversationViewModel
-    ) async throws {
-        if case let .unlockedSecretData(unlockedData: unlockedSecretData) = lib.secretDataRepository
-            .getSecretData() {
-            unlockedSecretData.messageMailbox = []
-            await conversationViewModel.clearModelDataAndLock()
-            try await EncryptedStorage.createOrResetStorageWithRandomPassphrase(
-                passphraseWordCount: lib.config.passphraseWordCount
-            )
-
-            if let coverMessageFactory = try? lib.publicDataRepository.getCoverMessageFactory() {
-                try await PrivateSendingQueueRepository.shared.wipeQueue(coverMessageFactory)
-            }
-        }
+    public func deleteAllMessagesAndCurrentSession(conversationViewModel: ConversationViewModel) async throws {
+        try await lib.secretDataRepository.deleteVault()
+        await conversationViewModel.clearModelDataAndLock()
     }
 }

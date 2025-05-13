@@ -278,7 +278,7 @@ class UserNewSessionViewModel: ObservableObject {
     @MainActor func initializeWithNewPassphrase(passphraseWordCount: Int) {
         if case .generating = state {
             validPrefixes = PasswordGenerator.shared.generatePrefixes()
-            let passphrase = EncryptedStorage.newStoragePassphrase(passphraseWordCount: passphraseWordCount)
+            let passphrase = PasswordGenerator.shared.generate(wordCount: passphraseWordCount)
             let passphraseWords = passphrase.words
 
             state = .remember(
@@ -369,7 +369,7 @@ class UserNewSessionViewModel: ObservableObject {
         await MainActor.run { state = .creating(passphrase: passphrase) }
 
         do {
-            _ = try EncryptedStorage.createOrResetStorageWithPassphrase(passphrase: passphrase)
+            _ = try await lib.secretDataRepository.createOrReset(passphrase: passphrase)
             try? await lib.secretDataRepository.unlock(passphrase: passphrase)
         } catch {
             await MainActor.run {
