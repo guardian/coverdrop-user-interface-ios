@@ -20,7 +20,7 @@ extension ContinueSessionError: LocalizedError {
         case .failedToUnlock:
             return """
             Failed to open message vault. Either you haven\'t set up a vault, or the passphrase was wrong. \
-            Please re-enter the passphrase or go back to set up a new vault.
+            Please re-enter the passphrase or go back to set up a vault.
             """
         }
     }
