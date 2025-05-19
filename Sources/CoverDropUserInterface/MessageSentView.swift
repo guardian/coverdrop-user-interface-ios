@@ -20,7 +20,7 @@ struct MessageSentView: View {
 
             VStack(alignment: .leading) {
                 ScrollView {
-                    Text("What to happens next?").textStyle(GuardianHeadlineSmallTextStyle())
+                    Text("What happens next?").textStyle(GuardianHeadlineSmallTextStyle())
                     Text(
                         """
                         Your message is being disguised. \
