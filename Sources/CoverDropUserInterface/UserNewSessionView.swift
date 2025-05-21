@@ -34,7 +34,6 @@ public enum PasswordField: Int, CaseIterable {
 
 struct UserNewSessionView: View {
     @Binding var navPath: NavigationPath
-    @State var keyboardVisible: Bool = false
     @State var isPasswordHelpOpen: Bool = false
     var passphraseWordCount: Int
     @ObservedObject var viewModel: UserNewSessionViewModel
@@ -48,13 +47,12 @@ struct UserNewSessionView: View {
             case .confirm, .creating, .finished:
                 viewModel.goBackToRemember()
             }
-        }, keyboardVisible: $keyboardVisible) {
-            if !keyboardVisible {
-                PasswordBannerView(action: {
-                    isPasswordHelpOpen = true
-                    navPath.append(Destination.help(contentVariant: .keepingPassphraseSafe))
-                }).transition(.move(edge: .top))
-            }
+        }) {
+            PasswordBannerView(action: {
+                isPasswordHelpOpen = true
+                navPath.append(Destination.help(contentVariant: .keepingPassphraseSafe))
+            }).transition(.move(edge: .top))
+
             VStack(alignment: .leading) {
                 switch viewModel.state {
                 case .generating:
@@ -66,7 +64,7 @@ struct UserNewSessionView: View {
                         visible: visible
                     )
                 case .confirm:
-                    confirmPassphraseView(viewModel: viewModel, keyboardVisibile: $keyboardVisible)
+                    confirmPassphraseView(viewModel: viewModel)
                 case .creating:
                     creatingStorageView()
                 case .finished:
@@ -90,8 +88,6 @@ struct UserNewSessionView: View {
                 Task {
                     viewModel.initializeWithNewPassphrase(passphraseWordCount: passphraseWordCount)
                 }
-            }.onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
-                withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
             }
             .onTapGesture {
                 focusedField = nil
@@ -159,22 +155,22 @@ struct UserNewSessionView: View {
         }
     }
 
-    func confirmPassphraseView(viewModel: UserNewSessionViewModel, keyboardVisibile: Binding<Bool>) -> some View {
+    func confirmPassphraseView(viewModel: UserNewSessionViewModel) -> some View {
         VStack(alignment: .leading) {
             Text("Enter passphrase")
-                .textStyle(TitleStyle(bottomPadding: keyboardVisibile.wrappedValue ? Padding.xSmall : Padding.medium))
+                .textStyle(TitleStyle(bottomPadding: Padding.medium))
             Text("Enter your passphrase to unlock your secure vault and send your first message.")
-                .textStyle(BodyStyle(bottomPadding: keyboardVisibile.wrappedValue ? Padding.xSmall : Padding.large))
+                .textStyle(BodyStyle(bottomPadding: Padding.large))
                 .fixedSize(horizontal: false, vertical: true)
 
             if viewModel.error != nil {
                 Text(viewModel.error?.localizedDescription ?? "")
                     .textStyle(FormErrorTextStyle())
-                    .padding(.bottom, keyboardVisibile.wrappedValue ? Padding.xSmall : Padding.large)
+                    .padding(.bottom, Padding.large)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            passphraseForm(
+            PassphraseFormView(
                 wordCount: passphraseWordCount,
                 words: $viewModel.enteredWords,
                 wordVisible: $viewModel.wordVisible,
@@ -247,7 +243,7 @@ struct UserNewSessionView: View {
 }
 
 class UserNewSessionViewModel: ObservableObject {
-    enum State {
+    enum State: Equatable {
         case generating
         case remember(passphrase: ValidPassword, passphraseWords: [String], visible: Bool)
         case confirm(passphrase: ValidPassword)

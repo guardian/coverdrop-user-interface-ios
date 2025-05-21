@@ -56,7 +56,7 @@ struct BannerView: View {
     var subtitleText: String
 
     var body: some View {
-        VStack(alignment: .trailing) {
+        VStack(alignment: .trailing, spacing: 0) {
             Button(action: self.action) {
                 HStack(alignment: .top) {
                     Image(systemName: imagePath)

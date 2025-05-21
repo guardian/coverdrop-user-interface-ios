@@ -8,7 +8,6 @@ struct NewMessageView: View {
     @State private var showingDismissalAlert = false
     @State private var showingForcedSelectionAlert = false
     @FocusState private var focusedField: Field?
-    @State var keyboardVisible: Bool = false
 
     // In practice, this view model's optionals should never be nil if accessed when state == .ready. Force unwrapping
     // will allow us to fail fast in the case of developer error.
@@ -37,24 +36,17 @@ struct NewMessageView: View {
     private func newMessage() -> some View {
         HeaderView(
             type: .newConversation,
-            dismissAction: { showingDismissalAlert = true },
-            keyboardVisible: $keyboardVisible
+            dismissAction: { showingDismissalAlert = true }
         ) {
-            if !keyboardVisible {
-                CraftMessageBannerView(action: {
-                    navPath.append(Destination.help(contentVariant: .craftMessage))
-                })
-            }
+            CraftMessageBannerView(action: {
+                navPath.append(Destination.help(contentVariant: .craftMessage))
+            })
 
             VStack(alignment: .leading) {
                 let titleText = "What do you want to share with us?"
-                if keyboardVisible {
-                    Text(titleText)
-                        .textStyle(GuardianHeadlineSmallTextStyle())
-                } else {
-                    Text(titleText)
-                        .textStyle(TitleStyle())
-                }
+                Text(titleText)
+                    .textStyle(TitleStyle())
+
                 chooseRecipient()
                 messageCompose()
                 Spacer()
@@ -62,9 +54,7 @@ struct NewMessageView: View {
             }
             .padding(Padding.large)
             .foregroundColor(Color.NewMessageView.foregroundColor)
-            .onReceive(Publishers.isKeyboardShown) { isKeyboardShown in
-                withAnimation(.linear(duration: 0)) { keyboardVisible = isKeyboardShown }
-            }.onTapGesture {
+            .onTapGesture {
                 // This closes the keyboard when tapping outside of the message text field
                 focusedField = nil
             }.navigationBarHidden(true)
@@ -90,10 +80,9 @@ struct NewMessageView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Select a journalist or team")
                 .textStyle(FormLabelTextStyle())
-            if !keyboardVisible {
-                Text("Your message is reviewed by journalists")
-                    .textStyle(BodyStyle())
-            }
+
+            Text("Your message is reviewed by journalists")
+                .textStyle(BodyStyle())
         }
 
         ZStack(alignment: .trailing) {

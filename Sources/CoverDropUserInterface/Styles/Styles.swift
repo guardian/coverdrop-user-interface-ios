@@ -424,7 +424,8 @@ struct LargeButtonStyle: ButtonStyle {
         let currentForegroundColor = isDisabled || configuration.isPressed ? Color.LargeButtonStyle
             .highlightForegroundColor : foregroundColor
         return configuration.label
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .multilineTextAlignment(.center)
             .padding(Padding.medium)
             .padding([.leading, .trailing], Padding.xLarge)
             .foregroundColor(currentForegroundColor)

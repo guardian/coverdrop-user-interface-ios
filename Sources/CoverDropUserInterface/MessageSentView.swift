@@ -14,13 +14,14 @@ struct MessageSentView: View {
             VStack(alignment: .center) {
                 Text("Your message will be received by a journalist soon.").textStyle(GuardianHeaderTextStyle())
             }
-            .padding([.top], Padding.large)
+            .padding([.top, .horizontal], Padding.large)
 
             customDivider().padding([.trailing, .leading, .top], Padding.large)
 
             VStack(alignment: .leading) {
                 ScrollView {
-                    Text("What happens next?").textStyle(GuardianHeadlineSmallTextStyle())
+                    Text("What happens next?")
+                        .textStyle(GuardianHeadlineSmallTextStyle())
                     Text(
                         """
                         Your message is being disguised. \

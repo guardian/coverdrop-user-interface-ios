@@ -12,25 +12,28 @@ struct OnboardingView: View {
             }
         }) {
             VStack(alignment: .leading, spacing: 0) {
-                TabView(selection: $viewModel.currentStep) {
-                    ForEach(OnboardingSteps.allCases) { step in
-                        onboardingStep(step: step)
+                VStack(alignment: .leading, spacing: 0) {
+                    TabView(selection: $viewModel.currentStep) {
+                        ForEach(OnboardingSteps.allCases) { step in
+                            onboardingStep(step: step)
+                        }
+                    }
+                    .tabViewStyle(.page)
+                    .indexViewStyle(.page(backgroundDisplayMode: .interactive))
+                }
+                .padding([.top, .leading, .trailing, .bottom], Padding.large)
+                .foregroundColor(Color.white)
+
+                Button(viewModel.currentStep.buttonText) {
+                    if viewModel.isFinalStep() {
+                        navPath.append(Destination.newPassphrase)
+                    } else {
+                        advanceToNextTab()
                     }
                 }
-                .tabViewStyle(.page)
+                .buttonStyle(PrimaryButtonStyle(isDisabled: false))
+                .padding([.bottom, .leading, .trailing], Padding.large)
             }
-            .padding([.top, .leading, .trailing, .bottom], Padding.large)
-            .foregroundColor(Color.white)
-
-            Button(viewModel.currentStep.buttonText) {
-                if viewModel.isFinalStep() {
-                    navPath.append(Destination.newPassphrase)
-                } else {
-                    advanceToNextTab()
-                }
-            }
-            .buttonStyle(PrimaryButtonStyle(isDisabled: false))
-            .padding([.bottom, .leading, .trailing], Padding.large)
         }
         .onAppear { viewModel.reset() }
         .navigationBarHidden(true)
@@ -43,19 +46,20 @@ struct OnboardingView: View {
     }
 
     func onboardingStep(step: OnboardingSteps) -> some View {
-        GeometryReader { metric in
+        // As we show our onboarding steps in a Tab View, the navigation dots cannot
+        // extend outside the view port, so we put the contents of the tab in a scroll view
+        // so the content can still be viewed at larger text sizes
+        ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .center, spacing: 0) {
-                Spacer()
                 Group {
                     step.image
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 200, height: 200)
                         .padding([.bottom], Padding.large)
-                    // the .frame sets the height as a percentage of the parent.
-                    // Totally magic numbers that works with and without the beta banner present
-                    // on both iPhone 16 and iPhone SE 3rd gen
-                }.frame(height: metric.size.height * 0.5 - 100)
-                Spacer()
+                }
+
+                // Spacers do not work in scroll views, so we add a frame to give it min and max values
+                Spacer().frame(minHeight: 30, maxHeight: 100)
 
                 Text("How this works")
                     .textStyle(TitleStyle())
@@ -69,10 +73,10 @@ struct OnboardingView: View {
                     .textStyle(BodyStyle(textAlignment: .center))
                     .padding([.top, .bottom], Padding.small)
                     .padding([.leading, .trailing], Padding.medium)
-                Spacer()
 
             }.foregroundColor(Color.white)
-        }
+            // This makes sure the page content never overlaps the navigation dots
+        }.padding(.bottom, 50)
     }
 }
 
