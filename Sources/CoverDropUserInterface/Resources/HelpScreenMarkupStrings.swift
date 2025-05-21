@@ -138,7 +138,6 @@ The pending message you see is part of a sophisticated system to keep your actio
 
 To ensure real messages are indistinguishable from the “cover” messages sent by the Guardian app, both messages must be sent at similar times. Otherwise, activity patterns could reveal when real messages are sent, potentially identifying a source.
 
-
 DIVIDER
 
 ### Who gets to see my messages?
@@ -148,6 +147,16 @@ If you select a specific journalist as a recipient, your message is routed direc
 Under some circumstances a substitute journalist will act on behalf of the designated recipient – for example if a reporter is briefly unavailable to respond to an ongoing conversation.
 
 Similarly, if someone using our apps should try to abuse the system, the recipient journalist may ask a colleague to take over. In both cases the addressee would temporarily transfer the means to decrypt their correspondence to a trusted colleague who is experienced in dealing with highly confidential material.
+
+DIVIDER
+
+### How can I be sure that my messages are really going to the Guardian?
+
+We use digital security keys to secure the content of your messages. The Guardian's main key is held in a secure location and you can verify that the app is identifying the correct one as follows:
+- Go back to the About Secure Messaging screen.
+- Scroll down to the bottom.
+- You'll see the word "root:" followed by a code identifying the key that the app is currently using.
+- Compare that code to the "Secure Messaging Digest" code that is published in the small print on page 2 of the Guardian newspaper in print.
 
 DIVIDER
 
@@ -174,13 +183,19 @@ There are two ways to do this. You can delete your old conversation to pick some
 
 DIVIDER
 
-## Troubleshooting
+## Troubleshooting / technical
 
 ### How do I report a technical problem?
 
 You can report problems with Secure Messaging by going back into the main app, selecting Settings and then Help. However, please note that unlike your communication using Secure Messaging, bug reports are not anonymous: they’re sent from your own email address and can include details about the phone you’re using and your Guardian subscription (if you have one). Your bug report shouldn't discuss the content of your Secure Message.
 
 Keep in mind that bug reports are sent via email. If someone gains access to your emails, they could see that you’ve attempted to use Secure Messaging. This means your use of the system is not secret.
+
+DIVIDER
+
+### How do I report security issues?
+
+To let us know about security issues with CoverDrop, the technology platform that powers Secure Messaging, we would prefer you email us under encryption. Please write to coverdrop.security@theguardian.com and use the public key with the fingerprint: 853F 7EFF 332F DA4F 66ED CD83 3CA0 0C56 15FA 4518
 
 DIVIDER
 
@@ -193,6 +208,16 @@ DIVIDER
 ### I forgot my passphrase. What should I do?
 
 We cannot reset your passphrase or provide reminders, as this would weaken security. If you lose it, please create a new secure message vault and start a new conversation.
+
+DIVIDER
+
+### What if someone compels me to show them my Secure Messaging vault?
+
+All Guardian apps automatically include an encrypted Secure Messaging vault. Whether a vault was created automatically or set up by you, it behaves identically: it's encrypted the same way, saved at the same times, and it always stays the same size. 
+
+This means that neither the app itself, nor someone with access to your smartphone, can tell the difference. If you were to enter an incorrect passphrase, the app would not know if you actually have a "real" message vault (which can be unlocked with a different passphrase) or if the vault was created automatically with a random passphrase that was never shown. The app responds to an incorrect passphrase by reporting, truthfully, that the passphrase does not work either because it's wrong or because you didn't create a vault at all. 
+
+Consequently you can plausibly deny that you have ever set up a vault by saying "I do not have a passphrase and I never did".
 """
 
 let helpMarkdownHowSecureMessagingWorks = """
@@ -302,7 +327,7 @@ Passphrase security
 Read more
 button_help_keeping_passphrase_safe
 
-At the point at which you send any information to us, the Guardian’s Editorial Code applies. theguardian.com/editorial-code
+At the point at which you send any information to us, the Guardian’s Editorial Code applies. See theguardian.com/editorial-code
 
 Last updated March 2025
 """
