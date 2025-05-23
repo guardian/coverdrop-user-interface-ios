@@ -58,90 +58,89 @@ struct AboutCoverDropView: View {
     }
 
     var body: some View {
-        NavigationView {
-            HeaderView(type: .about, dismissAction: {
-                if !navPath.isEmpty {
-                    navPath.removeLast()
-                }
-            }) {
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        Text("About Secure Messaging")
-                            .textStyle(LargeTitleStyle())
-                            .font(Font.headline.leading(.loose))
 
-                        Text("What this is for")
-                            .textStyle(GuardianHeaderTextStyle())
-                            .padding([.top], Padding.large)
-                            .padding([.bottom], Padding.small)
-                        ChevronButtonList(navPath: $navPath, buttonData: [
-                            ChevronButtonData(
-                                text: "Why we made Secure Messaging",
-                                target: .whyWeMadeSecureMessaging
-                            ),
-                            ChevronButtonData(
-                                text: "How Secure Messaging works",
-                                target: .howSecureMessagingWorks
-                            ),
-                            ChevronButtonData(
-                                text: "FAQs",
-                                target: .faq
-                            ),
-                            ChevronButtonData(
-                                text: "Privacy policy",
-                                target: .privacyPolicy
-                            )
-                        ])
-
-                        Text("Getting started")
-                            .textStyle(GuardianHeaderTextStyle())
-                            .padding([.top], Padding.large)
-                            .padding([.bottom], Padding.small)
-                        ChevronButtonList(navPath: $navPath, buttonData: [
-                            ChevronButtonData(
-                                text: "Compose your first message",
-                                target: .craftMessage
-                            ),
-                            ChevronButtonData(
-                                text: "Keeping passphrases safe",
-                                target: .keepingPassphraseSafe
-                            )
-                        ])
-
-                        Text("As the conversation progresses")
-                            .textStyle(GuardianHeaderTextStyle())
-                            .padding([.top], Padding.large)
-                            .padding([.bottom], Padding.small)
-                        ChevronButtonList(navPath: $navPath, buttonData: [
-                            ChevronButtonData(
-                                text: "What to expect as a reply",
-                                target: .replyExpectations
-                            ),
-                            ChevronButtonData(
-                                text: "Source protection",
-                                target: .sourceProtection
-                            )
-                        ])
-
-                        if uiConfig.showAboutScreenDebugInformation {
-                            Text("Technical information")
-                                .textStyle(GuardianHeaderTextStyle())
-                                .padding([.top], Padding.large)
-                                .padding([.bottom], Padding.small)
-                            Text("The details below help our engineers to develop and test this feature.")
-                                .padding([.bottom], Padding.small)
-                            DebugContextView(state: viewModel.state)
-                                .onAppear {
-                                    Task {
-                                        await viewModel.loadDebugContextInformation()
-                                    }
-                                }
-                        }
-                    }.padding(Padding.large)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                }
-                Spacer()
+        HeaderView(type: .about, dismissAction: {
+            if !navPath.isEmpty {
+                navPath.removeLast()
             }
+        }) {
+            ScrollView {
+                VStack(alignment: .leading) {
+                    Text("About Secure Messaging")
+                        .textStyle(LargeTitleStyle())
+                        .font(Font.headline.leading(.loose))
+
+                    Text("What this is for")
+                        .textStyle(GuardianHeaderTextStyle())
+                        .padding([.top], Padding.large)
+                        .padding([.bottom], Padding.small)
+                    ChevronButtonList(navPath: $navPath, buttonData: [
+                        ChevronButtonData(
+                            text: "Why we made Secure Messaging",
+                            target: .whyWeMadeSecureMessaging
+                        ),
+                        ChevronButtonData(
+                            text: "How Secure Messaging works",
+                            target: .howSecureMessagingWorks
+                        ),
+                        ChevronButtonData(
+                            text: "FAQs",
+                            target: .faq
+                        ),
+                        ChevronButtonData(
+                            text: "Privacy policy",
+                            target: .privacyPolicy
+                        )
+                    ])
+
+                    Text("Getting started")
+                        .textStyle(GuardianHeaderTextStyle())
+                        .padding([.top], Padding.large)
+                        .padding([.bottom], Padding.small)
+                    ChevronButtonList(navPath: $navPath, buttonData: [
+                        ChevronButtonData(
+                            text: "Compose your first message",
+                            target: .craftMessage
+                        ),
+                        ChevronButtonData(
+                            text: "Keeping passphrases safe",
+                            target: .keepingPassphraseSafe
+                        )
+                    ])
+
+                    Text("As the conversation progresses")
+                        .textStyle(GuardianHeaderTextStyle())
+                        .padding([.top], Padding.large)
+                        .padding([.bottom], Padding.small)
+                    ChevronButtonList(navPath: $navPath, buttonData: [
+                        ChevronButtonData(
+                            text: "What to expect as a reply",
+                            target: .replyExpectations
+                        ),
+                        ChevronButtonData(
+                            text: "Source protection",
+                            target: .sourceProtection
+                        )
+                    ])
+
+                    if uiConfig.showAboutScreenDebugInformation {
+                        Text("Technical information")
+                            .textStyle(GuardianHeaderTextStyle())
+                            .padding([.top], Padding.large)
+                            .padding([.bottom], Padding.small)
+                        Text("The details below help our engineers to develop and test this feature.")
+                            .padding([.bottom], Padding.small)
+                        DebugContextView(state: viewModel.state)
+                            .onAppear {
+                                Task {
+                                    await viewModel.loadDebugContextInformation()
+                                }
+                            }
+                    }
+                }.padding(Padding.large)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            }
+            Spacer()
         }.foregroundColor(Color.StartCoverDropSessionView.foregroundColor)
             .navigationBarHidden(true)
     }
