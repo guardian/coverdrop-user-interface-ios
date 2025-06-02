@@ -68,7 +68,7 @@ struct UserContinueSessionView: View {
                 .progressViewStyle(CircularProgressViewStyle())
                 .tint(.white)
                 .padding(Padding.large)
-            Text("Unlocking secure vault… please wait. On older phones this can take more than a minute…")
+            Text("Unlocking secure vault… please wait. On older phones this can take a while…")
                 .textStyle(BodyStyle())
             Spacer()
         }

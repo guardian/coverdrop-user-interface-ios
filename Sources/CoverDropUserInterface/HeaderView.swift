@@ -53,7 +53,7 @@ struct HeaderView<Content: View>: View {
                                     "Secure Messaging: public test",
                                     isPresented: $showingBetaBannerAlert
                                 ) {
-                                    Button("Ok", role: .cancel) {}
+                                    Button("OK", role: .cancel) {}
                                     Button("Hide warning", role: .destructive) {
                                         uiConfig.showBetaBanner = false
                                     }

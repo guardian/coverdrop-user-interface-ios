@@ -152,9 +152,9 @@ struct InboxView: View {
                    }, message: {
                        Text(
                            """
-                           This will delete your vault and you will not be able to unlock it anymore.\
-                           You won't be able to read any existing messages or future responses.\
-                           Already sent messages might still be read by the journalist.
+                           This will delete your vault and you will not be able to unlock it anymore. \
+                           You won't be able to read any existing messages or responses to them. \
+                           Messages you've recently sent may still be received by the journalist.
                            """
                        )
                    })

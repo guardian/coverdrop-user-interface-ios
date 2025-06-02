@@ -20,24 +20,24 @@ DIVIDER
 
 ### Facts
 
-Specifics are essential – such as company names, locations and dates:
+Specifics are critical - such as names, locations and dates.
 
 EXAMPLE
-I work at ~‘Company Name’ in Manchester~.
+I work at ~government department ‘Department name’~ in the ~procurement section~.
 
-### How you know this
+### Clearly state the nature of your tip
 
-Explain how you have access to this information:
+Be concise and focus on what you know, rather than what you think or suspect.
 
 EXAMPLE
-I work there as a ~warehouse manager~ so I have access to certain documents.
+I have discovered ~evidence of a senior official's involvement in corruption and bribery~. ‘Name’, the head of our section, has received $150,000 in under-the-radar payments.
 
 ### Evidence
 
-Describe how your tip can be proved:
+Tell us how you know what you know, and how we might verify it.
 
 EXAMPLE
-I have evidence that they’re forcing workers to skip breaks. Managers have sent orders ~in emails on my work computer, plus I have photos~. I think they should be exposed so everyone can see.
+I have ~photographic evidence of transactions~ from the past two years and access to ~further documents~ that show these were a quid pro quo for awarding contracts to multinational company ‘Company name’.
 
 Our journalists appreciate that sharing information can be intimidating. You should only share what is best for your safety. However, vague messages are rarely actionable.
 

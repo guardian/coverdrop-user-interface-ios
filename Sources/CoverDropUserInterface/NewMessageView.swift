@@ -102,7 +102,7 @@ struct NewMessageView: View {
                         }
                     }
                     .alert(
-                        "During this test period you can only contact a single Guardian recipient.",
+                        "At the current time you can only contact a single Guardian recipient.",
                         isPresented: $showingForcedSelectionAlert
                     ) {
                         Button("Dismiss", role: .cancel) {}
@@ -162,7 +162,7 @@ struct NewMessageView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text("What's your message?")
                 .textStyle(FormLabelTextStyle())
-            Text("What do you need to share.")
+            Text("See ‘Compose your first message’ for advice")
                 .textStyle(FormLabelSubtitleTextStyle())
         }
         VStack(alignment: .leading, spacing: 0) {
