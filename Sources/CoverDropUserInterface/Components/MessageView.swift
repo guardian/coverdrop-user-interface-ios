@@ -24,7 +24,7 @@ struct MessageView: View {
                 if message.isOutgoing {
                     HStack {
                         Spacer()
-                        Text("You").bold()
+                        Text("You").textStyle(BodyStyle()).bold()
                     }
                 }
                 VStack(alignment: .leading) {

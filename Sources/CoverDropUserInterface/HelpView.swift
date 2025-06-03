@@ -142,7 +142,7 @@ struct HelpView: View {
                     createComponentsColumn(
                         components: components,
                         onClickMapping: onClickMappingToAction
-                    ).padding(Padding.medium)
+                    ).padding(Padding.large)
                 }
             case let .failure(error):
                 Text(error.errorMessage())
@@ -192,7 +192,7 @@ private func createComponentsColumn(components: [HelpScreenComponent],
             case let .headline(text, level):
                 HelpHeadline(text: text, level: level)
             case let .text(text):
-                Text(text)
+                Text(text).textStyle(BodyStyle())
             case let .listItem(text):
                 HelpList(lines: text.split(separator: "\n").map { String($0) })
             case .divider:

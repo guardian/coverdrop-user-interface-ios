@@ -23,8 +23,10 @@ struct ChevronButtonList: View {
                     Button(action: { navigateToHelp(contentVariant: data.target) }) {
                         HStack {
                             Text(data.text)
+                                .textStyle(BodyStyle())
                                 .fontWeight(.semibold)
-                                .padding(.vertical, 8)
+                                .padding([.top], 8)
+                                .padding([.bottom], 4)
                             Spacer()
                             Image(systemName: "chevron.forward")
                                 .resizable()
@@ -41,7 +43,7 @@ struct ChevronButtonList: View {
                             .padding(.vertical, Padding.small)
                     }
                 }
-            }.padding(.leading, Padding.medium)
+            }.padding(.leading, Padding.large)
                 .padding(.vertical, Padding.small)
         }.background(Color.ChevronButtonList.backgroundColor)
             .cornerRadius(CornerRadius.medium)
@@ -58,7 +60,6 @@ struct AboutCoverDropView: View {
     }
 
     var body: some View {
-
         HeaderView(type: .about, dismissAction: {
             if !navPath.isEmpty {
                 navPath.removeLast()

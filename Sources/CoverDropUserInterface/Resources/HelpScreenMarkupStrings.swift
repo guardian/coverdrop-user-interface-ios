@@ -213,9 +213,9 @@ DIVIDER
 
 ### What if someone compels me to show them my Secure Messaging vault?
 
-All Guardian apps automatically include an encrypted Secure Messaging vault. Whether a vault was created automatically or set up by you, it behaves identically: it's encrypted the same way, saved at the same times, and it always stays the same size. 
+All Guardian apps automatically include an encrypted Secure Messaging vault. Whether a vault was created automatically or set up by you, it behaves identically: it's encrypted the same way, saved at the same times, and it always stays the same size.
 
-This means that neither the app itself, nor someone with access to your smartphone, can tell the difference. If you were to enter an incorrect passphrase, the app would not know if you actually have a "real" message vault (which can be unlocked with a different passphrase) or if the vault was created automatically with a random passphrase that was never shown. The app responds to an incorrect passphrase by reporting, truthfully, that the passphrase does not work either because it's wrong or because you didn't create a vault at all. 
+This means that neither the app itself, nor someone with access to your smartphone, can tell the difference. If you were to enter an incorrect passphrase, the app would not know if you actually have a "real" message vault (which can be unlocked with a different passphrase) or if the vault was created automatically with a random passphrase that was never shown. The app responds to an incorrect passphrase by reporting, truthfully, that the passphrase does not work either because it's wrong or because you didn't create a vault at all.
 
 Consequently you can plausibly deny that you have ever set up a vault by saying "I do not have a passphrase and I never did".
 """
@@ -233,7 +233,7 @@ DIVIDER
 
 ### Every Guardian app user provides cover for our sources
 
-In order to receive content, news apps exchange data with the app providers’ servers. With the introduction of the Secure Messaging system, the Guardian app automatically inserts tiny quantities of specially encrypted information along with that regular network activity. Every Guardian app does this, whether they’re being used for Secure Messaging or not. These automatic “messages” don’t actually contain real information. But they provide what we call ~“cover”~ for when real messages do get sent to and from our journalists.
+In order to receive content, news apps exchange data with the app providers’ servers. With the introduction of the Secure Messaging system, the Guardian app automatically inserts tiny quantities of specially encrypted information along with that regular network activity. Every Guardian app does this, whether they’re being used for Secure Messaging or not. These automatic “messages” don’t actually contain real information. But they provide what we call “cover” for when real messages do get sent to and from our journalists.
 
 ### Real messages look no different
 

@@ -128,13 +128,14 @@ struct HelpButton: View {
         Button(action: action) {
             HStack(alignment: .top, spacing: Padding.small) {
                 Image(.iconRoundInfo)
-                    .frame(width: 18, height: 18)
+                    .frame(width: 24, height: 18)
                     .padding(.top, 1)
 
                 VStack(alignment: .leading) {
                     Text(firstLine)
+                        .textStyle(BodyStyle(bottomPadding: 0))
                         .fontWeight(.semibold)
-                    Text(secondLine)
+                    Text(secondLine).textStyle(BodyStyle(bottomPadding: Padding.xSmall))
                 }
                 Spacer()
             }.padding(.all, 8)

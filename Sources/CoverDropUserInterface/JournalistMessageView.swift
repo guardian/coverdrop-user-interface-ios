@@ -93,8 +93,8 @@ struct JournalistMessageView: View {
                             let headerMessage = "This is a secure conversation with \(recipient.displayName)"
                             Text(
                                 "\(Image(systemName: "lock.fill")) \(headerMessage)"
-                            )
-                            .bold()
+                            ).textStyle(BodyStyle())
+                                .bold()
                         }
                     }
                     switch self.conversationViewModel.state {
