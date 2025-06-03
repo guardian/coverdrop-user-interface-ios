@@ -167,9 +167,9 @@ struct InboxView: View {
     var footer: some View {
         HStack {
             Button(action: {
-                navPath.append(Destination.help(contentVariant: .howSecureMessagingWorks))
+                navPath.append(Destination.about)
             }) {
-                Text("About SecureMessaging")
+                Text("About Secure Messaging")
                     .textStyle(InlineButtonTextStyle())
                     .foregroundColor(Color.InboxView.aboutButtonColor)
             }

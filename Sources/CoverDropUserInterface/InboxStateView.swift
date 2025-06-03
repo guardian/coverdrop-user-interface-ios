@@ -96,6 +96,11 @@ struct UnlockedSecretDataStateSwitcher: View {
                         conversationViewModel: conversationViewModel,
                         navPath: $loggedInNavPath
                     )
+                case .about:
+                    AboutCoverDropView(
+                        navPath: $loggedInNavPath,
+                        viewModel: AboutCoverDropViewModel(lib: lib)
+                    )
                 case let .help(contentVariant):
                     // This switch might appear unneccessary. However, the Navigation object will not correctly
                     // invalid the HelpView if we do not split into separate code paths...
