@@ -215,4 +215,10 @@ public enum MessageComposeError: Error {
             return false
         }
     }
+
+    func isMostRecentMessagePending() -> Bool {
+        guard let recentMessage = currentConversationForUi.last else { return false }
+        return recentMessage?.isMessagePending ?? false
+    }
+
 }

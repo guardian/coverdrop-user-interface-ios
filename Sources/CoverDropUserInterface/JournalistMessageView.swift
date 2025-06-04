@@ -111,14 +111,26 @@ struct JournalistMessageView: View {
                                 scrollToLastMessage(scrollViewProxy: scrollViewProxy)
                             }
                             if conversationViewModel.isMostRecentMessageFromUser() {
-                                Text(
+                                if conversationViewModel
+                                    .isMostRecentMessagePending() {
+                                    Text(
+                                    """
+                                    Your message is now queued up for secure transmission \
+                                    within routine Guardian app activity. \
+                                    We recommend that you exit Secure Messaging and wait \
+                                    for a response before you send another message.
+                                    """
+                                    ).textStyle(UserNotificationTextStyle())
+                                } else {
+                                    Text(
                                     """
                                     Your message has been sent. \
                                     We recommend that you exit Secure Messaging and \
                                     wait for a response before you send another message.
                                     """
-                                )
-                                .textStyle(UserNotificationTextStyle())
+                                    )
+                                    .textStyle(UserNotificationTextStyle())
+                                }
                             }
                         case _:
                             EmptyView()
